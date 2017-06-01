@@ -32,7 +32,7 @@ trait AuthData {
     }
 
     // for query
-    implicit val d2m : MongoDBObject => Map[String, JsValue] = { obj =>
+    implicit val d2m : DBObject => Map[String, JsValue] = { obj =>
         Map(
             "screen_name" -> toJson(obj.getAs[String]("screen_name").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "screen_photo" -> toJson(obj.getAs[String]("screen_photo").map (x => x).getOrElse(throw new Exception("db prase error")))

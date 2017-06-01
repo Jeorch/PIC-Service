@@ -5,7 +5,7 @@ import bmutil.dao.{_data_connection, from}
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 
-class MongoDBImpl extends DBTrait {
+trait MongoDBImpl extends DBTrait {
 
     override def insertObject(obj : DBObject, db_name : String, primary_key : String) : Unit = {
         val primary = obj.get(primary_key) //.map (x => x).getOrElse(throw new Exception("get primary key error"))
