@@ -4,5 +4,7 @@
 
 POST    /auth/authWithPassword                  controllers.AuthController.authWithPassword
 
+POST    /auth/checkAuthToken                    controllers.AuthController.authTokenCheckTest
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               			controllers.Assets.at(path="/public", file)
