@@ -10,10 +10,10 @@ import com.mongodb.casbah.query.dsl.QueryExpressionObject
 import com.mongodb.MongoCredential
 
 object _data_connection {
-	def conn_name : String = "baby"
+	def conn_name : String = "PIC"
 
-	val addr = new com.mongodb.casbah.Imports.ServerAddress("localhost", 2017)
-	val credentialsList = MongoCredential.createPlainCredential("dongdamaster", conn_name, "dongda@master".toCharArray)
+//	val addr = new com.mongodb.casbah.Imports.ServerAddress("localhost", 2017)
+//	val credentialsList = MongoCredential.createPlainCredential("dongdamaster", conn_name, "dongda@master".toCharArray)
 //    val _conn = MongoClient(addr, List(credentialsList))
 	val _conn = MongoClient()
 
