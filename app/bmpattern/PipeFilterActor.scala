@@ -72,19 +72,8 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 	var next : ActorRef = null
 	def receive = {
 		case cmd : msg_AuthCommand => dispatchImpl(cmd, AuthModule)
-//		case cmd : msg_PhoneCodeCommand => dispatchImpl(cmd, PhoneCodeModule)
-//		case cmd : msg_ProfileCommand => dispatchImpl(cmd, ProfileModule)
-//		case cmd : msg_EMMessageCommand => dispatchImpl(cmd, EMModule)  
-//		case cmd : module.kidnap.v2.msg_KidnapServiceCommand => dispatchImpl(cmd, module.kidnap.v2.kidnapModule)
-//        case cmd : module.kidnap.v3.msg_KidnapServiceCommand => dispatchImpl(cmd, module.kidnap.v3.kidnapModule)
-//		case cmd : module.kidnap.v2.msg_KidnapServiceCollectionCommand => dispatchImpl(cmd, module.kidnap.v2.kidnapCollectionModule)
-//		case cmd : module.kidnap.v3.msg_KidnapServiceCollectionCommand => dispatchImpl(cmd, module.kidnap.v3.kidnapCollectionModule)
-//		case cmd : msg_OrderCommand => dispatchImpl(cmd, orderModule)
-//		case cmd : msg_OrderCommentsCommand => dispatchImpl(cmd, orderCommentsModule)
 		case cmd : msg_ResultCommand => dispatchImpl(cmd, ResultModule)
         case cmd : msg_LogCommand => dispatchImpl(cmd, LogModule)
-//        case cmd : msg_RealNameCommand => dispatchImpl(cmd, RealNameModule)
-//        case cmd : msg_TMCommand => dispatchImpl(cmd, TMModule)
 		case cmd : ParallelMessage => {
 		    cancelActor
 			next = context.actorOf(ScatterGatherActor.prop(originSender, msr), "scat")

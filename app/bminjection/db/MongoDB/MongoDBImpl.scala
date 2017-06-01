@@ -1,0 +1,48 @@
+package bminjection.db.MongoDB
+
+import bminjection.db.DBTrait
+import bmutil.dao.{_data_connection, from}
+import com.mongodb.casbah.Imports._
+import play.api.libs.json.JsValue
+
+class MongoDBImpl extends DBTrait {
+
+    override def insertObject(obj : DBObject, db_name : String, primary_key : String) : Unit = {
+        val primary = obj.get(primary_key) //.map (x => x).getOrElse(throw new Exception("get primary key error"))
+        (from db() in db_name where (primary_key -> primary) select(x => x)).toList match {
+            case Nil => _data_connection.getCollection(db_name) += obj
+            case _ => throw new Exception("primary key error")
+        }
+    }
+
+    override def updateObject(obj : DBObject, db_name : String, primary_key : String) : Unit = {
+        val primary = obj.get(primary_key) //.map (x => x).getOrElse(throw new Exception("get primary key error"))
+        (from db() in db_name where (primary_key -> primary) select(x =>x)).toList match {
+            case head :: Nil => _data_connection.getCollection(db_name).update(head, obj)
+            case _ => throw new Exception("primary key error")
+        }
+    }
+
+    override def queryObject(condition : DBObject, db_name : String)
+                   (implicit t : DBObject => Map[String, JsValue]) : Option[Map[String, JsValue]] = {
+
+        (from db() in db_name where condition select(x => t(x))).toList match {
+            case Nil => None
+            case head :: Nil => Some(head)
+            case _ => throw new Exception("data duplicate")
+        }
+    }
+
+    override def queryMultipleObject(condition : DBObject, db_name : String, sort : String = "date", skip : Int = 0, take : Int = 20)
+                           (implicit t : DBObject => Map[String, JsValue]) : List[Map[String, JsValue]] = {
+        (from db() in db_name where condition).selectSkipTop(skip)(take)(sort)(x => t(x)).toList
+    }
+
+    override def deleteObject(obj: DBObject, db_name: String, primary_key: String): Unit = {
+        val primary = obj.get(primary_key) //.map (x => x).getOrElse(throw new Exception("get primary key error"))
+        (from db() in db_name where (primary_key -> primary) select(x =>x)).toList match {
+            case head :: Nil => _data_connection.getCollection(db_name) -= head
+            case _ => throw new Exception("primary key error")
+        }
+    }
+}
