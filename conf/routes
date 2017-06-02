@@ -3,6 +3,7 @@
 # ~~~~
 
 POST    /auth/authWithPassword                  controllers.AuthController.authWithPassword
+POST    /auth/pushUser                          controllers.AuthController.authPushUser
 
 POST    /auth/checkAuthToken                    controllers.AuthController.authTokenCheckTest
 

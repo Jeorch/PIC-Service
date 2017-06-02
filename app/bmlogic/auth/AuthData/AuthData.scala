@@ -1,8 +1,5 @@
 package bmlogic.auth.AuthData
 
-import java.util.Date
-
-import bmlogic.common.sercurity.Sercurity
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
@@ -15,10 +12,8 @@ trait AuthData {
         val build = MongoDBObject.newBuilder
         val user_name = (js \ "user_name").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
         val pwd = (js \ "pwd").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
-        build += "user_id" -> Sercurity.md5Hash(user_name + pwd + Sercurity.getTimeSpanWithMillSeconds)
         build += "user_name" -> user_name
         build += "pwd" -> pwd
-        build += "date" -> new Date().getTime
 
         build += "screen_name" -> (js \ "screen_name").asOpt[String].map (x => x).getOrElse("")
         build += "screen_photo" -> (js \ "screen_photo").asOpt[String].map (x => x).getOrElse("")

@@ -1,8 +1,5 @@
 package bminjection.encrypt.RSA
 
-import java.security.{KeyPair, KeyPairGenerator, PrivateKey, PublicKey}
-
-import bminjection.db.DBTrait
 import bminjection.encrypt.EncryptTrait
 import bmutil.dao.{_data_connection, from}
 import com.mongodb.casbah.Imports._
@@ -11,23 +8,28 @@ import com.mongodb.casbah.Imports._
   * Created by alfredyang on 01/06/2017.
   */
 trait RSAEncryptTrait extends javaEncryptTrait with EncryptTrait {
-    override lazy val (publicKey, privateKey) : (PublicKey, PrivateKey) = {
-        (from db() in "config" where ("project" -> "PIC") select (x => x)).toList match {
-            case head :: Nil => (head.getAs[PublicKey]("public").get, head.getAs[PrivateKey]("private").get)
+      lazy val queryKeys : (String, String) = {
+        (from db() in "encrypt_config" where ("project" -> "PIC") select (x => x)).toList match {
+            case head :: Nil => {
+                (head.getAs[String]("public_key").get, head.getAs[String]("private_key").get)
+            }
             case Nil => {
-                val keyPairGen = KeyPairGenerator.getInstance("RSA");
-                keyPairGen.initialize(1024);
-                val keyPair = keyPairGen.generateKeyPair();
+                val keyMap = RSAUtils.genKeyPair
+                val pub_key = RSAUtils.getPublicKey(keyMap)
+                val pri_key = RSAUtils.getPrivateKey(keyMap)
 
                 val builder = MongoDBObject.newBuilder
                 builder += "project" -> "PIC"
-                builder += "public" -> keyPair.getPublic
-                builder += "private" -> keyPair.getPrivate
+                builder += "public_key" -> pub_key
+                builder += "private_key" -> pri_key
 
-                _data_connection.getCollection("config") += builder.result
+//                _data_connection.getCollection("encrypt_config") += builder.result
 
-                (keyPair.getPublic, keyPair.getPrivate)
+                (pub_key, pri_key)
             }
         }
     }
+
+    override lazy val publicKey : String = queryKeys._1
+    override lazy val privateKey : String = queryKeys._2
 }
