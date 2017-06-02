@@ -21,16 +21,23 @@ trait AuthData {
         build += "email" -> (js \ "email").asOpt[String].map (x => x).getOrElse("")
 
         // 权限这个我再想想
-        build += "scrope" -> MongoDBList.newBuilder.result
+        build += "scope" -> MongoDBList.newBuilder.result
 
         build.result
     }
 
     // for query
     implicit val d2m : DBObject => Map[String, JsValue] = { obj =>
+        // 需要添加Scrope，的解析
         Map(
+            "user_id" -> toJson(obj.getAs[String]("user_id").map (x => x).getOrElse(throw new Exception("db prase error"))),
+            "user_name" -> toJson(obj.getAs[String]("user_name").map (x => x).getOrElse(throw new Exception("db prase error"))),
+            "phoneNo" -> toJson(obj.getAs[String]("phoneNo").map (x => x).getOrElse(throw new Exception("db prase error"))),
+            "email" -> toJson(obj.getAs[String]("email").map (x => x).getOrElse(throw new Exception("db prase error"))),
+            "scope" -> toJson(obj.getAs[List[String]]("scope").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "screen_name" -> toJson(obj.getAs[String]("screen_name").map (x => x).getOrElse(throw new Exception("db prase error"))),
-            "screen_photo" -> toJson(obj.getAs[String]("screen_photo").map (x => x).getOrElse(throw new Exception("db prase error")))
+            "screen_photo" -> toJson(obj.getAs[String]("screen_photo").map (x => x).getOrElse(throw new Exception("db prase error"))),
+            "date" -> toJson(obj.getAs[Number]("date").map (x => x.longValue).getOrElse(throw new Exception("db prase error")))
         )
     }
 }
