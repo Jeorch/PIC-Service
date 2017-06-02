@@ -23,7 +23,7 @@ trait RSAEncryptTrait extends javaEncryptTrait with EncryptTrait {
                 builder += "public_key" -> pub_key
                 builder += "private_key" -> pri_key
 
-//                _data_connection.getCollection("encrypt_config") += builder.result
+                _data_connection.getCollection("encrypt_config") += builder.result
 
                 (pub_key, pri_key)
             }

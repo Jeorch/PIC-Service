@@ -39,11 +39,9 @@ object AuthModule extends ModuleTrait with AuthData {
             o += "user_id" -> Sercurity.md5Hash(user_name + pwd + Sercurity.getTimeSpanWithMillSeconds)
             o += "date" -> date.asInstanceOf[Number]
 
-//            db.insertObject(o, "users", "user_name")
+            db.insertObject(o, "users", "user_name")
             val result = toJson(o - "pwd" - "phoneNo" - "email" - "date" + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24))) // token 默认一天过期
-//            val auth_token = att.encrypt2Token(result)
-            val auth_token = att.encrypt2Token("i am a test")
-            val auth = att.decrypt2JsValue(auth_token)
+            val auth_token = att.encrypt2Token(result)
             val reVal = toJson(o - "pwd" - "phoneNo" - "email" - "date" - "scrope")
 
             (Some(Map(
@@ -70,11 +68,10 @@ object AuthModule extends ModuleTrait with AuthData {
 			else {
                 val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
                 val reVal = result.get + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24))
-//                val auth_token = att.encrypt2Token(toJson("i am a test"))
-//                val auth = att.decrypt2JsValue(auth_token)
+                val auth_token = att.encrypt2Token(toJson(reVal))
 
                 (Some(Map(
-                    "auth_token" -> toJson("auth_token"),
+                    "auth_token" -> toJson(auth_token),
                     "user" -> toJson(result.get)
                 )), None)
             }
