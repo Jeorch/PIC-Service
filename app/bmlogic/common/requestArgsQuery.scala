@@ -1,12 +1,8 @@
 package bmlogic.common
 
-import play.api._
 import play.api.mvc._
 import play.api.libs.json.JsValue
 import play.api.libs.Files.TemporaryFile
-import play.api.libs.concurrent.Akka
-
-import bmutil.errorcode.ErrorCode
 
 import akka.actor.ActorSystem
 import akka.actor.Props
@@ -14,7 +10,6 @@ import akka.util.Timeout
 import akka.pattern.ask
 
 import scala.concurrent.duration._
-import scala.concurrent.Future
 import scala.concurrent.Await
 
 import bmmessages.MessageRoutes
