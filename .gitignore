@@ -9,6 +9,10 @@ target
 /upload
 /lib
 /bin/
+/app/controllers/LoginController.scala
+/app/bmlogic/login
 
 /sbt-dist
 .cache-main
+
+test/UserTest.scala

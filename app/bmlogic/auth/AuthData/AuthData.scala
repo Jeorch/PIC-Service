@@ -8,6 +8,7 @@ import play.api.libs.json.Json.toJson
   * Created by alfredyang on 01/06/2017.
   */
 trait AuthData {
+    
     implicit val m2d : JsValue => DBObject = { js =>
         val build = MongoDBObject.newBuilder
         val user_name = (js \ "user_name").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))

@@ -1,13 +1,13 @@
 package bmpattern
 
 import scala.concurrent.duration._
-
 import akka.actor.Actor
 import akka.actor.ActorContext
 import akka.actor.ActorLogging
 import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import akka.actor.Props
+import bmlogic.login.{LoginModule, msg_LoginCommand}
 
 //import module.auth.AuthModule
 //import module.auth.msg_AuthCommand
@@ -71,6 +71,7 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 	var rst : Option[Map[String, JsValue]] = msr.rst
 	var next : ActorRef = null
 	def receive = {
+		case cmd : msg_LoginCommand => dispatchImpl(cmd,LoginModule)
 		case cmd : msg_AuthCommand => dispatchImpl(cmd, AuthModule)
 		case cmd : msg_ResultCommand => dispatchImpl(cmd, ResultModule)
         case cmd : msg_LogCommand => dispatchImpl(cmd, LogModule)
