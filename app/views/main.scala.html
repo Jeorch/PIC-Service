@@ -1,4 +1,4 @@
-@(title: String)(content: Html)
+@(title: String)(include : Html)(content : Html)(scripts : Html)
 
 <!DOCTYPE html>
 
@@ -66,8 +66,13 @@
         <script src="@routes.Assets.at("js/locales/bootstrap-datetimepicker.zh-CN.js")"></script>
         <script src="@routes.Assets.at("js/Select2/select2.js")"></script>
         <script src="@routes.Assets.at("js/Select2/zh-CN.js")"></script>
+
+        @include
+
     </head>
     <body>
-    @content
+        @content
+
+        @scripts
     </body>
 </html>

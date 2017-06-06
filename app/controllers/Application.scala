@@ -7,12 +7,12 @@ import play.api.mvc._
   */
 class Application extends Controller {
     def index = Action {
-        Ok(views.html.index1())
+        Ok(views.html.index())
     }
     def login=Action{
         Ok(views.html.login())
     }
     def loginToIndex=Action{
-        Redirect(routes.Application.index())
+        Redirect("/test")
     }
 }

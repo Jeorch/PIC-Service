@@ -2,39 +2,10 @@ package bmpattern
 
 import scala.concurrent.duration._
 import akka.actor.Actor
-import akka.actor.ActorContext
 import akka.actor.ActorLogging
 import akka.actor.ActorRef
-import akka.actor.ActorSystem
 import akka.actor.Props
-import bmlogic.login.{LoginModule, msg_LoginCommand}
 
-//import module.auth.AuthModule
-//import module.auth.msg_AuthCommand
-//import module.emxmpp.EMModule
-//import module.emxmpp.msg_EMMessageCommand
-//import module.kidnap.v2.kidnapCollectionModule
-//import module.kidnap.v2.msg_KidnapServiceCollectionCommand
-//import module.order.v2.msg_OrderCommand
-//import module.order.v2.orderModule
-//import module.phonecode.PhoneCodeModule
-//import module.phonecode.msg_PhoneCodeCommand
-//import module.profile.v2.ProfileModule
-//import module.profile.v2.msg_ProfileCommand
-//import module.order.v2.msg_OrderCommentsCommand
-//import module.order.v2.orderCommentsModule
-//import module.realname.msg_RealNameCommand
-//import module.realname.RealNameModule
-//import module.timemanager.v3.msg_TMCommand
-//import module.timemanager.v3.TMModule
-//
-//
-//import module.kidnap.v2.kidnapModule
-//import module.kidnap.v2.msg_KidnapServiceCommand
-//import module.kidnap.v3.kidnapModule
-//import module.kidnap.v3.msg_KidnapServiceCommand
-
-import play.api.Application
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
@@ -71,7 +42,6 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 	var rst : Option[Map[String, JsValue]] = msr.rst
 	var next : ActorRef = null
 	def receive = {
-		case cmd : msg_LoginCommand => dispatchImpl(cmd,LoginModule)
 		case cmd : msg_AuthCommand => dispatchImpl(cmd, AuthModule)
 		case cmd : msg_ResultCommand => dispatchImpl(cmd, ResultModule)
         case cmd : msg_LogCommand => dispatchImpl(cmd, LogModule)
