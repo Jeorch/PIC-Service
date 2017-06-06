@@ -10,4 +10,9 @@ object AuthMessage {
 	case class msg_AuthWithPassword(data : JsValue) extends msg_AuthCommand
 	case class msg_AuthTokenParser(data : JsValue) extends msg_AuthCommand
 	case class msg_CheckAuthTokenTest(data : JsValue) extends msg_AuthCommand
+
+	case class msg_CheckEdgeScope(data : JsValue) extends msg_AuthCommand
+	case class msg_CheckProductLevelScope(data : JsValue) extends msg_AuthCommand
+	case class msg_CheckManufactureNameScope(data : JsValue) extends msg_AuthCommand
+	case class msg_CheckManufactureTypeScope(data : JsValue) extends msg_AuthCommand
 }

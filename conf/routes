@@ -2,10 +2,28 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-POST    /auth/authWithPassword                  controllers.AuthController.authWithPassword
+# auth 用户授权 End Point (详情参考概要设计，@Alfred)
+POST    /auth/password                          controllers.AuthController.authWithPassword
+POST    /auth/changepwd                         controllers.AuthController.authChangePwd
+POST    /auth/logout                            controllers.AuthController.authLogout
+POST    /auth/update                            controllers.AuthController.authUpdate
 POST    /auth/pushUser                          controllers.AuthController.authPushUser
-
 POST    /auth/checkAuthToken                    controllers.AuthController.authTokenCheckTest
+
+# admin 用具授权 End Point (详情参考概要设计，@Alfred)
+POST    /admin/password                         controllers.AdminController.adminWithPassword
+POST    /admin/change/scope                     controllers.AdminController.adminChangeScope
+POST    /admin/userlst                          controllers.AdminController.adminUserLst
+
+# retrieval 搜索数据 End Point (详情参考概要设计，@Alfred)
+POST    /data/search                            controllers.RetrievalController.conditionSearch
+POST    /data/calc/market                       controllers.RetrievalController.calcMarket
+POST    /data/calc/trend                        controllers.RetrievalController.calcTrend
+POST    /data/calc/percentage                   controllers.RetrievalController.calcPercentage
+POST    /data/calc/units                        controllers.RetrievalController.calcUnits
+
+# retrieval 生成报告 End Point (详情参考概要设计，@Alfred)
+POST    /data/report                            controllers.RetrievalController.dataReports
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               			controllers.Assets.at(path="/public", file)
