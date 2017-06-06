@@ -25,6 +25,7 @@ object AuthModule extends ModuleTrait with AuthData {
         case msg_AuthTokenParser(data) => authTokenPraser(data)
 
         case msg_CheckAuthTokenTest(data) => checkAuthTokenTest(data)(pr)
+        case msg_CheckTokenExpire(data) => checkAuthTokenExpire(data)(pr)
         case msg_CheckEdgeScope(data) => checkEdgeScope(data)(pr)
         case msg_CheckProductLevelScope(data) => checkProductLevelScope(data)(pr)
         case msg_CheckManufactureNameScope(data) => checkManufactureNameScope(data)(pr)
@@ -124,26 +125,31 @@ object AuthModule extends ModuleTrait with AuthData {
                       (pr : Option[Map[String, JsValue]])
                       (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
-        val auth = pr.map (x => x).getOrElse(throw new Exception("token parse error"))
-        val edge_lst = auth.get("edge").get.asOpt[List[String]].map (x => x.distinct.sorted).getOrElse(throw new Exception("token parse error"))
+        try {
+            val auth = pr.map (x => x).getOrElse(throw new Exception("token parse error"))
+            val edge_lst = auth.get("edge").get.asOpt[List[String]].map (x => x.distinct.sorted).getOrElse(throw new Exception("token parse error"))
 
-        (data \ "condition" \ "edge").asOpt[List[String]].map { x =>
+            (data \ "condition" \ "edge").asOpt[List[String]].map { x =>
 
-            val edge_condition = x.distinct.sorted
-            var result = pr.get
-            var edges : List[String] = Nil
-            edge_condition.foreach { x =>
-                if (edge_lst.contains(x))
-                    edges = x :: edges
-                else
-                    result = result + ("Warning" -> toJson("没有搜索的全权限，请联系你的管理员添加"))
-            }
-            if (!edges.isEmpty) {
-                result = result + ("search_edge_condition" -> toJson(edges))
-            }
-            (Some(result), None)
+                val edge_condition = x.distinct.sorted
+                var result = pr.get
+                var edges : List[String] = Nil
+                edge_condition.foreach { x =>
+                    if (edge_lst.contains(x))
+                        edges = x :: edges
+                    else
+                        result = result + ("Warning" -> toJson("没有搜索的全权限，请联系你的管理员添加"))
+                }
+                if (!edges.isEmpty) {
+                    result = result + ("search_edge_condition" -> toJson(edges))
+                }
+                (Some(result), None)
 
-        }.getOrElse((pr, None))
+            }.getOrElse((pr, None))
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
     }
 
     def checkProductLevelScope(data : JsValue)
@@ -163,25 +169,46 @@ object AuthModule extends ModuleTrait with AuthData {
                                  (pr : Option[Map[String, JsValue]])
                                  (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
-        val auth = pr.map (x => x).getOrElse(throw new Exception("token parse error"))
-        val name_lst = (auth.get("scope").get \ "manufacture_name").asOpt[List[String]].map (x => x.distinct.sorted).getOrElse(throw new Exception("token parse error"))
+        try {
+            val auth = pr.map (x => x).getOrElse(throw new Exception("token parse error"))
+            val name_lst = (auth.get("scope").get \ "manufacture_name").asOpt[List[String]].map (x => x.distinct.sorted).getOrElse(throw new Exception("token parse error"))
 
-        (data \ "condition" \ "manufacture_name").asOpt[List[String]].map { x =>
+            (data \ "condition" \ "manufacture_name").asOpt[List[String]].map { x =>
 
-            val name_condition = x.distinct.sorted
-            var result = pr.get
-            var names : List[String] = Nil
-            name_condition.foreach { x =>
-                if (name_lst.contains(x))
-                    names = x :: names
-                else
-                    result = result + ("Warning" -> toJson("没有搜索的全权限，请联系你的管理员添加"))
-            }
-            if (!names.isEmpty) {
-                result = result + ("search_manufacture_name_condition" -> toJson(names))
-            }
-            (Some(result), None)
+                val name_condition = x.distinct.sorted
+                var result = pr.get
+                var names : List[String] = Nil
+                name_condition.foreach { x =>
+                    if (name_lst.contains(x))
+                        names = x :: names
+                    else
+                        result = result + ("Warning" -> toJson("没有搜索的全权限，请联系你的管理员添加"))
+                }
+                if (!names.isEmpty) {
+                    result = result + ("search_manufacture_name_condition" -> toJson(names))
+                }
+                (Some(result), None)
 
-        }.getOrElse((pr, None))
+            }.getOrElse((pr, None))
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def checkAuthTokenExpire(data : JsValue)
+                            (pr : Option[Map[String, JsValue]])
+                            (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+
+        try {
+            val auth = pr.map (x => x).getOrElse(throw new Exception("token parse error"))
+            val expire_in = auth.get("expire_in").get.asOpt[Long].map (x => x).getOrElse(throw new Exception("token parse error"))
+
+            if (new Date().getTime > expire_in)
+throw new Exception("token expired")
+            else (pr, None)
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
     }
 }
