@@ -18,7 +18,6 @@ class Application extends Controller {
     def contactus = Action {
         Ok(views.html.contactus())
     }
-
     def aboutus = Action {
         Ok(views.html.aboutus())
     }
