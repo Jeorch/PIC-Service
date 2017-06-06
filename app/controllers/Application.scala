@@ -15,4 +15,11 @@ class Application extends Controller {
     def loginToIndex=Action{
         Redirect("/test")
     }
+    def contactus = Action {
+        Ok(views.html.contactus())
+    }
+
+    def aboutus = Action {
+        Ok(views.html.aboutus())
+    }
 }

@@ -22,7 +22,7 @@ object MongoDBCollManager {
     
     private def getCollection(name : String) : MongoCollection = this.getBabyDatabase()(name)
 
-    private def getProductsCollection : MongoCollection = this.getCollection("products")
+    private def getProductsCollection : MongoCollection = this.getCollection("products.scala.xml")
 //    private def getProductsDetailCollection : MongoCollection = this.getCollection("products_details")
     
     /**
