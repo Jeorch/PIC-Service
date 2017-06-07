@@ -16,7 +16,7 @@ import com.mongodb.casbah.Imports._
 /**
   * Created by alfredyang on 01/06/2017.
   */
-class RetrievalModule extends ModuleTrait with RetrievalData {
+object RetrievalModule extends ModuleTrait with RetrievalData {
     def dispatchMsg(msg : MessageDefines)(pr : Option[Map[String, JsValue]])(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
         case msg_ConditionSearchCommand(data) => conditionSearch(data)(pr)
 
@@ -53,7 +53,7 @@ class RetrievalModule extends ModuleTrait with RetrievalData {
             db.insertObject(o, "retrieval", "sales_id")
 
             (Some(Map(
-                "retrival" -> toJson(o)
+                "retrival" -> toJson(o - "sales_id")
             )), None)
 
         } catch {
@@ -71,7 +71,7 @@ class RetrievalModule extends ModuleTrait with RetrievalData {
             db.updateObject(o, "retrieval", "sales_id")
 
             (Some(Map(
-                "retrival" -> toJson(o)
+                "retrival" -> toJson(o - "sales_id")
             )), None)
 
         } catch {
@@ -89,7 +89,7 @@ class RetrievalModule extends ModuleTrait with RetrievalData {
             db.deleteObject(o, "retrieval", "sales_id")
 
             (Some(Map(
-                "retrival" -> toJson(o)
+                "retrival" -> toJson(o - "sales_id")
             )), None)
 
         } catch {

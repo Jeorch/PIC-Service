@@ -21,7 +21,7 @@ lazy val root = (project in file(".")).
     settings(commonSettings: _*).
     settings(
 	    routesGenerator := InjectedRoutesGenerator,
-        name := "piu-service",
+        name := "pic-service",
         fork in run := true,
         javaOptions += "-Xmx5G"
     ).enablePlugins(PlayScala)
