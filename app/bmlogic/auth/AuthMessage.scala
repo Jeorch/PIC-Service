@@ -11,6 +11,7 @@ object AuthMessage {
 	case class msg_AuthTokenParser(data : JsValue) extends msg_AuthCommand
 	case class msg_CheckAuthTokenTest(data : JsValue) extends msg_AuthCommand
 
+	case class msg_CheckAdministrator(data : JsValue) extends msg_AuthCommand
 	case class msg_CheckTokenExpire(data : JsValue) extends msg_AuthCommand
 	case class msg_CheckEdgeScope(data : JsValue) extends msg_AuthCommand
 	case class msg_CheckProductLevelScope(data : JsValue) extends msg_AuthCommand

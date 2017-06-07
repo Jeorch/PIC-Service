@@ -156,13 +156,17 @@ object AuthModule extends ModuleTrait with AuthData {
                               (pr : Option[Map[String, JsValue]])
                               (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
-        val auth = pr.map (x => x).getOrElse(throw new Exception("token parse error"))
-        val product_level = (auth.get("scope").get \ "product_level").asOpt[JsValue].
-                                map (x => x).getOrElse(throw new Exception("token parse error"))
+        try {
+            val auth = pr.map (x => x).getOrElse(throw new Exception("token parse error"))
+            val product_level = (auth.get("scope").get \ "product_level").asOpt[JsValue].
+                map (x => x).getOrElse(throw new Exception("token parse error"))
 
 
-        // TODO: 谁来写呀
-        (pr, None)
+            // TODO: 谁来写呀
+            (pr, None)
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
     }
 
     def checkManufactureNameScope(data : JsValue)
@@ -204,8 +208,7 @@ object AuthModule extends ModuleTrait with AuthData {
             val auth = pr.map (x => x).getOrElse(throw new Exception("token parse error"))
             val expire_in = auth.get("expire_in").get.asOpt[Long].map (x => x).getOrElse(throw new Exception("token parse error"))
 
-            if (new Date().getTime > expire_in)
-throw new Exception("token expired")
+            if (new Date().getTime > expire_in) throw new Exception("token expired")
             else (pr, None)
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))

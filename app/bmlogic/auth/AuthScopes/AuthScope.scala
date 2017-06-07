@@ -1,26 +1,28 @@
 package bmlogic.auth.AuthScopes
 
+import com.mongodb.casbah.Imports.{MongoDBList, MongoDBObject}
+import play.api.libs.json.JsValue
+
 /**
   * Created by alfredyang on 02/06/2017.
   */
 trait AuthScope extends Enumeration {
-    type AuthScope = Value
-    val Edge_Scope  = Value(0, "区域权限")
-    val Product_Scope = Value(1, "药品权限")
-    val Manufacture_Scope = Value(2, "厂家权限")
-
-    trait EdgeScope extends Enumeration {
-        type EdgeScope = Value
-        val beijing = Value(0, "北京") // 后面你们来添加
+    def pushEdgeScope(data : JsValue) : MongoDBList = {
+        val result = MongoDBList.newBuilder
+        (data \ "scope" \ "edge").asOpt[List[String]].map (x => x).getOrElse(Nil).foreach(result += _)
+        result.result
     }
 
-    // TODO: 这样的权限不具备扩展性，在考虑
-    trait ProductScope extends Enumeration {
-        type ProductScope = Value
+    def pushProduceLevelScope(data : JsValue) : MongoDBObject = {
+        val result = MongoDBObject.newBuilder
+        val tmp = "product_level_one" :: "product_level_two" :: "product_level_three" :: Nil
+        tmp foreach(result += _ -> (data \ "scope" \ "product_level_one").asOpt[String].map (x => x).getOrElse(""))
+        result.result
     }
 
-    // TODO: 这样的权限不具备扩展性，在考虑
-    trait ManufactureScope extends Enumeration {
-        type ManufactureScope = Value
+    def pushManufactureNameScope(data : JsValue) : MongoDBList = {
+        val result = MongoDBList.newBuilder
+        (data \ "scope" \ "manufacture_name").asOpt[List[String]].map (x => x).getOrElse(Nil).foreach(result += _)
+        result.result
     }
 }

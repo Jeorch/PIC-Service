@@ -1,5 +1,6 @@
 package bmlogic.auth.AuthData
 
+import bmlogic.auth.AuthScopes.AuthScope
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
@@ -7,7 +8,7 @@ import play.api.libs.json.Json.toJson
 /**
   * Created by alfredyang on 01/06/2017.
   */
-trait AuthData {
+trait AuthData extends AuthScope {
     
     implicit val m2d : JsValue => DBObject = { js =>
         val build = MongoDBObject.newBuilder
@@ -25,6 +26,7 @@ trait AuthData {
         scope_builder += "edge" -> pushEdgeScope(js)
         scope_builder += "product_level" -> pushProduceLevelScope(js)
         scope_builder += "manufacture_name" -> pushManufactureNameScope(js)
+        scope_builder += "is_admin" -> (js \ "scope" \ "is_admin").asOpt[Int].map (x => x).getOrElse(0)
 
         build += "scope" -> scope_builder.result
 
@@ -44,24 +46,5 @@ trait AuthData {
             "screen_photo" -> toJson(obj.getAs[String]("screen_photo").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "date" -> toJson(obj.getAs[Number]("date").map (x => x.longValue).getOrElse(throw new Exception("db prase error")))
         )
-    }
-
-    def pushEdgeScope(data : JsValue) : MongoDBList = {
-        val result = MongoDBList.newBuilder
-        (data \ "scope" \ "edge").asOpt[List[String]].map (x => x).getOrElse(Nil).foreach(result += _)
-        result.result
-    }
-
-    def pushProduceLevelScope(data : JsValue) : MongoDBObject = {
-        val result = MongoDBObject.newBuilder
-        val tmp = "product_level_one" :: "product_level_two" :: "product_level_three" :: Nil
-        tmp foreach(result += _ -> (data \ "scope" \ "product_level_one").asOpt[String].map (x => x).getOrElse(""))
-        result.result
-    }
-
-    def pushManufactureNameScope(data : JsValue) : MongoDBList = {
-        val result = MongoDBList.newBuilder
-        (data \ "scope" \ "manufacture_name").asOpt[List[String]].map (x => x).getOrElse(Nil).foreach(result += _)
-        result.result
     }
 }
