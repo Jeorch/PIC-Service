@@ -41,7 +41,7 @@ trait AuthData extends AuthScope {
             "user_name" -> toJson(obj.getAs[String]("user_name").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "phoneNo" -> toJson(obj.getAs[String]("phoneNo").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "email" -> toJson(obj.getAs[String]("email").map (x => x).getOrElse(throw new Exception("db prase error"))),
-            "scope" -> toJson(obj.getAs[List[String]]("scope").map (x => x).getOrElse(throw new Exception("db prase error"))),
+//            "scope" -> toJson(obj.getAs[List[String]]("scope").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "screen_name" -> toJson(obj.getAs[String]("screen_name").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "screen_photo" -> toJson(obj.getAs[String]("screen_photo").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "date" -> toJson(obj.getAs[Number]("date").map (x => x.longValue).getOrElse(throw new Exception("db prase error")))
