@@ -29,6 +29,7 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
         case msg_DeleteProduct(data) => deleteProduct(data)
 
         case msg_CalcPercentage(data) => calcPercentage(data)
+        case msg_CalcTrend(data) => calcTrend(data)
 
         case _ => ???
     }
@@ -108,18 +109,47 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
         }
     }
 
+    //by clock
     def calcPercentage(data : JsValue)
                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-            val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
+//            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+//            val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
 
             val queryName = (data \ "oral_name").asOpt[String].map (x => x).getOrElse((data \ "category").asOpt[String].map (x => x).getOrElse(throw new Exception("input error")))
             val province = (data \ "province").asOpt[String].map (x => x).getOrElse("all")
             val date = (data \ "date").asOpt[String].map (x => x).getOrElse(new Date().getTime)
 
             (Some(Map(
+                "queryname" -> toJson(queryName),
+                "province" -> toJson(province),
+                "date" -> toJson(date.toString),
                 "percentage" -> toJson("30%")
+            )), None)
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    //by clock
+    def calcTrend(data : JsValue)
+                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+//            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+//            val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
+
+            val queryName = (data \ "oral_name").asOpt[String].map (x => x).getOrElse((data \ "category").asOpt[String].map (x => x).getOrElse(throw new Exception("input error")))
+            val province = (data \ "province").asOpt[String].map (x => x).getOrElse("all")
+            val date = (data \ "date").asOpt[String].map (x => x).getOrElse(new Date().getTime)
+
+//            val thisYearSales = ???
+//            val listYearSales = ???
+
+            (Some(Map(
+                "queryname" -> toJson(queryName),
+                "province" -> toJson(province),
+                "date" -> toJson(date.toString),
+                "trend" -> toJson("30%")
             )), None)
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
