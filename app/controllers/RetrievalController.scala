@@ -23,7 +23,7 @@ class RetrievalController @Inject () (as_inject : ActorSystem, dbt : DBTrait, at
     def conditionSearch = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
         import bmpattern.LogMessage.common_log
         import bmpattern.ResultMessage.common_result
-        MessageRoutes(msg_log(toJson(Map("method" -> toJson("push user"))), jv)
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("condition search"))), jv)
             :: msg_AuthPushUser(jv) :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 

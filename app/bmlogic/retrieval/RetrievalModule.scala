@@ -5,6 +5,7 @@ import java.util.Date
 import bminjection.db.DBTrait
 import bminjection.token.AuthTokenTrait
 import bmlogic.common.sercurity.Sercurity
+import bmlogic.retrieval.ConditionSearchFunc.ConditionSearchFunc
 import bmlogic.retrieval.RetrievalData.RetrievalData
 import bmlogic.retrieval.RetrievalMessage._
 import bmmessages.{CommonModules, MessageDefines}
@@ -19,7 +20,7 @@ import com.mongodb.casbah.Imports._
 /**
   * Created by alfredyang on 01/06/2017.
   */
-object RetrievalModule extends ModuleTrait with RetrievalData {
+object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSearchFunc {
     def dispatchMsg(msg : MessageDefines)(pr : Option[Map[String, JsValue]])(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
         case msg_ConditionSearchCommand(data) => conditionSearch(data)(pr)
 
@@ -38,7 +39,12 @@ object RetrievalModule extends ModuleTrait with RetrievalData {
 
 
         try {
-            (pr, None)
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            val condition = conditionParse(data, pr.get)
+            val result = Map("search_result" -> toJson(db.queryMultipleObject(condition, "retrieval")))
+
+            (Some(result), None)
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
