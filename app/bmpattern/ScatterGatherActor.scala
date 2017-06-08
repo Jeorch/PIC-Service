@@ -60,7 +60,7 @@ class ScatterGatherActor(originSender : ActorRef, msr : MessageRoutes) extends A
 		case x : AnyRef => println(s"something messages: $x"); ???
 	}
 	
-	val timeOutSchdule = context.system.scheduler.scheduleOnce(2 second, self, new timeout)
+	val timeOutSchdule = context.system.scheduler.scheduleOnce(60 second, self, new timeout)
 
 	def rstReturn = {
 		msr.lst match {
