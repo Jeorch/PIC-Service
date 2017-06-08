@@ -16,14 +16,14 @@ trait ConditionSearchFunc {
           */
         val manufacture_name_condition =
             pr.get("search_manufacture_name_condition").
-                map (x => x).getOrElse(throw new Exception("search condition parse error"))
+                map (x => x).getOrElse(Nil)
 
         /**
           * 区域
           */
         val edge_condition =
             pr.get("search_edge_condition").
-                map (x => x).getOrElse(throw new Exception("search condition parse error"))
+                map (x => x).getOrElse(Nil)
 
         /**
           * 日期

@@ -126,8 +126,8 @@ object AuthModule extends ModuleTrait with AuthData {
                       (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
-            val auth = pr.map (x => x).getOrElse(throw new Exception("token parse error"))
-            val edge_lst = auth.get("edge").get.asOpt[List[String]].map (x => x.distinct.sorted).getOrElse(throw new Exception("token parse error"))
+            val auth = pr.map (x => x.get("auth").get).getOrElse(throw new Exception("token parse error"))
+            val edge_lst = (auth \ "scope" \ "edge").asOpt[List[String]].map (x => x.distinct.sorted).getOrElse(throw new Exception("token parse error"))
 
             (data \ "condition" \ "edge").asOpt[List[String]].map { x =>
 
@@ -157,8 +157,8 @@ object AuthModule extends ModuleTrait with AuthData {
                               (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
-            val auth = pr.map (x => x).getOrElse(throw new Exception("token parse error"))
-            val product_level = (auth.get("scope").get \ "product_level").asOpt[JsValue].
+            val auth = pr.map (x => x.get("auth").get).getOrElse(throw new Exception("token parse error"))
+            val product_level = (auth \ "scope" \ "product_level").asOpt[JsValue].
                 map (x => x).getOrElse(throw new Exception("token parse error"))
 
 
@@ -174,8 +174,8 @@ object AuthModule extends ModuleTrait with AuthData {
                                  (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
-            val auth = pr.map (x => x).getOrElse(throw new Exception("token parse error"))
-            val name_lst = (auth.get("scope").get \ "manufacture_name").asOpt[List[String]].map (x => x.distinct.sorted).getOrElse(throw new Exception("token parse error"))
+            val auth = pr.map (x => x.get("auth").get).getOrElse(throw new Exception("token parse error"))
+            val name_lst = (auth \ "scope" \ "manufacture_name").asOpt[List[String]].map (x => x.distinct.sorted).getOrElse(throw new Exception("token parse error"))
 
             (data \ "condition" \ "manufacture_name").asOpt[List[String]].map { x =>
 
@@ -205,8 +205,8 @@ object AuthModule extends ModuleTrait with AuthData {
                             (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 
         try {
-            val auth = pr.map (x => x).getOrElse(throw new Exception("token parse error"))
-            val expire_in = auth.get("expire_in").get.asOpt[Long].map (x => x).getOrElse(throw new Exception("token parse error"))
+            val auth = pr.map (x => x.get("auth").get).getOrElse(throw new Exception("token parse error"))
+            val expire_in = (auth \ "expire_in").asOpt[Long].map (x => x).getOrElse(throw new Exception("token parse error"))
 
             if (new Date().getTime > expire_in) throw new Exception("token expired")
             else (pr, None)
