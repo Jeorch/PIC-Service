@@ -1,9 +1,6 @@
 package bmmessages
 
-import akka.actor.ActorRef
-import akka.actor.Actor
 import play.api.libs.json.JsValue
-import play.api.libs.json.JsLookup
 
 trait MessageDefines
 abstract class CommonMessage extends MessageDefines

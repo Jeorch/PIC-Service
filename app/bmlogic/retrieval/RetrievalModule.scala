@@ -1,9 +1,12 @@
 package bmlogic.retrieval
 
+import java.util.Date
+
 import bminjection.db.DBTrait
+import bminjection.token.AuthTokenTrait
 import bmlogic.common.sercurity.Sercurity
 import bmlogic.retrieval.RetrievalData.RetrievalData
-import bmlogic.retrieval.RetrievalMessage.{msg_ConditionSearchCommand, msg_DeleteProduct, msg_PushProduct, msg_UpdateProduct}
+import bmlogic.retrieval.RetrievalMessage._
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
 import bmutil.errorcode.ErrorCode
@@ -23,6 +26,8 @@ object RetrievalModule extends ModuleTrait with RetrievalData {
         case msg_PushProduct(data) => pushProduct(data)
         case msg_UpdateProduct(data) => updateProduct(data)
         case msg_DeleteProduct(data) => deleteProduct(data)
+
+        case msg_CalcPercentage(data) => calcPercentage(data)
 
         case _ => ???
     }
@@ -92,6 +97,24 @@ object RetrievalModule extends ModuleTrait with RetrievalData {
                 "retrival" -> toJson(o - "sales_id")
             )), None)
 
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+
+    def calcPercentage(data : JsValue)
+                     (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
+
+            val queryName = (data \ "oral_name").asOpt[String].map (x => x).getOrElse((data \ "category").asOpt[String].map (x => x).getOrElse(throw new Exception("input error")))
+            val province = (data \ "province").asOpt[String].map (x => x).getOrElse("all")
+            val date = (data \ "date").asOpt[String].map (x => x).getOrElse(new Date().getTime)
+
+            (Some(Map(
+                "percentage" -> toJson("30%")
+            )), None)
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
