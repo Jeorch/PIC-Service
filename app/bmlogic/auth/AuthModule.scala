@@ -134,12 +134,18 @@ object AuthModule extends ModuleTrait with AuthData {
                 val edge_condition = x.distinct.sorted
                 var result = pr.get
                 var edges : List[String] = Nil
-                edge_condition.foreach { x =>
-                    if (edge_lst.contains(x))
-                        edges = x :: edges
-                    else
-                        result = result + ("Warning" -> toJson("没有搜索的全权限，请联系你的管理员添加"))
+
+                if (edge_lst.isEmpty) {
+                    edges = edge_condition
+                } else {
+                    edge_condition.foreach { x =>
+                        if (edge_lst.contains(x))
+                            edges = x :: edges
+                        else
+                            result = result + ("Warning" -> toJson("没有搜索的全权限，请联系你的管理员添加"))
+                    }
                 }
+
                 if (!edges.isEmpty) {
                     result = result + ("search_edge_condition" -> toJson(edges))
                 }
@@ -182,12 +188,18 @@ object AuthModule extends ModuleTrait with AuthData {
                 val name_condition = x.distinct.sorted
                 var result = pr.get
                 var names : List[String] = Nil
-                name_condition.foreach { x =>
-                    if (name_lst.contains(x))
-                        names = x :: names
-                    else
-                        result = result + ("Warning" -> toJson("没有搜索的全权限，请联系你的管理员添加"))
+
+                if (name_lst.isEmpty) {
+                    names = name_condition
+                } else {
+                    name_condition.foreach { x =>
+                        if (name_lst.contains(x))
+                            names = x :: names
+                        else
+                            result = result + ("Warning" -> toJson("没有搜索的全权限，请联系你的管理员添加"))
+                    }
                 }
+
                 if (!names.isEmpty) {
                     result = result + ("search_manufacture_name_condition" -> toJson(names))
                 }
