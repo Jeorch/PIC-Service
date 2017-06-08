@@ -57,7 +57,7 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 	 	case x : AnyRef => println(x); ???
 	}
 	
-	val timeOutSchdule = context.system.scheduler.scheduleOnce(2 second, self, new timeout)
+	val timeOutSchdule = context.system.scheduler.scheduleOnce(2000 second, self, new timeout)
 
 	def rstReturn = tmp match {
 		case Some(_) => { rst match {
