@@ -806,7 +806,7 @@ a.more2 span{display:none;}
 .selectContent {clear: both; }
 .unselectContent {display: none; }
 
-/***************************************<定义TAG标签样式---鼠标点击切换内容，参见创新，需js支持，js/index.js和js/jquery.js>*********************************/
+/***************************************<定义TAG标签样式---鼠标点击切换内容，参见创新，需js支持，js/home.js和js/jquery.js>*********************************/
 .topgamelistbox2 { width:100%; margin:0 auto; }
 .tabnav2_gt { width:100%; height:36px; clear: both; display: block;margin:0 auto; background:url(../images/title_c.jpg) repeat-x 0 0;}
 .tabnav2_gt .aa {display: block; float: left; padding-left:20px; padding-right:20px; height:36px; text-align: center; line-height:36px; }

@@ -24,11 +24,12 @@ POST    /data/calc/units                        controllers.RetrievalController.
 
 # retrieval 生成报告 End Point (详情参考概要设计，@Alfred)
 
-# 测试路径 以后删除 @YangMei
-GET     /test                                   controllers.Application.index
+# 显示报告界面
+GET     /data/report                            controllers.PagesController.goHome
 
-#login
-GET     /login                                  controllers.Application.login
+
+#用户登录
+GET     /login                                  controllers.PagesController.login
 #POST    /loginAction                            controllers.LoginController.loginAction
 
 # Map static resources from the /public folder to the /assets URL path
@@ -36,5 +37,5 @@ GET     /assets/*file               			controllers.Assets.at(path="/public", fil
 
 
 # by clock
-GET     /contactus                      		controllers.Application.contactus
-GET     /aboutus                                controllers.Application.aboutus
+GET     /contactus                      		controllers.PagesController.contactus
+GET     /aboutus                                controllers.PagesController.aboutus

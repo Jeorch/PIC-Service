@@ -27,7 +27,7 @@ class requestArgsQuery @Inject() (implicit akkasys : ActorSystem) extends Contro
 
   	def requestArgs(request : Request[AnyContent])(func : JsValue => JsValue) : Result = {
   		try {
-  			request.body.asJson.map { x => 
+  			request.body.asJson.map { x =>
   				Ok(func(x))
   			}.getOrElse (BadRequest("Bad Request for input"))
   		} catch {
@@ -37,6 +37,7 @@ class requestArgsQuery @Inject() (implicit akkasys : ActorSystem) extends Contro
 	
   	def requestArgsV2(request : Request[AnyContent])(func : JsValue => MessageRoutes) : Result = {
   		try {
+
   			request.body.asJson.map { x => 
   				Ok(commonExcution(func(x)))
   			}.getOrElse (BadRequest("Bad Request for input"))
@@ -55,9 +56,9 @@ class requestArgsQuery @Inject() (implicit akkasys : ActorSystem) extends Contro
   		try {
    			request.body.asMultipartFormData.map { x => 
    				Ok(func(x))
-  			}.getOrElse (BadRequest("Bad Request for input")) 			  
+  			}.getOrElse (BadRequest("Bad Request for input1"))
   		} catch {
-  			case _ : Exception => BadRequest("Bad Request for input")
+  			case _ : Exception => BadRequest("Bad Request for input2")
   		}
   	}
 }

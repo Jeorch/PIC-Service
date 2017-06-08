@@ -3,13 +3,33 @@
     <head>
         <title>登陆页面</title>
     </head>
+    <script src="@routes.Assets.at("js/jquery-1.9.1.min.js")"></script>
     <body>
-        <form action="loginAction" method="post" enctype='application/json'>
-   用户登陆
-        用户名：<input type="text" name="name">
-        密码： <input type="password" name="password">
-        <input type="submit" value="提交">
-
-        </form>
+        用户登陆
+        用户名：<input type="text" id="name">
+        密码： <input type="password" id="password">
+        <input type="button" id="sub" value="提交">
     </body>
+    <script>
+        $("#sub").click(function(){
+            var d = JSON.stringify({
+                "user_name" : $("#name").val(),
+                "pwd" : $("#password").val()
+            })
+            $.ajax({
+                type: "POST",
+                url: "/auth/password",
+                data: d,
+                contentType: "application/json,charset=utf-8",
+                error: function(request) {
+                    console.error("Connection error");
+                },
+                success: function(data) {
+                    console.info(data)
+                    window.location="@routes.PagesController.goHome()"
+                    //$("#commonLayout_appcreshi").parent().html(data);
+                }
+            })
+        })
+    </script>
 </html>

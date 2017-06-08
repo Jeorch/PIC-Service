@@ -1,7 +1,33 @@
-
 @main("PIC") {
+  <!--css-->
 
-} {
+  <link href="@routes.Assets.at("css/Select2/select2.css")" rel="stylesheet">
+  <link href="@routes.Assets.at("css/bootstrap/css/bootstrap-datetimepicker.min.css")" rel="stylesheet">
+  <link href="@routes.Assets.at("css/flavr/animate.css")" rel="stylesheet">
+  <link href="@routes.Assets.at("css/flavr/flavr.css")" rel="stylesheet">
+  <link href="@routes.Assets.at("css/jQueryScrollBar/jquery.mCustomScrollbar.css")" rel="stylesheet">
+  <link href="@routes.Assets.at("css/style2.css")" rel="stylesheet">
+  <link href="@routes.Assets.at("css/report.css")" rel="stylesheet">
+
+
+  <!--JS-->
+
+  <script src="@routes.Assets.at("js/html5media.min.js")"></script>
+  <script src="@routes.Assets.at("js/jquery.easing.min.js")"></script>
+  <script src="@routes.Assets.at("js/modernizr.min.js")"></script>
+  <script src="@routes.Assets.at("js/flavr/flavr.min.js")"></script>
+  <script src="@routes.Assets.at("js/lhgdialog/lhgdialog.min.js")"></script>
+  <script src="@routes.Assets.at("js/jQueryScrollBar/jquery.mousewheel.min.js")"></script>
+  <script src="@routes.Assets.at("js/jQueryScrollBar/jquery.mCustomScrollbar.js")"></script>
+  <script src="@routes.Assets.at("js/jQueryUI1.10/jquery-ui-1.10.4.min.js")"></script>
+  <script src="@routes.Assets.at("js/eachars3.0/echarts.js")"></script>
+  <script src="@routes.Assets.at("js/eachars3.0/map/china.js")"></script>
+  <script src="@routes.Assets.at("js/accounting.min.js")"></script>
+  <script src="@routes.Assets.at("js/flavr/flavr.min.js")"></script>
+  <script src="@routes.Assets.at("js/Select2/select2.js")"></script>
+
+
+}{
     <div class="container-fluid mCustomScrollbar" >
       <div class="navbar navbar-default navbar-static-top" style="margin-bottom: 0;">
         <div class="row hoemTop">
@@ -322,13 +348,18 @@
     </div>
 } {
     <script src="@routes.Assets.at("js/common.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("js/gridData.js")"></script>
+    <script src="@routes.Assets.at("js/report.js")"></script>
+    <script src="@routes.Assets.at("js/home.js")"></script>
+    <script src="@routes.Assets.at("js/left.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.at("js/Select2/select2.js")"></script>
+    <script src="@routes.Assets.at("js/Select2/zh-CN.js")"></script>
     <script src="@routes.Assets.at("js/bootstrap/bootstrap-datetimepicker.min.js")" type="text/javascript"></script>
     <script src="@routes.Assets.at("js/locales/bootstrap-datetimepicker.zh-CN.js")" type="text/javascript"></script>
-    <script src="@routes.Assets.at("js/left.js")" type="text/javascript"></script>
+
     <script type="text/javascript">
             var pageTypeIndex = "index1Page";
-//需改
-            var userName = "yym";
+            var userName = "";
             @*var list = @list;*@
             var temp = false;
             $(document).ready(function () {
