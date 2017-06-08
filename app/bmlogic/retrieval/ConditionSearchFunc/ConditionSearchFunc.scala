@@ -14,16 +14,18 @@ trait ConditionSearchFunc {
         /**
           * 生产厂商名
           */
-        val manufacture_name_condition =
-            pr.get("search_manufacture_name_condition").
-                map (x => x).getOrElse(Nil)
+        val mnc = pr.get("search_manufacture_name_condition").map (x => x.asOpt[List[String]].get).getOrElse(Nil)
+        val manufacture_name_condition : Option[DBObject] =
+            if (mnc.isEmpty) None
+            else Some($or(mnc map ("manufacture" $eq _)))
 
         /**
           * 区域
           */
-        val edge_condition =
-            pr.get("search_edge_condition").
-                map (x => x).getOrElse(Nil)
+        val ec = pr.get("search_edge_condition").map (x => x.asOpt[List[String]].get).getOrElse(Nil)
+        val edge_condition : Option[DBObject] =
+            if (ec.isEmpty) None
+            else Some($or(ec map ("province" $eq _)))
 
         /**
           * 日期
@@ -41,9 +43,9 @@ trait ConditionSearchFunc {
           * 通用名 * 产品名 * 生产厂商类型 * 剂型 * 规格 * 包装
           */
         val result =
-        ("oral_name" :: "product_name" :: "manufacture_type"
-            :: "product_type" :: "specifications" :: "package" :: Nil)
-                .map (equalsConditions[String](data, _)).filterNot(_ == None).map (_.get)
+            (edge_condition :: manufacture_name_condition :: ("oral_name" :: "product_name" :: "manufacture_type"
+                :: "product_type" :: "specifications" :: "package" :: Nil)
+                    .map (equalsConditions[String](data, _))).filterNot(_ == None).map (_.get)
 
         if (result.isEmpty) DBObject()
         else $and(result)
