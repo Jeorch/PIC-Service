@@ -5,7 +5,7 @@ import javax.inject.Inject
 import akka.actor.ActorSystem
 import bminjection.db.DBTrait
 import bminjection.token.AuthTokenTrait
-import bmlogic.auth.AuthMessage.msg_AuthPushUser
+import bmlogic.auth.AuthMessage.{msg_AuthPushUser, msg_AuthTokenParser}
 import bmlogic.common.requestArgsQuery
 import bmlogic.retrieval.RetrievalMessage.msg_CalcPercentage
 import bmmessages.{CommonModules, MessageRoutes}
@@ -24,7 +24,7 @@ class RetrievalController @Inject () (as_inject : ActorSystem, dbt : DBTrait, at
         import bmpattern.LogMessage.common_log
         import bmpattern.ResultMessage.common_result
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("condition search"))), jv)
-            :: msg_AuthPushUser(jv) :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+            :: msg_AuthTokenParser(jv) :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 
     def calcMarket = Action (Ok(""))
