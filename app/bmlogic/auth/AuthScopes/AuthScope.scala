@@ -68,10 +68,10 @@ trait AuthScope {
 
     def productLevel2Category(lst : List[String]) : List[String] = {
         val cat = (from db() in "config" where ("index" -> "PIC")
-                    select (x => x.getAs[MongoDBList]("category").
-                        get.asInstanceOf[List[BasicDBObject]])).toList.head
+                    select (x =>
+                        x.getAs[BasicDBList]("category").get.toList.asInstanceOf[List[BasicDBObject]]
+                    )).toList.head
 
-        println(cat)
         val f = cat.filter(x => lst.contains(x.getString("des")))
 
         val one = (f.filter(x => x.getInt("level") == 0)).map (x => one2three(x.getString("des"), cat)).flatten
