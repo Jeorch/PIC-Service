@@ -177,6 +177,9 @@ object AuthModule extends ModuleTrait with AuthData {
 
             if (!reVal.isEmpty)
                 result = result + ("search_category_condition" -> toJson(reVal))
+            else if (reVal.isEmpty && !auth_cat_lst.isEmpty)
+                result = result + ("search_category_condition" -> toJson(auth_cat_lst))
+            else Unit
 
             (pr, None)
         } catch {
