@@ -164,11 +164,20 @@ object AuthModule extends ModuleTrait with AuthData {
 
         try {
             val auth = pr.map (x => x.get("auth").get).getOrElse(throw new Exception("token parse error"))
-            val product_level = (auth \ "scope" \ "product_level").asOpt[JsValue].
+            val product_level = (auth \ "scope" \ "category").asOpt[List[String]].
                 map (x => x).getOrElse(throw new Exception("token parse error"))
 
+            var result = pr.get
+            val lst = (data \ "condition" \ "category").asOpt[List[String]].map (x => x).getOrElse(Nil)
+            val category_lst = productLevel2Category(lst).distinct.sorted
+            val auth_cat_lst = productLevel2Category(product_level).distinct.sorted
 
-            // TODO: 谁来写呀
+            val reVal = if (auth_cat_lst.isEmpty) category_lst
+                        else category_lst.takeWhile(auth_cat_lst.contains(_))
+
+            if (!reVal.isEmpty)
+                result = result + ("search_category_condition" -> toJson(reVal))
+
             (pr, None)
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))

@@ -24,7 +24,7 @@ trait AuthData extends AuthScope {
 
         val scope_builder = MongoDBObject.newBuilder
         scope_builder += "edge" -> pushEdgeScope(js)
-        scope_builder += "product_level" -> pushProduceLevelScope(js)
+        scope_builder += "category" -> pushProduceLevelScope(js)
         scope_builder += "manufacture_name" -> pushManufactureNameScope(js)
         scope_builder += "is_admin" -> (js \ "scope" \ "is_admin").asOpt[Int].map (x => x).getOrElse(0)
 
@@ -42,7 +42,7 @@ trait AuthData extends AuthScope {
             "phoneNo" -> toJson(obj.getAs[String]("phoneNo").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "email" -> toJson(obj.getAs[String]("email").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "scope" -> toJson(Map("edge" -> queryEdgeScope(obj),
-                                    "product_level" -> queryProductLevelScope(obj),
+                                    "category" -> queryProductLevelScope(obj),
                                     "manufacture_name" -> queryManufactureNameScope(obj),
                                     "is_admin" -> queryIsAdminScope(obj))),
             "screen_name" -> toJson(obj.getAs[String]("screen_name").map (x => x).getOrElse(throw new Exception("db prase error"))),

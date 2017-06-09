@@ -28,6 +28,14 @@ trait ConditionSearchFunc {
             else Some($or(ec map ("province" $eq _)))
 
         /**
+          * 类型
+          */
+        val cat = pr.get("search_category_condition").map (x => x.asOpt[List[String]].get).getOrElse(Nil)
+        val cat_condition : Option[DBObject] =
+            if (cat.isEmpty) None
+            else Some($or(cat map ("category" $eq _)))
+
+        /**
           * 日期
           */
         val timespan_condition = (data \ "date").asOpt[Long].map (x => x).getOrElse(-1.toLong)
@@ -43,7 +51,8 @@ trait ConditionSearchFunc {
           * 通用名 * 产品名 * 生产厂商类型 * 剂型 * 规格 * 包装
           */
         val result =
-            (edge_condition :: manufacture_name_condition :: ("oral_name" :: "product_name" :: "manufacture_type"
+            (cat_condition :: edge_condition :: manufacture_name_condition
+                :: ("oral_name" :: "product_name" :: "manufacture_type"
                 :: "product_type" :: "specifications" :: "package" :: Nil)
                     .map (equalsConditions[String](data, _))).filterNot(_ == None).map (_.get)
 

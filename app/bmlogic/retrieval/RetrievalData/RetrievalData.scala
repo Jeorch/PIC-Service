@@ -22,15 +22,13 @@ trait RetrievalData {
         builder += "manufacture_type" -> (js \ "manufacture_type").asOpt[String].map (x => x).getOrElse(throw new Exception("product without manufacture type"))
         builder += "product_type" -> (js \ "product_type").asOpt[String].map (x => x).getOrElse(throw new Exception("product without product type"))
         builder += "package" -> (js \ "package").asOpt[String].map (x => x).getOrElse(throw new Exception("product without package"))
-
-        // TODO: category ...
+        builder += "category" -> (js \ "category").asOpt[String].map (x => x).getOrElse(throw new Exception("product without category"))
 
         builder.result
     }
 
     // for query
     implicit val d2m : DBObject => Map[String, JsValue] = { obj =>
-        // TODO: category
         Map(
             "sales_id" -> toJson(obj.getAs[String]("sales_id").map (x => x).getOrElse(throw new Exception("product without sales id"))),
             "date" -> toJson(obj.getAs[Number]("date").map (x => x.longValue).getOrElse(throw new Exception("product without time"))),
@@ -43,7 +41,8 @@ trait RetrievalData {
             "product_unit" -> toJson(obj.getAs[String]("product_unit").map (x => x).getOrElse(throw new Exception("product with product unit"))),
             "manufacture_type" -> toJson(obj.getAs[String]("manufacture_type").map (x => x).getOrElse(throw new Exception("product with manufacture type"))),
             "product_type" -> toJson(obj.getAs[String]("product_type").map (x => x).getOrElse(throw new Exception("product with product type"))),
-            "package" -> toJson(obj.getAs[String]("package").map (x => x).getOrElse(throw new Exception("product with package")))
+            "package" -> toJson(obj.getAs[String]("package").map (x => x).getOrElse(throw new Exception("product with package"))),
+            "category" -> toJson(obj.getAs[String]("category").map (x => x).getOrElse(throw new Exception("product with category")))
         )
     }
 }

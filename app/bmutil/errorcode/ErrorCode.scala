@@ -27,6 +27,7 @@ object ErrorCode {
         new ErrorNode("product without product type", -210, "销售数据没有剂型数据"),
         new ErrorNode("product without package", -211, "销售数据没有剂型数据"),
         new ErrorNode("product without sales id", -212, "销售数据没有缺少ID"),
+		new ErrorNode("product without category", -213, "销售数据没有分类数据"),
 
 		new ErrorNode("search condition parse error", -301, "搜索条件解析错误"),
 
