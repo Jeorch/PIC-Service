@@ -124,7 +124,7 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
                 "queryname" -> toJson(queryName),
                 "province" -> toJson(province),
                 "date" -> toJson(date.toString),
-                "percentage" -> toJson("30%")
+                "percentage" -> toJson("13.72 %")
             )), None)
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -149,7 +149,7 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
                 "queryname" -> toJson(queryName),
                 "province" -> toJson(province),
                 "date" -> toJson(date.toString),
-                "trend" -> toJson("30%")
+                "trend" -> toJson("1.26 %")
             )), None)
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
