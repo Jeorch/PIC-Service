@@ -371,7 +371,7 @@
               $("#jxname").text(userName.substring(userName.length - 1));
               $("#grzl").click(function () {
                 if (!temp) {
-                  myAlert();
+                  errAlert();
                 }
                 temp = true;
               });
@@ -389,7 +389,7 @@
               });
             });
 
-            function myAlert() {
+            function errAlert() {
               new $.flavr({
                 animateEntrance: "flipInX",
                 animateClosing: "flipOutX",
