@@ -13,7 +13,7 @@ import bminjection.encrypt.RSA.RSAUtils
   */
 trait PICTokenTrait extends RSAEncryptTrait with AuthTokenTrait {
     def encrypt2Token(js : JsValue) : String = {
-        val data = js.toString().getBytes(StandardCharsets.ISO_8859_1)
+        val data = js.toString().getBytes(StandardCharsets.UTF_8)
         val encodedData = RSAUtils.encryptByPrivateKey(data, privateKey)
         Base64.encode(new String(encodedData, StandardCharsets.ISO_8859_1))
     }
