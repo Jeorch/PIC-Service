@@ -7,7 +7,7 @@ import bminjection.db.DBTrait
 import bminjection.token.AuthTokenTrait
 import bmlogic.auth.AuthMessage._
 import bmlogic.common.requestArgsQuery
-import bmlogic.retrieval.RetrievalMessage.{msg_CalcPercentage, msg_CalcTrend, msg_ConditionSearchCommand}
+import bmlogic.retrieval.RetrievalMessage._
 import bmmessages.{CommonModules, MessageRoutes}
 import bmpattern.LogMessage.msg_log
 import bmpattern.ResultMessage.msg_CommonResultMessage
@@ -29,7 +29,14 @@ class RetrievalController @Inject () (as_inject : ActorSystem, dbt : DBTrait, at
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 
-    def calcMarket = Action (Ok(""))
+    def calcMarket = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import bmpattern.LogMessage.common_log
+        import bmpattern.ResultMessage.common_result
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("calc market size"))), jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv) :: msg_CheckProductLevelScope(jv)
+            :: msg_CheckEdgeScope(jv) :: msg_CheckManufactureNameScope(jv) :: msg_CalcMarketSize(jv)
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+    })
 
     //by clock
     def calcTrend = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>

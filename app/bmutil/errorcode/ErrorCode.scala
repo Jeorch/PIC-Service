@@ -30,6 +30,7 @@ object ErrorCode {
 		new ErrorNode("product without category", -213, "销售数据没有分类数据"),
 
 		new ErrorNode("search condition parse error", -301, "搜索条件解析错误"),
+		new ErrorNode("calc market size func error", -302, "计算市场销售额出错"),
 
 		new ErrorNode("no db connection", -901, "没找到数据库链接"),
 		new ErrorNode("db prase error", -902, "数据库结构发现错误"),

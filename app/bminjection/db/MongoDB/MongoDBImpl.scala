@@ -45,4 +45,19 @@ trait MongoDBImpl extends DBTrait {
             case _ => throw new Exception("primary key error")
         }
     }
+
+    override def querySum(condition : DBObject, db_name : String)
+                         (sum : (Map[String, JsValue], Map[String, JsValue]) => Map[String, JsValue])
+                         (acc: (DBObject) => Map[String, JsValue]) : Option[Map[String, JsValue]] = {
+
+        val c = from db() in db_name where condition selectCursor
+
+        var result : Map[String, JsValue] = Map.empty
+        while (c.hasNext) {
+            result = sum(result, acc(c))
+        }
+
+        if (result.isEmpty) None
+        else Some(result)
+    }
 }

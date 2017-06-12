@@ -5,9 +5,8 @@
 
 package bmutil.dao
 
+import com.mongodb.casbah.MongoCursor
 import com.mongodb.casbah.Imports._
-import com.mongodb.casbah.query.dsl.QueryExpressionObject
-import com.mongodb.MongoCredential
 
 object _data_connection {
 	def conn_name : String = "PIC"
@@ -141,6 +140,8 @@ class AMongoDBLINQ extends IDatabaseContext {
 		}
 		nc
 	}
+
+	def selectCursor : MongoCursor = openConnection.find(w)
 
 	def count : Int = openConnection.count(w)
 }
