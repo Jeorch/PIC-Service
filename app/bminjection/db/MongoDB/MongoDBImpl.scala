@@ -54,7 +54,7 @@ trait MongoDBImpl extends DBTrait {
 
         var result : Map[String, JsValue] = Map.empty
         while (c.hasNext) {
-            result = sum(result, acc(c))
+            result = sum(result, acc(c.next()))
         }
 
         if (result.isEmpty) None

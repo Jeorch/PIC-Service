@@ -113,7 +113,8 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
 
     //by clock
     def calcPercentage(data : JsValue)
-                     (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+                      (pr : Option[Map[String, JsValue]])
+                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
 //            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 //            val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
@@ -135,7 +136,8 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
 
     //by clock
     def calcTrend(data : JsValue)
-                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+                 (pr : Option[Map[String, JsValue]])
+                 (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
 //            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 //            val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
