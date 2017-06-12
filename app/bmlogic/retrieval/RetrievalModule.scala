@@ -168,7 +168,7 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
             val condition = conditionParse(data, pr.get)
-            val result = db.querySum(condition, "retrival"){(s, a) =>
+            val result = db.querySum(condition, "retrieval"){(s, a) =>
                 val os = s.get("sales").map (x => x.asOpt[Long].get).getOrElse(0.toLong)
                 val as = a.get("sales").map (x => x.asOpt[Long].get).getOrElse(0.toLong)
                 Map("sales" -> toJson(os + as))
