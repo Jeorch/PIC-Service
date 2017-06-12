@@ -5,7 +5,7 @@ import java.util.Date
 import bminjection.db.DBTrait
 import bminjection.token.AuthTokenTrait
 import bmlogic.common.sercurity.Sercurity
-import bmlogic.retrieval.ConditionSearchFunc.ConditionSearchFunc
+import bmlogic.conditions.ConditionSearchFunc
 import bmlogic.retrieval.RetrievalData.RetrievalData
 import bmlogic.retrieval.RetrievalMessage._
 import bmmessages.{CommonModules, MessageDefines}
@@ -27,11 +27,6 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
         case msg_PushProduct(data) => pushProduct(data)
         case msg_UpdateProduct(data) => updateProduct(data)
         case msg_DeleteProduct(data) => deleteProduct(data)
-
-        case msg_CalcPercentage(data) => calcPercentage(data)(pr)
-        case msg_CalcTrend(data) => calcTrend(data)(pr)
-        case msg_CalcMarketSize(data) => calcMarketSize(data)(pr)
-
 
         case _ => ???
     }
@@ -109,83 +104,5 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
-    }
-
-    //by clock
-    def calcPercentage(data : JsValue)
-                      (pr : Option[Map[String, JsValue]])
-                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
-        try {
-//            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-//            val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
-
-            val queryName = (data \ "oral_name").asOpt[String].map (x => x).getOrElse((data \ "category").asOpt[String].map (x => x).getOrElse(throw new Exception("input error")))
-            val province = (data \ "province").asOpt[String].map (x => x).getOrElse("all")
-            val date = (data \ "date").asOpt[String].map (x => x).getOrElse(new Date().getTime)
-
-            (Some(Map(
-                "queryname" -> toJson(queryName),
-                "province" -> toJson(province),
-                "date" -> toJson(date.toString),
-                "percentage" -> toJson("13.72 %")
-            )), None)
-        } catch {
-            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
-        }
-    }
-
-    //by clock
-    def calcTrend(data : JsValue)
-                 (pr : Option[Map[String, JsValue]])
-                 (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
-        try {
-//            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-//            val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
-
-            val queryName = (data \ "oral_name").asOpt[String].map (x => x).getOrElse((data \ "category").asOpt[String].map (x => x).getOrElse(throw new Exception("input error")))
-            val province = (data \ "province").asOpt[String].map (x => x).getOrElse("all")
-            val date = (data \ "date").asOpt[String].map (x => x).getOrElse(new Date().getTime)
-
-//            val thisYearSales = ???
-//            val listYearSales = ???
-
-            (Some(Map(
-                "queryname" -> toJson(queryName),
-                "province" -> toJson(province),
-                "date" -> toJson(date.toString),
-                "trend" -> toJson("1.26 %")
-            )), None)
-        } catch {
-            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
-        }
-    }
-
-    def calcMarketSize(data : JsValue)
-                      (pr : Option[Map[String, JsValue]])
-                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
-
-        try {
-            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-
-            val condition = conditionParse(data, pr.get)
-            val result = db.querySum(condition, "retrieval"){(s, a) =>
-                val os = s.get("sales").map (x => x.asOpt[Long].get).getOrElse(0.toLong)
-                val as = a.get("sales").map (x => x.asOpt[Long].get).getOrElse(0.toLong)
-                Map("sales" -> toJson(os + as))
-            } { o =>
-                Map(
-                    "sales" -> toJson(o.getAs[Number]("sales")
-                                        .map (x => x.longValue)
-                                        .getOrElse(throw new Exception("product without sales value")))
-                )
-            }
-
-            if (result.isEmpty) throw new Exception("calc market size func error")
-            else (result, None)
-
-        } catch {
-            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
-        }
-
     }
 }

@@ -37,6 +37,7 @@ object ErrorCode {
 		new ErrorNode("no encrypt impl", -903, "权限加密方式不清晰或者Token不存在"),
 		new ErrorNode("token parse error", -904, "token数据解析出现错误"),
 		new ErrorNode("token expired", -905, "token过期"),
+		new ErrorNode("db aggregation error", -906, "数据Map Reduce操作发生错误"),
 
   		new ErrorNode("unknown error", -999, "unknown error")
   	)

@@ -143,5 +143,16 @@ class AMongoDBLINQ extends IDatabaseContext {
 
 	def selectCursor : MongoCursor = openConnection.find(w)
 
+    /**
+      * TODO: 后期需要优化
+      */
+    def aggregate(group : MongoDBObject) : DBObject = {
+        val pipeline = MongoDBList(MongoDBObject("$match" -> w)) ++
+                        MongoDBList(MongoDBObject("$group" -> group))
+
+        val a = _data_connection._conn(_data_connection.conn_name)
+        a.command(MongoDBObject("aggregate" -> coll_name, "pipeline" -> pipeline))
+    }
+
 	def count : Int = openConnection.count(w)
 }

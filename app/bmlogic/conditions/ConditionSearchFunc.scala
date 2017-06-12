@@ -1,7 +1,7 @@
-package bmlogic.retrieval.ConditionSearchFunc
+package bmlogic.conditions
 
-import play.api.libs.json.JsValue
 import com.mongodb.casbah.Imports._
+import play.api.libs.json.JsValue
 
 /**
   * Created by alfredyang on 08/06/2017.

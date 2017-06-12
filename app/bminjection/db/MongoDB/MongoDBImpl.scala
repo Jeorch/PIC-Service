@@ -60,4 +60,8 @@ trait MongoDBImpl extends DBTrait {
         if (result.isEmpty) None
         else Some(result)
     }
+
+    override def aggregate(condition : DBObject, db_name : String, group : DBObject)
+                 (implicit t : DBObject => Map[String, JsValue]) : Option[Map[String, JsValue]] =
+        Some(t((from db() in db_name where condition).aggregate(group)))
 }

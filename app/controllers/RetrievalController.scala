@@ -5,6 +5,7 @@ import javax.inject.Inject
 import akka.actor.ActorSystem
 import bminjection.db.DBTrait
 import bminjection.token.AuthTokenTrait
+import bmlogic.aggregateCalc.AggregateCalcMessage._
 import bmlogic.auth.AuthMessage._
 import bmlogic.common.requestArgsQuery
 import bmlogic.retrieval.RetrievalMessage._

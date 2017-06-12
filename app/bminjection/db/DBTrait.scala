@@ -19,6 +19,9 @@ trait DBTrait {
                 (sum : (Map[String, JsValue], Map[String, JsValue]) => Map[String, JsValue])
                 (acc: (DBObject) => Map[String, JsValue]) : Option[Map[String, JsValue]]
 
+    def aggregate(condition : DBObject, db_name : String, group : DBObject)
+                 (implicit t : DBObject => Map[String, JsValue]) : Option[Map[String, JsValue]]
+
     def deleteObject(obj : DBObject, db_name : String, primary_key : String) : Unit
 
     def restoreDatabase() = ???
