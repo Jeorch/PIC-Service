@@ -12,7 +12,9 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 import bmmessages._
 import bmlogic.auth.{AuthModule, msg_AuthCommand}
+import bmlogic.config.{ConfigModule, msg_ConfigCommand}
 import bmlogic.retrieval.{RetrievalModule, msg_RetrievalCommand}
+
 
 object PipeFilterActor {
 	def prop(originSender : ActorRef, msr : MessageRoutes) : Props = {
@@ -28,7 +30,7 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 		module.dispatchMsg(cmd)(rst) match {
 			case (_, Some(err)) => {
 				originSender ! error(err)
-				cancelActor					
+				cancelActor
 			}
 			case (Some(r), _) => {
 //				println(r)
@@ -49,6 +51,9 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 		case cmd : msg_AdjustDataCommand => dispatchImpl(cmd, AdjustDataModule)
 		case cmd : msg_ResultCommand => dispatchImpl(cmd, ResultModule)
         case cmd : msg_LogCommand => dispatchImpl(cmd, LogModule)
+		case cmd : msg_ConfigCommand=>dispatchImpl(cmd,ConfigModule)
+		
+
 		case cmd : ParallelMessage => {
 		    cancelActor
 			next = context.actorOf(ScatterGatherActor.prop(originSender, msr), "scat")

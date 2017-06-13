@@ -49,6 +49,7 @@
                 "user_name" : $("#name").val(),
                 "pwd" : $("#password").val()
             })
+
             $.ajax({
                 type: "POST",
                 url: "/auth/password",
@@ -61,11 +62,11 @@
 
                 },
                 success: function(data) {
-
-                    console.info(data)
-                    window.location="@routes.PagesController.goHome()"
-
-                    //$("#commonLayout_appcreshi").parent().html(data);
+                    if(data.status == "ok") {
+                      $.cookie("token",data.result.auth_token);
+                      $.cookie("user_name",data.result.user.user_name)
+                        window.location="@routes.PagesController.goHome()"
+                    }
                 }
             })
         })

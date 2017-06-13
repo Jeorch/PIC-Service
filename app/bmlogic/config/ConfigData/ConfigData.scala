@@ -1,0 +1,35 @@
+package bmlogic.config.ConfigData
+
+import com.mongodb.casbah.Imports._
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json.toJson
+import collection.JavaConversions._
+
+/**
+  * Created by apple on 6/12/17.
+  */
+trait ConfigData {
+    
+    def convertJsValue(lst: List[BasicDBObject]): JsValue = {
+        
+//        toJson(lst.map (x => x.iterator.toList.map(z => Map(z._1 -> z._2))).flatten)
+        
+        toJson(lst.map { x =>
+            Map("level" -> toJson(x.getAs[Number]("level").map(x => x.intValue()).getOrElse(throw new Exception("index error"))),
+                "parent" -> toJson(x.getAs[String]("parent").map(x => x).getOrElse(throw new Exception("index error"))),
+                "def" -> toJson(x.getAs[String]("def").map(x => x).getOrElse(throw new Exception("index error"))),
+                "des" -> toJson(x.getAs[String]("des").map(x => x).getOrElse(throw new Exception("index error")))
+            )
+
+        })
+    }
+    
+    implicit val d2m : DBObject => Map[String, JsValue] = { obj =>
+        
+        Map(
+            "index"->toJson(obj.getAs[String]("index").map(x=>x).getOrElse(throw new Exception("index error"))),
+            "province"->toJson(obj.getAs[List[String]]("province").map(x=>x).getOrElse(throw new Exception("index error"))),
+            "category"-> convertJsValue(obj.getAs[List[BasicDBObject]]("category").map(x => x).get)
+        )
+    }
+}

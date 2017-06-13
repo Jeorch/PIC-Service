@@ -83,35 +83,35 @@ function BindSelect(ctrlName, url, type, textname, maps) {
 		 escapeMarkup: function (m) { return m; }
 	 }); 
   //绑定Ajax的内容
-    $.post(url, maps, function (data) {
-    	selectObj.empty();//清空下拉框
-    	selectObj.append("<option value=''>" + textname + "</option>");
-    	iskickout(data);
-        $.each(data, function (i, v) {
-        	var id = v.lid;
-        	var name = "";
-        	if(type == 0){
-        		name = v.lname
-        		if(ctrlName == "province"){//全国汇总-qy
-        			$.each(list,function(j,k){
-        				if(k == name+"-qy"){
-        					selectObj.append("<option value='" + id + "'>" + name + "</option>");
-        				}
-        			});
-        		}else{
-        			selectObj.append("<option value='" + id + "'>" + name + "</option>");
-        		}
-        	}else if(type == 1){
-        		var code = v.lname;
-        		name = v.remarks;
-        		selectObj.append("<option value='" + id + ","+code+"'>" + name + "</option>");
-        	}else if(type == 2){
-        		var code = v.parentCode;
-        		name = v.lname
-        		selectObj.append("<option value='" + id + ","+code+"'>" + name + "</option>");
-        	}
-        });
-    });
+  //   $.post(url, maps, function (data) {
+  //   	selectObj.empty();//清空下拉框
+  //   	selectObj.append("<option value=''>" + textname + "</option>");
+  //   	iskickout(data);
+  //       $.each(data, function (i, v) {
+  //       	var id = v.lid;
+  //       	var name = "";
+  //       	if(type == 0){
+  //       		name = v.lname
+  //       		if(ctrlName == "province"){//全国汇总-qy
+  //       			$.each(list,function(j,k){
+  //       				if(k == name+"-qy"){
+  //       					selectObj.append("<option value='" + id + "'>" + name + "</option>");
+  //       				}
+  //       			});
+  //       		}else{
+  //       			selectObj.append("<option value='" + id + "'>" + name + "</option>");
+  //       		}
+  //       	}else if(type == 1){
+  //       		var code = v.lname;
+  //       		name = v.remarks;
+  //       		selectObj.append("<option value='" + id + ","+code+"'>" + name + "</option>");
+  //       	}else if(type == 2){
+  //       		var code = v.parentCode;
+  //       		name = v.lname
+  //       		selectObj.append("<option value='" + id + ","+code+"'>" + name + "</option>");
+  //       	}
+  //       });
+  //   });
 }
 var leftUrl = "../leftData/queryByIDALL";
 

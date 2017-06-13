@@ -140,6 +140,8 @@ class AMongoDBLINQ extends IDatabaseContext {
 		}
 		nc
 	}
+	
+	
 
 	def selectCursor : MongoCursor = openConnection.find(w)
 
