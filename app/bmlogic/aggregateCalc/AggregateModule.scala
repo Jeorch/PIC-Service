@@ -45,9 +45,9 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
             val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "market size"), "sales" -> MongoDBObject("$sum" -> "$sales"))
 
             val ori_con = (oral_name_condition :: product_name_condition :: basic_conditions).
-                                filterNot(_ != None).map (_.get)
+                                filterNot(_ == None).map (_.get)
 
-            val par_con = (parent_name_conditon :: basic_conditions).filterNot(_ != None).map (_.get)
+            val par_con = (parent_name_conditon :: basic_conditions).filterNot(_ == None).map (_.get)
 
             val ori_result = db.aggregate($and(ori_con), "retrieval", group){ x =>
                 Map("sales" -> toJson(aggregateSalesResult(x, "market size")))
