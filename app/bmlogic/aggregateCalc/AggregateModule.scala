@@ -27,30 +27,21 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
         case _ => ???
     }
 
-    //by clock
     def calcPercentage(data : JsValue)
                       (pr : Option[Map[String, JsValue]])
                       (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
-//            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-//            val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
-            val queryName = (data \ "oral_name").asOpt[String].map (x => x).getOrElse((data \ "category").asOpt[String].map (x => x).getOrElse(throw new Exception("input error")))
-            val province = (data \ "province").asOpt[String].map (x => x).getOrElse("all")
-            val date = (data \ "date").asOpt[String].map (x => x).getOrElse(new Date().getTime)
 
-            (Some(Map(
-                "queryname" -> toJson(queryName),
-                "province" -> toJson(province),
-                "date" -> toJson(date.toString),
-                "percentage" -> toJson("13.72 %")
-            )), None)
+
+            null
+
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
 
-    //by clock
     def calcTrend(data : JsValue)
                  (pr : Option[Map[String, JsValue]])
                  (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
@@ -108,6 +99,10 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
         }
     }
 
+    /**
+      * 市场规模：客户输入的市场的最新月份，累计一年的销售额
+      * 累计一年的条件没有添加，这个算是一个练习，@qianpeng
+      */
     def calcMarketSize2(data : JsValue)
                        (pr : Option[Map[String, JsValue]])
                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {

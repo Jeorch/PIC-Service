@@ -11,6 +11,36 @@ import play.api.libs.json.JsValue
 trait ConditionSearchFunc {
     val sdf = new SimpleDateFormat("yyyyMM")
 
+
+    def dateConditionParse(js : JsValue) : DBObject = {
+        val data = (js \ "condition").asOpt[JsValue].map (x => x).getOrElse(throw new Exception("search condition parse error"))
+
+        val date_input = (data \ "date").asOpt[JsValue].map (x => Some(x)).getOrElse(None)
+
+        val date_condition =
+        date_input match {
+            case Some(date) => {
+                /**
+                  * start : yyyyMM 形式的时间表达式
+                  * end : yyyyMM 形式的时间表达式
+                  */
+                val start = (date \ "start").asOpt[String].map (x => x).
+                                getOrElse(throw new Exception("search condition parse error"))
+                val end = (date \ "end").asOpt[String].map (x => x).
+                                getOrElse(throw new Exception("search condition parse error"))
+
+                val start_date = sdf.parse(start).getTime
+                val end_date = sdf.parse(end).getTime
+
+                Some($and("date" $lt end_date, "date" $gte start_date))
+            }
+            case None => None
+        }
+
+        if (date_condition.isEmpty) DBObject()
+        else date_condition.get
+    }
+
     def conditionParse(js : JsValue, pr : Map[String, JsValue]) : DBObject = {
 
         val data = (js \ "condition").asOpt[JsValue].map (x => x).getOrElse(throw new Exception("search condition parse error"))
@@ -40,35 +70,10 @@ trait ConditionSearchFunc {
             else Some($or(cat map ("category" $eq _)))
 
         /**
-          * 日期
-          */
-        val date_input = (data \ "date").asOpt[JsValue].map (x => Some(x)).getOrElse(None)
-
-        val date_condition =
-        date_input match {
-            case Some(date) => {
-                /**
-                  * start : yyyyMM 形式的时间表达式
-                  * end : yyyyMM 形式的时间表达式
-                  */
-                val start = (date \ "start").asOpt[String].map (x => x).
-                                getOrElse(throw new Exception("search condition parse error"))
-                val end = (date \ "end").asOpt[String].map (x => x).
-                                getOrElse(throw new Exception("search condition parse error"))
-
-                val start_date = sdf.parse(start).getTime
-                val end_date = sdf.parse(end).getTime
-
-                Some($and("date" $lt end_date, "date" $gte start_date))
-            }
-            case None => None
-        }
-
-        /**
           * 通用名 * 产品名 * 生产厂商类型 * 剂型 * 规格 * 包装
           */
         val result =
-            (date_condition :: cat_condition :: edge_condition :: manufacture_name_condition
+            (cat_condition :: edge_condition :: manufacture_name_condition
                 :: ("oral_name" :: "product_name" :: "manufacture_type"
                 :: "product_type" :: "specifications" :: "package" :: Nil)
                     .map (equalsConditions[String](data, _))).filterNot(_ == None).map (_.get)
