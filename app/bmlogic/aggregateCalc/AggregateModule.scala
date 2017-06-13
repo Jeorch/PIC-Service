@@ -33,8 +33,6 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
-
-
             null
 
         } catch {
@@ -78,8 +76,10 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
-            val condition = conditionParse(data, pr.get)
-            val result = db.querySum(condition, "retrieval"){(s, a) =>
+            val condition = (conditionParse(data, pr.get) :: dateConditionParse(data) ::
+                                oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).
+                                    filterNot(_ == None).map(_.get)
+            val result = db.querySum($and(condition), "retrieval"){(s, a) =>
                 val os = s.get("sales").map (x => x.asOpt[Long].get).getOrElse(0.toLong)
                 val as = a.get("sales").map (x => x.asOpt[Long].get).getOrElse(0.toLong)
                 Map("sales" -> toJson(os + as))
@@ -110,10 +110,12 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
          try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
-            val condition = conditionParse(data, pr.get)
+            val condition = (conditionParse(data, pr.get) :: dateConditionParse(data) ::
+                                oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).
+                                    filterNot(_ == None).map(_.get)
             val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "market size"), "sales" -> MongoDBObject("$sum" -> "$sales"))
 
-            val result = db.aggregate(condition, "retrieval", group){ x =>
+            val result = db.aggregate($and(condition), "retrieval", group){ x =>
 
                 val ok = x.getAs[Number]("ok").get.intValue
                 if (ok == 0) throw new Exception("db aggregation error")
