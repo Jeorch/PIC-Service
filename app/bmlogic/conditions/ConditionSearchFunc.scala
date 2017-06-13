@@ -2,6 +2,7 @@ package bmlogic.conditions
 
 import java.text.SimpleDateFormat
 
+import bmutil.dao.from
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 
@@ -10,7 +11,6 @@ import play.api.libs.json.JsValue
   */
 trait ConditionSearchFunc {
     val sdf = new SimpleDateFormat("yyyyMM")
-
 
     def oralNameConditionParse(js : JsValue) : Option[DBObject] = {
         val data = (js \ "condition").asOpt[JsValue].map (x => x)
@@ -22,6 +22,29 @@ trait ConditionSearchFunc {
         val data = (js \ "condition").asOpt[JsValue].map (x => x)
             .getOrElse(throw new Exception("search condition parse error"))
         equalsConditions[String](data, "product_name")
+    }
+
+    def parentNameConditionParse(js : JsValue) : Option[DBObject] = {
+        val data = (js \ "condition").asOpt[JsValue].map (x => x)
+            .getOrElse(throw new Exception("search condition parse error"))
+
+        val oral_name_opt = (data \ "oral_name").asOpt[String]
+        val product_name_opt = (data \ "product_name").asOpt[String]
+
+        if (oral_name_opt.isEmpty && product_name_opt.isEmpty) None
+        else {
+            val oral_lst =
+            oral_name_opt.map { x =>
+                (from db() in "category" where("des" -> x) select(x => x.getAs[String]("parent").get)).toList
+            }.getOrElse(Nil)
+
+            val product_lst =
+                oral_name_opt.map { x =>
+                    (from db() in "category" where("def" -> x) select(x => x.getAs[String]("parent").get)).toList
+                }.getOrElse(Nil)
+
+            Some($or((oral_lst ++ product_lst).distinct.map (x => DBObject("category" -> x))))
+        }
     }
 
 //    def parentCategoryConditionParse(js : JsValue, pr : Map[String, JsValue]) : Option[DBObject] = {

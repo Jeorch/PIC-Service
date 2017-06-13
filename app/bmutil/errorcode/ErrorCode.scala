@@ -31,6 +31,7 @@ object ErrorCode {
 
 		new ErrorNode("search condition parse error", -301, "搜索条件解析错误"),
 		new ErrorNode("calc market size func error", -302, "计算市场销售额出错"),
+		new ErrorNode("calc percentage without oral name or product name", -303, "计算市场份额必须提供通用名或者产品名"),
 
 		new ErrorNode("no db connection", -901, "没找到数据库链接"),
 		new ErrorNode("db prase error", -902, "数据库结构发现错误"),

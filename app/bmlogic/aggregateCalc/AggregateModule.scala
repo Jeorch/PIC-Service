@@ -33,10 +33,38 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
-//            val oral_name_condition = oralNameConditionParse(data)
-//            val oral
+            val oral_name_condition = oralNameConditionParse(data)
+            val product_name_condition = productNameConditionParse(data)
 
-            null
+            val parent_name_conditon =
+            if (oral_name_condition.isEmpty && product_name_condition.isEmpty) throw new Exception("calc percentage without oral name or product name")
+            else parentNameConditionParse(data)
+
+            val basic_conditions = (conditionParse(data, pr.get) :: dateConditionParse(data) :: Nil)
+
+            val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "market size"), "sales" -> MongoDBObject("$sum" -> "$sales"))
+
+            val ori_con = (oral_name_condition :: product_name_condition :: basic_conditions).
+                                filterNot(_ != None).map (_.get)
+
+            val par_con = (parent_name_conditon :: basic_conditions).filterNot(_ != None).map (_.get)
+
+            val ori_result = db.aggregate($and(ori_con), "retrieval", group){ x =>
+                Map("sales" -> toJson(aggregateSalesResult(x, "market size")))
+            }
+
+            val par_result = db.aggregate($and(par_con), "retrieval", group){ x =>
+                Map("sales" -> toJson(aggregateSalesResult(x, "market size")))
+            }
+
+            val percentage =
+            if (ori_result.isEmpty || par_result.isEmpty) throw new Exception("")
+            else (ori_result.get.get("sales").get.asOpt[Long].get.floatValue()) /
+                    (par_result.get.get("sales").get.asOpt[Long].get.floatValue())
+
+            (Some(Map(
+                "percentage" -> toJson(percentage)
+            )), None)
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -119,16 +147,7 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
             val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "market size"), "sales" -> MongoDBObject("$sum" -> "$sales"))
 
             val result = db.aggregate($and(condition), "retrieval", group){ x =>
-
-                val ok = x.getAs[Number]("ok").get.intValue
-                if (ok == 0) throw new Exception("db aggregation error")
-                else {
-                    val lst : BasicDBList = x.getAs[BasicDBList]("result").get
-                    val tmp = lst.toList.asInstanceOf[List[BasicDBObject]]
-                    tmp.find(y => y.getAs[BasicDBObject]("_id").get.getString("ms") == "market size").map { z =>
-                        Map("sales" -> toJson(z.getLong("sales") / 100))
-                    }.getOrElse(throw new Exception("db aggregation error"))
-                }
+                Map("sales" -> toJson(aggregateSalesResult(x, "market size")))
             }
 
             if (result.isEmpty) throw new Exception("calc market size func error")
@@ -139,4 +158,15 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
         }
     }
 
+    def aggregateSalesResult(x : MongoDBObject, id : String) : Long = {
+        val ok = x.getAs[Number]("ok").get.intValue
+        if (ok == 0) throw new Exception("db aggregation error")
+        else {
+            val lst : BasicDBList = x.getAs[BasicDBList]("result").get
+            val tmp = lst.toList.asInstanceOf[List[BasicDBObject]]
+            tmp.find(y => y.getAs[BasicDBObject]("_id").get.getString("ms") == id).map { z =>
+                z.getLong("sales") / 100
+            }.getOrElse(throw new Exception("db aggregation error"))
+        }
+    }
 }
