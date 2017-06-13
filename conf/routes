@@ -22,6 +22,9 @@ POST    /data/calc/trend                        controllers.RetrievalController.
 POST    /data/calc/percentage                   controllers.RetrievalController.calcPercentage
 POST    /data/calc/units                        controllers.RetrievalController.calcUnits
 
+# 调试数据所用，以后去掉，不要调用
+POST    /data/adjust                            controllers.AdjustController.adjustNameData
+
 # retrieval 生成报告 End Point (详情参考概要设计，@Alfred)
 
 # 显示报告界面

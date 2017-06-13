@@ -6,6 +6,7 @@ import akka.actor.ActorLogging
 import akka.actor.ActorRef
 import akka.actor.Props
 import bmlogic.aggregateCalc.{AggregateModule, msg_AggregateCommand}
+import bmlogic.adjustdata.{msg_AdjustDataCommand, AdjustDataModule}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
@@ -45,6 +46,7 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 		case cmd : msg_AuthCommand => dispatchImpl(cmd, AuthModule)
 		case cmd : msg_RetrievalCommand => dispatchImpl(cmd, RetrievalModule)
 		case cmd : msg_AggregateCommand => dispatchImpl(cmd, AggregateModule)
+		case cmd : msg_AdjustDataCommand => dispatchImpl(cmd, AdjustDataModule)
 		case cmd : msg_ResultCommand => dispatchImpl(cmd, ResultModule)
         case cmd : msg_LogCommand => dispatchImpl(cmd, LogModule)
 		case cmd : ParallelMessage => {

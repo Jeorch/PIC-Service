@@ -39,7 +39,6 @@ class RetrievalController @Inject () (as_inject : ActorSystem, dbt : DBTrait, at
             :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 
-    //by clock
     def calcTrend = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
         import bmpattern.LogMessage.common_log
         import bmpattern.ResultMessage.common_result
@@ -47,7 +46,6 @@ class RetrievalController @Inject () (as_inject : ActorSystem, dbt : DBTrait, at
             :: msg_CalcTrend(jv) :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 
-    //by clock
     def calcPercentage = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
         import bmpattern.LogMessage.common_log
         import bmpattern.ResultMessage.common_result

@@ -33,6 +33,9 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
+//            val oral_name_condition = oralNameConditionParse(data)
+//            val oral
+
             null
 
         } catch {
