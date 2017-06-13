@@ -26,7 +26,7 @@ trait MongoDBImpl extends DBTrait {
     override def queryObject(condition : DBObject, db_name : String)
                    (implicit t : DBObject => Map[String, JsValue]) : Option[Map[String, JsValue]] = {
 
-        (from db() in db_name where condition select(x => t(x))).toList match {
+        (from db() in db_name where condition).selectTop(1)("date")(x => t(x)).toList match {
             case Nil => None
             case head :: Nil => Some(head)
             case _ => throw new Exception("data duplicate")
