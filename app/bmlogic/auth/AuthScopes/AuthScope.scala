@@ -16,10 +16,6 @@ trait AuthScope {
     }
 
     def pushProduceLevelScope(data : JsValue) : DBObject = {
-//        val result = MongoDBObject.newBuilder
-//        val tmp = "product_level_one" :: "product_level_two" :: "product_level_three" :: Nil
-//        tmp foreach(result += _ -> (data \ "scope" \ "product_level_one").asOpt[List[String]].map (x => x).getOrElse(Nil))
-//        result.result
         val result = MongoDBList.newBuilder
         (data \ "scope" \ "category").asOpt[List[String]].map (x => x).getOrElse(Nil).foreach(result += _)
         result.result
@@ -38,17 +34,6 @@ trait AuthScope {
     }
 
     def queryProductLevelScope(obj : MongoDBObject) : JsValue = {
-//        val scope = obj.getAs[MongoDBObject]("scope").map (x => x).getOrElse(throw new Exception("db prase error"))
-//        val product_level = scope.getAs[MongoDBObject]("product_level").map (x => x).getOrElse(throw new Exception("db prase error"))
-//        val product_level_one = product_level.getAs[List[String]]("product_level_one").map (x => x).getOrElse(throw new Exception("db prase error"))
-//        val product_level_two = product_level.getAs[List[String]]("product_level_two").map (x => x).getOrElse(throw new Exception("db prase error"))
-//        val product_level_three = product_level.getAs[List[String]]("product_level_three").map (x => x).getOrElse(throw new Exception("db prase error"))
-//        toJson(
-//            Map("product_level" ->
-//                toJson(Map("product_level_one" -> product_level_one,
-//                            "product_level_two" -> product_level_two,
-//                            "product_level_three" -> product_level_three)))
-//        )
         val scope = obj.getAs[MongoDBObject]("scope").map (x => x).getOrElse(throw new Exception("db prase error"))
         val lst = scope.getAs[List[String]]("category").map (x => x).getOrElse(throw new Exception("db prase error"))
         toJson(lst)
