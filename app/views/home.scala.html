@@ -179,10 +179,12 @@
                         <!-- 			<a href="#">保存筛选器</a> <a onclick="resetbtn()" style="margin-left: 10px;">重置</a> <a class="search-btn" onclick="serachbtn()" style="margin-left: 5px;">搜索</a> -->
                         <!-- 			<a href="index3.jsp" class="search-btn" style="margin-left: 10px;">显示报告</a><a class="search-btn" href="index2.jsp" style="margin-left: 5px;">列表</a> -->
                         <!-- 			<a onclick="seachGrid()" class="search-btn" style="margin-left: 10px;">确认</a> -->
-                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6"><a id="xsbg" class="search-btn" onclick="showView(0)">
+                        <div class="col-xs-6 col-sm-6 col-md-4 col-lg-6"><a id="xsbg" class="search-btn" onclick="showView(0)">
                             显示报告</a></div>
-                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6"><a id="xssj" class="search-btn" onclick="showView(1)">
+                        <div class="col-xs-6 col-sm-6 col-md-4 col-lg-6"><a id="xssj" class="search-btn" onclick="showView(1)">
                             显示数据</a></div>
+                        <div class="col-xs-6 col-sm-6 col-md-4 col-lg-6"><a id="xssj" class="search-btn" onclick="showDig()">
+                            test</a></div>
 
                             <!--<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6"><a class="search-btn" onclick="Test()">啦啦啦啦</a></div> -->
 
@@ -381,6 +383,53 @@
                     }
                 });
             }
+            function calcMarket(data) {
+                $.ajax({
+                    type: "POST",
+                    url: "/data/calc/market",
+                    dataType: "json",
+                    cache: false,
+                    data: data,
+                    contentType: "application/json,charset=utf-8",
+                    success: function (r) {
+                        console.log(r)
+                        if (r.status == "ok") {
+                            var market = r.result.calc.sales;
+                            $("#guim").text(market)
+                        } else {
+                            $.tooltip(r.result.message);
+                        }
+                    }
+                });
+            }
+            function calcTrend() {
+                var oral_name = "他汀类"
+                var province = "北京"
+
+                var data = JSON.stringify({
+                    "oral_name": oral_name,
+                    "province": province,
+                    "date": ""
+                })
+
+                $.ajax({
+                    type: "POST",
+                    url: "/data/calc/trend",
+                    dataType: "json",
+                    cache: false,
+                    data: data,
+                    contentType: "application/json,charset=utf-8",
+                    success: function (r) {
+                        if (r.result.status == "success") {
+                            var percentage = r.result.percentage;
+                            $('#zengzl').attr("title",percentage);
+                            $('#zengzl').html(percentage);
+                        } else {
+                            $.tooltip(r.result.message);
+                        }
+                    }
+                });
+            }
 
             function calcPercentage() {
                 var oral_name = "阿托伐他汀"
@@ -411,35 +460,6 @@
                 });
             }
 
-            function calcTrend() {
-                var oral_name = "阿托伐他汀"
-                var date = "2017-1"
-                var province = "四川"
-
-                var data = JSON.stringify({
-                    "oral_name": oral_name,
-                    "province": province,
-                    "date": date
-                })
-
-                $.ajax({
-                    type: "POST",
-                    url: "/data/calc/trend",
-                    dataType: "json",
-                    cache: false,
-                    data: data,
-                    contentType: "application/json,charset=utf-8",
-                    success: function (r) {
-                        if (r.result.status = "success") {
-                            var trend = r.result.trend;
-                            $('#fene').attr("title",trend);
-                            $('#fene').html(trend);
-                        } else {
-                            $.tooltip(r.result.message);
-                        }
-                    }
-                });
-            }
 
     </script>
 }
