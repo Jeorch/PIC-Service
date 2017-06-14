@@ -43,13 +43,17 @@ class RetrievalController @Inject () (as_inject : ActorSystem, dbt : DBTrait, at
         import bmpattern.LogMessage.common_log
         import bmpattern.ResultMessage.common_result
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("calc trend"))), jv)
-            :: msg_CalcTrend(jv) :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_CheckProductLevelScope(jv) :: msg_CheckEdgeScope(jv) :: msg_CheckManufactureNameScope(jv)
+            :: msg_CalcTrend(jv) :: msg_CalcTrend_Mat(jv) :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 
     def calcPercentage = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
         import bmpattern.LogMessage.common_log
         import bmpattern.ResultMessage.common_result
-        MessageRoutes(msg_log(toJson(Map("method" -> toJson("calc percentage"))), jv)
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("calc percentage"))), jv) :: msg_AuthTokenParser(jv)
+            :: msg_CheckTokenExpire(jv) :: msg_CheckProductLevelScope(jv)
+            :: msg_CheckEdgeScope(jv) :: msg_CheckManufactureNameScope(jv)
             :: msg_CalcPercentage(jv) :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 

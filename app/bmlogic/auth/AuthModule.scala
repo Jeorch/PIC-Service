@@ -171,17 +171,15 @@ object AuthModule extends ModuleTrait with AuthData {
             val lst = (data \ "condition" \ "category").asOpt[List[String]].map (x => x).getOrElse(Nil)
             val category_lst = productLevel2Category(lst).distinct.sorted
             val auth_cat_lst = productLevel2Category(product_level).distinct.sorted
-
             val reVal = if (auth_cat_lst.isEmpty) category_lst
                         else category_lst.takeWhile(auth_cat_lst.contains(_))
-
+            
             if (!reVal.isEmpty)
                 result = result + ("search_category_condition" -> toJson(reVal))
             else if (reVal.isEmpty && !auth_cat_lst.isEmpty)
                 result = result + ("search_category_condition" -> toJson(auth_cat_lst))
             else Unit
-
-            (pr, None)
+            (Some(result), None)
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
