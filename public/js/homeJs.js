@@ -75,7 +75,28 @@ $(document).ready(function () {
         scrollEasing: "easeOutCirc",
         scrollInertia: 400
     });
+
     showleft()
+
+
+    //加载页面直接调用,之后会撤掉
+    var token=$.cookie("token")
+    var tempD=JSON.stringify({
+        "token":token,
+        "condition":{
+            "category":["他汀类"],
+
+            "date":{
+                "end":"2017-12",
+                "start":"2016-01"
+            }
+        }
+    })
+
+    calcMarket(tempD)
+    calcPercentage();
+    calcTrend();
+
 });
 
 $("#userInfo").click(function () {
@@ -314,7 +335,7 @@ function showDig() {
         }
 
     })
-    console.log(d)
+    //console.log(d)
     calcMarket(d)
 }
 // function showLeftInfo(btn,info,res,fun) {

@@ -13,4 +13,5 @@ object AggregateCalcMessage {
     case class msg_CalcPercentage(data : JsValue) extends msg_AggregateCommand // 市场份额
     case class msg_CalcTrend(data : JsValue) extends msg_AggregateCommand // 市场增长率 选中当前日期数据
     case class msg_CalcTrend_Mat(data: JsValue) extends msg_AggregateCommand // 市场增长率 选中当前日期的MAT数据
+    case class msg_ProductQuantity(data : JsValue) extends msg_AggregateCommand//产品数量
 }

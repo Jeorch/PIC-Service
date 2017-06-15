@@ -21,7 +21,6 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
         case msg_CalcTrend(data) => calcTrend(data)(pr)
         case msg_CalcTrend_Mat(data) => calcTrendMat(data)(pr)
         case msg_CalcMarketSize(data) => calcMarketSize2(data)(pr)
-        
         case _ => ???
     }
     
@@ -166,8 +165,15 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
             
             val condition = (conditionParse(data, pr.get) :: dateConditionParse(data) ::
+
                 oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).
                 filterNot(_ == None).map(_.get)
+
+//                                oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).
+//                                    filterNot(_ == None).map(_.get)
+            println(pr.get)
+            println(condition)
+
             val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "market size"), "sales" -> MongoDBObject("$sum" -> "$sales"))
             
             val result = db.aggregate($and(condition), "retrieval", group){ x =>

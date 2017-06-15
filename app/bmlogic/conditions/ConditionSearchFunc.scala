@@ -137,6 +137,6 @@ trait ConditionSearchFunc {
         else Some($and(result))
     }
     
-    def equalsConditions[T <: String](data : JsValue, name : String) : Option[DBObject] =
+    def  equalsConditions[T <: String](data : JsValue, name : String) : Option[DBObject] =
         (data \ name).asOpt[String].map (x => Some(name $eq x)).getOrElse(None)
 }

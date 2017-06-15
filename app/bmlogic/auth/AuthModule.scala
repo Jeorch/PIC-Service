@@ -23,7 +23,7 @@ object AuthModule extends ModuleTrait with AuthData {
         case msg_AuthPushUser(data) => authPushUser(data)
 		case msg_AuthWithPassword(data) => authWithPassword(data)
         case msg_AuthTokenParser(data) => authTokenPraser(data)
-
+        
         case msg_CheckAuthTokenTest(data) => checkAuthTokenTest(data)(pr)
         case msg_CheckTokenExpire(data) => checkAuthTokenExpire(data)(pr)
         case msg_CheckEdgeScope(data) => checkEdgeScope(data)(pr)
@@ -64,15 +64,13 @@ object AuthModule extends ModuleTrait with AuthData {
     def authWithPassword(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
 		try {
 			val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-
 			val user_name = (data \ "user_name").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
 			val pwd = (data \ "pwd").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
-
 			val result = db.queryObject($and("user_name" -> user_name, "pwd" -> pwd), "users")
             val date = new Date().getTime
-
             if (result.isEmpty) throw new Exception("unkonw error")
 			else {
+                
                 val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
                 val reVal = result.get + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24))
                 val auth_token = att.encrypt2Token(toJson(reVal))
@@ -95,6 +93,7 @@ object AuthModule extends ModuleTrait with AuthData {
             val result = db.queryObject(DBObject("user_id" -> user_id), "users")
             if (result.isEmpty) throw new Exception("unkonw error")
             else (Some(result.get), None)
+            
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
@@ -117,7 +116,7 @@ object AuthModule extends ModuleTrait with AuthData {
     def checkAuthTokenTest(data : JsValue)
                           (pr : Option[Map[String, JsValue]])
                           (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
-        println(pr)
+//        println(pr)
         (pr, None)
     }
 

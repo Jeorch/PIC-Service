@@ -56,6 +56,15 @@ class RetrievalController @Inject () (as_inject : ActorSystem, dbt : DBTrait, at
             :: msg_CheckEdgeScope(jv) :: msg_CheckManufactureNameScope(jv)
             :: msg_CalcPercentage(jv) :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
+    def calcQuantity=Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import bmpattern.LogMessage.common_log
+        import bmpattern.ResultMessage.common_result
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("calc percentage"))), jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_CheckEdgeScope(jv) :: msg_CheckManufactureNameScope(jv)
+            
+            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+    })
 
     def calcUnits = Action(Ok(""))
     def dataReports = Action(Ok(""))

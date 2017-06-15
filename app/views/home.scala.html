@@ -405,6 +405,7 @@
             }
 
             function calcMarket(data) {
+
                 $.ajax({
                     type: "POST",
                     url: "/data/calc/market",
@@ -425,13 +426,23 @@
             }
 
             function calcTrend() {
-                var oral_name = "他汀类"
-                var province = "北京"
-
+                var token=$.cookie("token")
+                var oral_name = "阿托伐他汀"
+//                var product_name="阿乐"
+//                var edge="北京"
+                var start="201501"
+                var end="201601"
                 var data = JSON.stringify({
-                    "oral_name": oral_name,
-                    "province": province,
-                    "date": ""
+                    "token":token,
+                    "condition":{
+//                        "product_name":product_name,
+                        "oral_name":oral_name,
+//                        "edge":[edge],
+                        "date":{
+                            "start":start,
+                            "end":end
+                        }
+                    }
                 })
 
                 $.ajax({
@@ -442,27 +453,35 @@
                     data: data,
                     contentType: "application/json,charset=utf-8",
                     success: function (r) {
-                        if (r.result.status == "success") {
-                            var percentage = r.result.percentage;
-                            $('#zengzl').attr("title",percentage);
-                            $('#zengzl').html(percentage);
-                        } else {
-                            $.tooltip(r.result.message);
+                        if (r.status == "ok") {
+                            var trend = parseFloat(r.result.trend);
+                            var treNum=Math.floor(trend*100)/100
+                            $('#zengzl').attr("title",trend);
+                            $('#zengzl').text(treNum);
                         }
                     }
                 });
             }
 
             function calcPercentage() {
+                var token=$.cookie("token")
                 var oral_name = "阿托伐他汀"
-                var province = "四川"
-
+                var product_name="阿乐"
+                var edge="北京"
+                var start="201501"
+                var end="201601"
                 var data = JSON.stringify({
-                    "oral_name": oral_name,
-                    "province": province,
-                    "date": ""
+                    "token":token,
+                    "condition":{
+                        "product_name":product_name,
+                        "oral_name":oral_name,
+                        "edge":[edge],
+                        "date":{
+                            "start":start,
+                            "end":end
+                        }
+                    }
                 })
-
                 $.ajax({
                     type: "POST",
                     url: "/data/calc/percentage",
@@ -471,12 +490,11 @@
                     data: data,
                     contentType: "application/json,charset=utf-8",
                     success: function (r) {
-                        if (r.result.status = "success") {
-                            var percentage = r.result.percentage;
-                            $('#zengzl').attr("title",percentage);
-                            $('#zengzl').html(percentage);
-                        } else {
-                            $.tooltip(r.result.message);
+                        if (r.status == "ok") {
+                            var percentage = parseFloat(r.result.percentage);
+                            var percentNum=Math.floor(percentage*10000)/100
+                           // $('#fene').attr("title",percentage);
+                            $('#fene').text(percentNum+"%");
                         }
                     }
                 });
