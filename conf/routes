@@ -30,7 +30,6 @@ POST    /data/adjust                            controllers.AdjustController.adj
 # 显示报告界面
 GET     /data/report                            controllers.PagesController.goHome
 
-
 #用户登录
 GET     /login                                  controllers.PagesController.login
 #个人中心

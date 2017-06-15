@@ -9,6 +9,7 @@
     <link href="@routes.Assets.at("css/report.css")" rel="stylesheet">
     <link href="@routes.Assets.at("css/style2.css")" rel="stylesheet">
     <link href="@routes.Assets.at("css/Select2/select2.css")" rel="stylesheet">
+    <link href="@routes.Assets.at("css/search.css")" rel="stylesheet"></link>
         <!--JS-->
 
     <script src="@routes.Assets.at("js/html5media.min.js")"></script>
@@ -19,8 +20,8 @@
     <script src="@routes.Assets.at("js/jQueryScrollBar/jquery.mousewheel.min.js")"></script>
     <script src="@routes.Assets.at("js/jQueryScrollBar/jquery.mCustomScrollbar.js")"></script>
     <script src="@routes.Assets.at("js/jQueryUI1.10/jquery-ui-1.10.4.min.js")"></script>
-    <script src="@routes.Assets.at("js/eachars3.0/echarts.js")"></script>
-    <script src="@routes.Assets.at("js/eachars3.0/map/china.js")"></script>
+    <!--<script src="@routes.Assets.at("js/eachars3.0/echarts.js")"></script>
+    <script src="@routes.Assets.at("js/eachars3.0/map/china.js")"></script>-->
     <script src="@routes.Assets.at("js/accounting.min.js")"></script>
     <script src="@routes.Assets.at("js/flavr/flavr.min.js")"></script>
     <script src="@routes.Assets.at("js/Select2/select2.js")"></script>
@@ -186,8 +187,6 @@
                         <div class="col-xs-6 col-sm-6 col-md-4 col-lg-6"><a id="xssj" class="search-btn" onclick="showDig()">
                             test</a></div>
 
-                            <!--<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6"><a class="search-btn" onclick="Test()">啦啦啦啦</a></div> -->
-
 
                     </div>
                     <div class="h100"></div>
@@ -304,21 +303,48 @@
                         @*<%-- <jsp:include page="Report.jsp" /> --%>*@
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                             <div class="brief-introduction">
-                                <div class="brief-picture">
-                                    <img src="@routes.Assets.at("images/content1.png")" alt="" class="imgcontent"/><!-- class="img-responsive" -->
+                                <div id="img" class="brief-picture">
+                                    <img src="@routes.Assets.at("images/content1.png")" alt="" class="imgcontent"/>
                                 </div>
+
+                                <div class="container-fluid" id="grid" style="display: none;">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hover">
+                                            <tr>
+                                                <th>序号</th>
+                                                <th>时间</th>
+                                                <th>省份</th>
+                                                <th>商品名</th>
+                                                <th>销售额(元)</th>
+                                                <th>销量(盒)</th>
+                                                <th>通用名</th>
+                                                <th>厂家</th>
+                                                <th>规格</th>
+                                                <th>治疗I</th>
+                                                <th>治疗II</th>
+                                                <th>治疗III</th>
+                                                <th>最小产品单位</th>
+                                                <th>厂家类型</th>
+                                                <th>剂型</th>
+                                                <th>包装</th>
+                                            </tr>
+                                            <tbody id ="tbody"></tbody>
+                                        </table>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6 dataTables_info" id="pageinfo"></div>
+                                            <div class="col-sm-6 text-right">
+                                                <ul id='pageview'></ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                             <div class="h10"></div>
                         </div>
                     </div>
-                        <!--<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-						 <div class="brief-introduction">
-							<div class="brief-picture">
-								<img src="("images/content1.jpg")" alt="" class="img-responsive"/>
-							</div>
-						</div>
-						<div class="h10"></div>
-					</div>-->
                 </div>
             </div>
         </div>
@@ -349,13 +375,13 @@
     </div>
 } {
     <script src="@routes.Assets.at("js/gridData.js")"></script>
-    @*<script src="@routes.Assets.at("js/report.js")"></script>*@
-    <script src="@routes.Assets.at("js/home.js")"></script>
+    <!--<script src="@routes.Assets.at("js/home.js")"></script>-->
     <script src="@routes.Assets.at("js/Select2/select2.js")"></script>
-    @*<script src="@routes.Assets.at("js/left.js")"></script>*@
     <script src="@routes.Assets.at("js/Select2/zh-CN.js")"></script>
     <script src="@routes.Assets.at("js/bootstrap/bootstrap-datetimepicker.min.js")" ></script>
     <script src="@routes.Assets.at("js/locales/bootstrap-datetimepicker.zh-CN.js")" ></script>
+    <script src="@routes.Assets.at("js/bootstrap/bootstrap-paginator.js")" ></script>
+    <script src="@routes.Assets.at("js/page.js")" ></script>
     <script src="@routes.Assets.at("js/homeJs.js")"></script>
     <script type="text/javascript">
 
@@ -375,14 +401,9 @@
             }
 
             function logoutSys() {
-                $.post("../userInfo/logout", {}, function (data) {
-                    if (eval("(" + data + ")") == "ok") {
-                        location = "../userInfo/logoutSystem";
-                    } else {
-                        alert("因后端异常无法请求数据，请关闭浏览器重试！");
-                    }
-                });
+                console.info("登出")
             }
+
             function calcMarket(data) {
                 $.ajax({
                     type: "POST",
@@ -402,6 +423,7 @@
                     }
                 });
             }
+
             function calcTrend() {
                 var oral_name = "他汀类"
                 var province = "北京"
