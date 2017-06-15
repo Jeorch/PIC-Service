@@ -130,7 +130,7 @@ $("#userInfo").click(function () {
 
 function showleft() {
     var d = JSON.stringify({
-        "test": "a"
+        "test": "no data"
     })
 
     $.ajax({
@@ -152,13 +152,16 @@ function showleft() {
                 getLel_two("ATC2", "治疗II", lev)
                 getLel_thr("ATC3", "治疗III", lev)
                 //无数据
-                showLeftInfo("genericnameinfo", "通用名", data)
-                showLeftInfo("product", "商品名", data)
+
+                showLeftInfo("genericnameinfo", "通用名",data)
+                showLeftInfo("product", "商品名",data)
                 showLeftInfo("manufacturetype", "生产厂家类型", data)
-                showLeftInfo("manufacture", "生产厂家", data)
-                showLeftInfo("dosage", "剂型", data)
-                showLeftInfo("specification", "规格", data)
-                showLeftInfo("package", "包装", data)
+
+
+                showLeftInfo("manufacture", "生产厂家", data.result.info[0].manufacture)
+                showLeftInfo("dosage", "剂型", data.result.info[0].product_type)
+                showLeftInfo("specification", "规格", data.result.info[0].specifications)
+                showLeftInfo("package", "包装", data.result.info[0].package)
 //                            showLeftInfo("province","区域",pro,getProvince("province",pro))
 //                            showLeftInfo("ATC1","治疗I",lev,getDes("ATC1",lev,0))
 //                            showLeftInfo("ATC2","治疗I",lev,getDes("ATC2",lev,1))
@@ -254,6 +257,7 @@ function getLel_thr(btn, info, res) {
 function showLeftInfo(btn, info, res) {
     var selectObj = $("#" + btn);
     //设置Select2的处理
+    console.log(res)
     selectObj.select2({
         language: 'zh-CN',
         maximumInputLength: 100,//限制最大字符，以防坑货
@@ -265,7 +269,10 @@ function showLeftInfo(btn, info, res) {
     });
     selectObj.empty();//清空下拉框
     selectObj.append("<option value=''>info</option>");
-
+    $.each(res, function (i, item) {
+        console.log(item)
+        selectObj.append("<option value=" + item + ">" + item+ "</option>")
+    })
 }
 //选项框控制
 function showDig() {

@@ -23,13 +23,22 @@ trait ConfigData {
 
         })
     }
+
+    
+    
+   
     
     implicit val d2m : DBObject => Map[String, JsValue] = { obj =>
         
         Map(
             "index"->toJson(obj.getAs[String]("index").map(x=>x).getOrElse(throw new Exception("index error"))),
-            "province"->toJson(obj.getAs[List[String]]("province").map(x=>x).getOrElse(throw new Exception("index error"))),
-            "category"-> convertJsValue(obj.getAs[List[BasicDBObject]]("category").map(x => x).get)
+            "province"->toJson(obj.getAs[List[String]]("province").map(x=>x).getOrElse(throw new Exception("province error"))),
+            "category"-> convertJsValue(obj.getAs[List[BasicDBObject]]("category").map(x => x).get),
+            "manufacture"->toJson(obj.getAs[List[String]]("manufacture").get),
+            "product_type"->toJson(obj.getAs[List[String]]("product_type").get),
+            "specifications"->toJson(obj.getAs[List[String]]("specifications").get),
+            "package"->toJson(obj.getAs[List[String]]("package").get)
+            
         )
     }
 }
