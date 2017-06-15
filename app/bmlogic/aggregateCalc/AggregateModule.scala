@@ -21,6 +21,7 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
         case msg_CalcTrend(data) => calcTrend(data)(pr)
         case msg_CalcTrend_Mat(data) => calcTrendMat(data)(pr)
         case msg_CalcMarketSize(data) => calcMarketSize2(data)(pr)
+    
         case _ => ???
     }
     
@@ -69,6 +70,9 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
     }
     
     
+    /**
+      * 还可以更简单，你们谁来优化这个？？？
+      */
     def calcTrend(data : JsValue)
                  (pr : Option[Map[String, JsValue]])
                  (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
