@@ -92,7 +92,7 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
             (Some(result), None)
         } catch {
             case ex : Exception =>
-                println(ex)
+                //println(ex)
                 (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }

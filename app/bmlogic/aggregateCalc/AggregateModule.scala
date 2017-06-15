@@ -171,8 +171,7 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
 
 //                                oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).
 //                                    filterNot(_ == None).map(_.get)
-            println(pr.get)
-            println(condition)
+
 
             val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "market size"), "sales" -> MongoDBObject("$sum" -> "$sales"))
             
