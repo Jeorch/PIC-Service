@@ -56,7 +56,8 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
             
             val condition = (conditionParse(data, pr.get) :: dateConditionParse(data) ::
                              oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
-
+            
+            println(s"fuck = $condition")
             var index = 1
             val skip = (data \ "condition" \ "skip").asOpt[Int].getOrElse(1)
             val r = db.queryMultipleObject($and(condition), "retrieval", skip = skip, take = TAKE).map { x =>
@@ -67,8 +68,8 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
                       |     <td>2016/01</td>
                       |     <td>${x.get("province").get.as[String]}</td>
                       |     <td>${x.get("product_name").get.as[String]}</td>
-                      |     <td>${x.get("sales").get.as[Int]}</td>
-                      |     <td>${x.get("units").get.as[Int]}</td>
+                      |     <td>${x.get("sales").get.as[Long]}</td>
+                      |     <td>${x.get("units").get.as[Long]}</td>
                       |     <td>${x.get("oral_name").get.as[String]}</td>
                       |     <td>${x.get("manufacture").get.as[String]}</td>
                       |     <td>${x.get("specifications").get.as[String]}</td>
@@ -83,6 +84,7 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
                 index += 1
                 Map("html" -> html)
             }
+            
             val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "count"), "count" -> MongoDBObject("$sum" -> 1))
             
             val count = db.aggregate($and(condition), "retrieval", group){ x =>
@@ -92,7 +94,6 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
             (Some(result), None)
         } catch {
             case ex : Exception =>
-                //println(ex)
                 (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
