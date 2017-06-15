@@ -2,14 +2,14 @@ package bmlogic.category
 
 import bminjection.db.DBTrait
 import bmlogic.category.categoryData.CategoryData
-import bmlogic.retrieval.RetrievalData.RetrievalData
-import bmlogic.category.CategoryMessage.{msg_FirstChildCategoryCommand, msg_SecondChildCategoryCommand, msg_ThridChildCategoryCommand}
+import bmlogic.category.CategoryMessage._
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
 import bmutil.errorcode.ErrorCode
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
+import bminjection.db.LoadCategory._
 
 import scala.collection.immutable.Map
 
@@ -17,10 +17,15 @@ import scala.collection.immutable.Map
   * Created by yym on 6/15/17.
   */
 object CategoryModule extends ModuleTrait with CategoryData {
+    
+    lazy val c = category
+    
     def dispatchMsg(msg : MessageDefines)(pr : Option[Map[String, JsValue]])(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
         case msg_FirstChildCategoryCommand(data)=>FirstChildCategory(data)
         case msg_SecondChildCategoryCommand(data)=>SecondChildCategory(data)
         //case  msg_ThridChildCategoryCommand(data)=>ThridChildCategory(data)
+
+        case msg_Category(data) => Category(data)
         case _ => ???
     }
     //查出治疗1中包含的治疗2
@@ -79,4 +84,22 @@ object CategoryModule extends ModuleTrait with CategoryData {
 //        }
         
  //   }
+ 
+ 
+    def Category(data: JsValue): (Option[Map[String, JsValue]], Option[JsValue]) = {
+        val result = c match {
+            case None => None
+            case Some(ca) =>
+                val atc_one = ca.filter(x => x.get("level").get.as[Int] == 0)
+                val atc_tow = ca.filter(x => x.get("level").get.as[Int] == 1)
+                val atc_three = ca.filter(x => x.get("level").get.as[Int] == 2)
+                val oral_product = ca.filter(x => x.get("level").get.as[Int] == 3)
+                Some(Map("atc_one" -> toJson(atc_one),
+                    "atc_tow" -> toJson(atc_tow),
+                    "atc_three" -> toJson(atc_three),
+                    "oral_product" -> toJson(oral_product)))
+            case _ => ???
+        }
+        (result, None)
+    }
 }

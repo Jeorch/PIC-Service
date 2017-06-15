@@ -12,7 +12,7 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 import bmmessages._
 import bmlogic.auth.{AuthModule, msg_AuthCommand}
-import bmlogic.category.msg_CategoryCommand
+import bmlogic.category.{CategoryModule, msg_CategoryCommand}
 import bmlogic.config.{ConfigModule, msg_ConfigCommand}
 import bmlogic.retrieval.{RetrievalModule, msg_RetrievalCommand}
 
@@ -53,7 +53,7 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 		case cmd : msg_ResultCommand => dispatchImpl(cmd, ResultModule)
         case cmd : msg_LogCommand => dispatchImpl(cmd, LogModule)
 		case cmd : msg_ConfigCommand=>dispatchImpl(cmd,ConfigModule)
-		case cmd : msg_CategoryCommand=>dispatchImpl(cmd,ConfigModule)
+		case cmd : msg_CategoryCommand=>dispatchImpl(cmd,CategoryModule)
 		
 		case cmd : ParallelMessage => {
 		    cancelActor

@@ -8,6 +8,9 @@ import play.api.libs.json.Json.toJson
   * Created by yym on 6/15/17.
   */
 trait CategoryData {
+    
+    
+    
     implicit val d2m : DBObject => Map[String, JsValue] = { obj =>
         Map(
             "level"->toJson(obj.getAs[Int]("level").map(x=>x).getOrElse(throw  new Exception("category without level"))),

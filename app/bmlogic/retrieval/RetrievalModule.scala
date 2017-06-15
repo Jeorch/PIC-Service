@@ -51,15 +51,22 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         
         try {
-            
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
             
             val condition = (conditionParse(data, pr.get) :: dateConditionParse(data) ::
                              oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
             
-            println(s"fuck = $condition")
+            val count = if(!condition.isEmpty) {
+                val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "count"), "count" -> MongoDBObject("$sum" -> 1))
+                db.aggregate($and(condition), "retrieval", group){ x =>
+                    Map("count" -> toJson(aggregateSalesResult(x, "count")))
+                }
+            }else {
+                Some(Map("count" -> toJson(0)))
+            }
+            
             var index = 1
-            val skip = (data \ "condition" \ "skip").asOpt[Int].getOrElse(1)
+            val skip = (data \ "skip").asOpt[Int].getOrElse(1)
             val r = db.queryMultipleObject($and(condition), "retrieval", skip = skip, take = TAKE).map { x =>
                 lazy val atc = searchatc(x.get("category").get.asOpt[String].getOrElse(throw new Exception("input error")))(Some(Nil)).map(x => x).getOrElse(throw new Exception)
                 val html =
@@ -85,11 +92,6 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
                 Map("html" -> html)
             }
             
-            val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "count"), "count" -> MongoDBObject("$sum" -> 1))
-            
-            val count = db.aggregate($and(condition), "retrieval", group){ x =>
-                Map("count" -> toJson(aggregateSalesResult(x, "count")))
-            }
             val result = Map("search_result" -> toJson(r), "page" -> toJson(Page(skip, count.get.get("count").get.as[Long])))
             (Some(result), None)
         } catch {

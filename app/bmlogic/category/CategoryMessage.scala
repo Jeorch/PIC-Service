@@ -13,5 +13,7 @@ import play.api.libs.json.JsValue
         case class msg_FirstChildCategoryCommand(data : JsValue) extends msg_CategoryCommand
         case class msg_SecondChildCategoryCommand(data : JsValue) extends msg_CategoryCommand
         case class msg_ThridChildCategoryCommand(data : JsValue) extends msg_CategoryCommand
+        
+        case class msg_Category(data: JsValue) extends msg_CategoryCommand
     }
 

@@ -8,7 +8,7 @@ import play.api.libs.json.Json.toJson
   */
 object Page {
 
-    def TAKE = 20
+    def TAKE = 10
     def SKIP(PAGE_CURRENT : Long) : Long = ((PAGE_CURRENT-1)*TAKE)
 
     /**

@@ -137,11 +137,9 @@
                             </div>
                         </div>
                     </div>
-                    @*<shiro:hasPermission name="治疗类别I">*@
                     <div class="box-wrap">
                         <select id="ATC1" class="selectWidth" name="atc1Name"></select>
                     </div>
-                    @*</shiro:hasPermission>*@
 
                     <div class="box-wrap">
                         <select id="ATC2" class="selectWidth" name="atc2Name"></select>
@@ -155,11 +153,9 @@
                     <div class="box-wrap">
                         <select id="product" class="selectWidth" name="productName"></select>
                     </div>
-                    @* <shiro:hasPermission name="qy">*@
                     <div class="box-wrap">
                         <select id="province" class="selectWidth" name="provinceName"></select>
                     </div>
-                    @*</shiro:hasPermission>*@
                     <div class="box-wrap">
                         <select id="manufacturetype" class="selectWidth" name="manuTypeName"></select>
                     </div>
@@ -182,8 +178,6 @@
                         <!-- 			<a onclick="seachGrid()" class="search-btn" style="margin-left: 10px;">确认</a> -->
                         <div class="col-xs-6 col-sm-6 col-md-4 col-lg-6"><a id="xsbg" class="search-btn" onclick="showView(0)">
                             显示报告</a></div>
-                        @*<div class="col-xs-6 col-sm-6 col-md-4 col-lg-6"><a id="xssj" class="search-btn" onclick="showView(1)">*@
-                            @*显示数据</a></div>*@
                         <div class="col-xs-6 col-sm-6 col-md-4 col-lg-6"><a id="xssj" class="search-btn" onclick="showDig()">
                             显示数据</a></div>
 
@@ -311,7 +305,7 @@
                                     <div class="table-responsive">
                                         <table class="table table-bordered table-hover">
                                             <tr>
-                                                <th>序号</th>
+                                                <th></th>
                                                 <th>时间</th>
                                                 <th>省份</th>
                                                 <th>商品名</th>
@@ -374,8 +368,6 @@
         </div>
     </div>
 } {
-    <!--<script src="@routes.Assets.at("js/gridData.js")"></script>
-    <script src="@routes.Assets.at("js/home.js")"></script>-->
     <script src="@routes.Assets.at("js/Select2/select2.js")"></script>
     <script src="@routes.Assets.at("js/Select2/zh-CN.js")"></script>
     <script src="@routes.Assets.at("js/bootstrap/bootstrap-datetimepicker.min.js")" ></script>
@@ -383,6 +375,8 @@
     <script src="@routes.Assets.at("js/bootstrap/bootstrap-paginator.js")" ></script>
     <script src="@routes.Assets.at("js/page.js")" ></script>
     <script src="@routes.Assets.at("js/homeJs.js")"></script>
+    <script src="@routes.Assets.at("js/common2.js")"></script>
+    <script src="@routes.Assets.at("js/search.js")"></script>
     <script type="text/javascript">
 
 
@@ -405,7 +399,6 @@
             }
 
             function calcMarket(data) {
-
                 $.ajax({
                     type: "POST",
                     url: "/data/calc/market",
@@ -425,26 +418,7 @@
                 });
             }
 
-            function calcTrend() {
-                var token=$.cookie("token")
-                var oral_name = "阿托伐他汀"
-//                var product_name="阿乐"
-//                var edge="北京"
-                var start="201501"
-                var end="201601"
-                var data = JSON.stringify({
-                    "token":token,
-                    "condition":{
-//                        "product_name":product_name,
-                        "oral_name":oral_name,
-//                        "edge":[edge],
-                        "date":{
-                            "start":start,
-                            "end":end
-                        }
-                    }
-                })
-
+            function calcTrend(data) {
                 $.ajax({
                     type: "POST",
                     url: "/data/calc/trend",
@@ -457,31 +431,13 @@
                             var trend = parseFloat(r.result.trend);
                             var treNum=Math.floor(trend*100)/100
                             $('#zengzl').attr("title",trend);
-                            $('#zengzl').text(treNum);
+                            $('#zengzl').text(treNum );
                         }
                     }
                 });
             }
 
-            function calcPercentage() {
-                var token=$.cookie("token")
-                var oral_name = "阿托伐他汀"
-                var product_name="阿乐"
-                var edge="北京"
-                var start="201501"
-                var end="201601"
-                var data = JSON.stringify({
-                    "token":token,
-                    "condition":{
-                        "product_name":product_name,
-                        "oral_name":oral_name,
-                        "edge":[edge],
-                        "date":{
-                            "start":start,
-                            "end":end
-                        }
-                    }
-                })
+            function calcPercentage(data) {
                 $.ajax({
                     type: "POST",
                     url: "/data/calc/percentage",
