@@ -76,10 +76,6 @@ $(document).ready(function () {
         scrollInertia: 400
     });
     showleft()
-
-    //加载页面直接调用calcPercentage(),之后会撤掉
-    calcPercentage();
-    calcTrend();
 });
 
 $("#userInfo").click(function () {
@@ -188,7 +184,6 @@ function getLel_one(btn, info, res) {
     selectObj.append("<option value=''>info</option>");
     $.each(res, function (i, item) {
         if (item.level == 0) {
-            console.log(item.des)
             selectObj.append("<option value=" + item.des + ">" + item.des + "</option>")
         }
 
