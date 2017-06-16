@@ -14,13 +14,14 @@ object _data_connection {
 //	val addr = new com.mongodb.casbah.Imports.ServerAddress("localhost", 2017)
 //	val credentialsList = MongoCredential.createPlainCredential("dongdamaster", conn_name, "dongda@master".toCharArray)
 //    val _conn = MongoClient(addr, List(credentialsList))
-	val _conn = MongoClient()
+	val _conn = MongoClient()(conn_name)
 
 	var _conntion : Map[String, MongoCollection] = Map.empty
 	
 	def getCollection(coll_name : String) : MongoCollection = {
-		if (!_conntion.contains(coll_name)) _conntion += (coll_name -> _conn(conn_name)(coll_name))
-		
+//		if (!_conntion.contains(coll_name)) _conntion += (coll_name -> _conn(conn_name)(coll_name))
+		if (!_conntion.contains(coll_name)) _conntion += (coll_name -> _conn(coll_name))
+
 		_conntion.get(coll_name).get
 	}
 	
@@ -34,8 +35,9 @@ object _data_connection {
 trait IDatabaseContext {
 	var coll_name : String = null
 
-	protected def openConnection : MongoCollection = 
-	  	_data_connection._conn(_data_connection.conn_name)(coll_name)
+	protected def openConnection : MongoCollection =
+		_data_connection._conn(coll_name)
+//	  	_data_connection._conn(_data_connection.conn_name)(coll_name)
 	protected def closeConnection = null
 }
 
@@ -152,7 +154,7 @@ class AMongoDBLINQ extends IDatabaseContext {
         val pipeline = MongoDBList(MongoDBObject("$match" -> w)) ++
                         MongoDBList(MongoDBObject("$group" -> group))
 
-        val a = _data_connection._conn(_data_connection.conn_name)
+        val a = _data_connection._conn
         a.command(MongoDBObject("aggregate" -> coll_name, "pipeline" -> pipeline))
     }
 
