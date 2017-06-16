@@ -45,3 +45,5 @@ GET     /assets/*file               			controllers.Assets.at(path="/public", fil
 # by clock
 GET     /contactus                      		controllers.PagesController.contactus
 GET     /aboutus                                controllers.PagesController.aboutus
+
+GET     /comingsoon                        controllers.PagesController.comingsoon

@@ -28,4 +28,8 @@ class PagesController extends Controller {
     def aboutus = Action {
         Ok(views.html.aboutus())
     }
+    
+    def comingsoon = Action {
+        Ok(views.html.comingsonn())
+    }
 }

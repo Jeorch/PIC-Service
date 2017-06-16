@@ -2,13 +2,29 @@
  * Created by qianpeng on 2017/6/15.
  */
 
+var reset = function() {
+    $("#yearInputb").val("")
+    $("#monthInputb").val("")
+    var array = [
+        "ATC1","ATC2","ATC3","genericnameinfo","product","province","manufacture","manufacturetype","dosage","specification","package"
+    ]
+    resetSelect(array)
+}
+
+var resetSelect = function(array) {
+    $.each(array, function (i,v) {
+        $("#"+v+" option:first").prop("selected",true)
+        $("#"+v).trigger('change.select2');
+    });
+}
+
 /**
  * 数据列表
  */
 var showDataList = function() {
 
     pageResult(1)
-    $("#img").hide();
+    $(".imgs").hide();
     $("#grid").show();
 }
 
@@ -40,7 +56,14 @@ var pageResult = function(skip) {
                     $("#tbody").append(v.html)
                 })
                 Page(r)
+                searchCount++
+                if(searchCount == 4){
+                    $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
+                    searchCount = 0
+                }
             }else{
+                $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
+                searchCount = 0
                 $("#pageview").hide()
                 Page(null)
             }
@@ -112,6 +135,14 @@ function calcMarket(data) {
             if (r.status == "ok") {
                 var market = r.result.calc.sales;
                 $("#guim").text(market)
+                searchCount++
+                if(searchCount == 4){
+                    $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
+                    searchCount = 0
+                }
+            }else{
+                $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
+                searchCount = 0
             }
         }
     });
@@ -130,6 +161,14 @@ function calcTrend(data) {
                 var trend = parseFloat(r.result.trend);
                 var treNum=(Math.floor(trend*100)/100)+ "%"
                 $('#zengzl').text(treNum);
+                searchCount++
+                if(searchCount == 4){
+                    $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
+                    searchCount = 0
+                }
+            }else {
+                $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
+                searchCount = 0
             }
         }
     });
@@ -148,6 +187,14 @@ function calcPercentage(data) {
                 var percentage = parseFloat(r.result.percentage);
                 var percentNum=(Math.floor(percentage*10000)/100) +"%"
                 $('#fene').text(percentNum);
+                searchCount++
+                if(searchCount == 4){
+                    $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
+                    searchCount = 0
+                }
+            }else {
+                $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
+                searchCount = 0
             }
         }
     });

@@ -1,10 +1,8 @@
 /**
  * Created by yym on 6/13/17.
  */
-var pageTypeIndex = "homePage";
 var userName = $.cookie("user_name")
-var list = null;
-var temp = false;
+var searchCount = 0;
 $('.timepk_year').datetimepicker({
     language: 'zh-CN',
     format: "yyyy",
@@ -177,6 +175,7 @@ function showLeftInfo(btn, info, res) {
 }
 //选项框控制
 function showDig() {
+    $("#xssj").attr({"class":"screen-box","onclick":""})
     $("#guim").text("")
     $('#zengzl').text("");
     $("#fene").text("")
