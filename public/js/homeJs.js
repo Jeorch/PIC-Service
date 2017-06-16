@@ -4,27 +4,15 @@
 var userName = $.cookie("user_name")
 var searchCount = 0;
 $('.timepk_year').datetimepicker({
-    language: 'zh-CN',
-    format: "yyyy",
-    weekStart: 1,
-    todayBtn: true,
-    autoclose: true,
-    todayHighlight: 1,
-    startView: 4,
-    minView: 4,
-    forceParse: 0
+    language: 'zh-CN', format: "yyyy", weekStart: 1,
+    todayBtn: true, autoclose: true, todayHighlight: 1,
+    startView: 4, minView: 4, forceParse: 0
 });
 
 $('.timepk_month').datetimepicker({
-    language: 'zh-CN',
-    format: "yyyy-mm",
-    weekStart: 1,
-    todayBtn: 1,
-    autoclose: 1,
-    todayHighlight: 1,
-    startView: 3,
-    minView: 3,
-    forceParse: 0
+    language: 'zh-CN', format: "yyyy-mm", weekStart: 1,
+    todayBtn: 1, autoclose: 1, todayHighlight: 1,
+    startView: 3, minView: 3, forceParse: 0
 });
 
 $(document).ready(function () {
@@ -50,7 +38,6 @@ $(document).ready(function () {
 
     $('#timeTab a').click(function (e) {
         e.preventDefault()
-
         $(this).tab('show')
     });
     $(".userName").text(userName);
@@ -87,7 +74,7 @@ $("#userInfo").click(function () {
                 $.cookie("email", data.result.auth.email);
                 $.cookie("phoneNo", data.result.phoneNo);
                 $.cookie("screen_photo", data.result.screen_photo);
-                window.location = "/userInfo"
+                window.open("/userInfo")
             } else {
                 window.location = "@routes.PagesController.login()"
 
@@ -96,6 +83,7 @@ $("#userInfo").click(function () {
     })
 })
 
+//这个还可以在简化，@杨艳梅 回来你做
 function showleft() {
     $.ajax({
         type: "POST",

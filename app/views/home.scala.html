@@ -46,17 +46,15 @@
                         <div id="btnGroup" class="btn-group btn-group-lg">
                             <button type="button" id="en" class="btn btn-default">EN</button>
                             <button id="btnShow" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                <span class="userName">NULL</span> <span class="caret"></span>
+                                <span id="jxname">NULL</span> <span class="caret"></span>
                             </button>
-                            <div id="content" class="dropdown-menu" role="menu"
-                            style="padding: 0;">
+                            <div id="content" class="dropdown-menu" role="menu" style="padding: 0;">
                                 <div class="drop-down">
                                     <div class="manager-text">
                                         <span class="userName">NULL</span>
                                     </div>
                                     <div class="personal-text">
-                                        <a class="border-left" href="#" id="userInfo">
-                                            个人资料</a> <a href="#" onclick="logoutSys()">退出</a>
+                                        <a class="border-left" id="userInfo">个人资料</a> <a href="#" onclick="logoutSys()">退出</a>
                                     </div>
                                 </div>
                             </div>
@@ -372,26 +370,33 @@
     <script src="@routes.Assets.at("js/search.js")"></script>
     <script type="text/javascript">
 
-
-            function errAlert() {
-                new $.flavr({
-                    animateEntrance: "flipInX",
-                    animateClosing: "flipOutX",
-                    content: "该功能暂未开放！",
-                    buttons: {
-                        info: {text: "知道了", style: "info"}
-                    },
-                    onClose: function () {
-                        temp = false;
-                    }
-                });
-            }
+//            function errAlert() {
+//                new $.flavr({
+//                    animateEntrance: "flipInX",
+//                    animateClosing: "flipOutX",
+//                    content: "该功能暂未开放！",
+//                    buttons: {
+//                        info: {text: "知道了", style: "info"}
+//                    },
+//                    onClose: function () {
+//                        temp = false;
+//                    }
+//                });
+//            }
 
             function logoutSys() {
-                console.info("登出")
+                cleanAllCookie();
+                location = "/login"
             }
 
-
+            var cleanAllCookie = function() {
+                var keys = document.cookie.match(/[^ =;]+(?=\=)/g);
+                if(keys) {
+                    $.each(keys, function(i, v) {
+                        $.cookie(v, "", {"path": "/", "expires": -1 });
+                    })
+                }
+            }
 
 
     </script>
