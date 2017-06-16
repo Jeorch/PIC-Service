@@ -13,7 +13,7 @@ var getSearchValue = function () {
         $("#ATC1"),
         $("#ATC2"),
         $("#ATC3")
-    ]
+    ];
 
     var category = null;
     $.each(atc, function(i, v) {
@@ -24,6 +24,20 @@ var getSearchValue = function () {
         }
     })
 
+    var oral = null;
+    if($("#genericnameinfo").val() != "") {
+        oral = {
+            "oral_name": $("#genericnameinfo").val()
+        }
+    }
+
+    var product = null;
+    if($("#product").val() != "") {
+        product = {
+            "product_name": $("#product").val()
+        }
+    }
+
     var edge = null;
     if($("#province").val() != "") {
         edge = {
@@ -31,5 +45,5 @@ var getSearchValue = function () {
         }
     }
 
-    return $.extend(category, edge)
+    return $.extend(category, edge, oral, product)
 }

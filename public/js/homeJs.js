@@ -58,25 +58,14 @@ $(document).ready(function () {
     $(".userName").text(userName);
     $("#jxname").text(userName.substring(userName.length - 1));
 
-    $("#en").click(function () {
-        if (!temp) {
-            myAlert();
-        }
-        temp = true;
-    });
 
-    $("#en").click(function () {
-        if (!temp) {
-            myAlert();
-        }
-        temp = true;
-    });
     $(".mCustomScrollbar").mCustomScrollbar({
         theme: "minimal-dark",
         scrollEasing: "easeOutCirc",
         scrollInertia: 400
     });
 
+    showAtcInfo()
     showleft()
 });
 
@@ -110,30 +99,14 @@ $("#userInfo").click(function () {
 })
 
 function showleft() {
-    var d = JSON.stringify({
-        "test": "no data"
-    })
-
     $.ajax({
         type: "POST",
         url: "/showConfig",
-        data: d,
+        data: JSON.stringify({}),
         contentType: "application/json,charset=utf-8",
         success: function (data) {
             if (data.status == "ok") {
-
-                var pro = data.result.info[0].province
-                var lev = data.result.info[0].category
-                getProvince("province", "区域", pro)
-                getLel_one("ATC1", "治疗I", lev)
-                getLel_two("ATC2", "治疗II", lev)
-                getLel_thr("ATC3", "治疗III", lev)
-                //无数据
-
-                showLeftInfo("genericnameinfo", "通用名",data)
-                showLeftInfo("product", "商品名",data)
-
-
+                showLeftInfo("province", "区域", data.result.info[0].province)
                 showLeftInfo("manufacture", "生产厂家", data.result.info[0].manufacture)
                 showLeftInfo("manufacturetype", "生产厂商类型",eval(["内资","合资"]))
                 showLeftInfo("dosage", "剂型", data.result.info[0].product_type)
@@ -143,102 +116,59 @@ function showleft() {
             }
         }
     })
-
 }
+
+var showAtcInfo = function() {
+    $.ajax({
+        type: "POST",
+        url: "/category",
+        data: JSON.stringify({}),
+        contentType: "application/json,charset=utf-8",
+        success: function (data) {
+            if (data.status == "ok") {
+                showLeftInfo("ATC1", "治疗I", data.result.atc_one)
+                showLeftInfo("ATC2", "治疗II", data.result.atc_tow)
+                showLeftInfo("ATC3", "治疗III", data.result.atc_three)
+                showLeftInfo("genericnameinfo", "通用名", data.result.oral)
+                showLeftInfo("product", "商品名", data.result.product)
+            }
+        }
+    })
+}
+
+/**
+ * 暂时没用到
+ * @param data
+ * @param flag
+ * @returns {Array}
+ */
+var eachResult = function (data, flag) {
+    var array = new Array();
+    $.each(data, function(i, v){
+        if(flag == "des") {
+            array.push(v.des);
+        }else if(flag == "def") {
+            array.push(v.def);
+        }else return array;
+    });
+    return array;
+}
+
+var creatSelect = function(id, info) {
+    return $("#" + id).select2({
+        language: 'zh-CN',
+        maximumInputLength: 100,//限制最大字符，以防坑货
+        placeholder: info,
+        allowClear: true,
+        escapeMarkup: function (m) {
+            return m;
+        }
+    });
+}
+
 //控制左
-function getProvince(btn, info, res) {
-    var selectObj = $("#" + btn);
-    //设置Select2的处理
-    selectObj.select2({
-        language: 'zh-CN',
-        maximumInputLength: 100,//限制最大字符，以防坑货
-        placeholder: info,
-        allowClear: true,
-        escapeMarkup: function (m) {
-            return m;
-        }
-    });
-    selectObj.empty();//清空下拉框
-    selectObj.append("<option value=''>info</option>");
-    $.each(res, function (i, item) {
-        selectObj.append("<option value=" + item + ">" + item + "</option>")
-    })
-}
-
-function getLel_one(btn, info, res) {
-    var selectObj = $("#" + btn);
-    //设置Select2的处理
-    selectObj.select2({
-        language: 'zh-CN',
-        maximumInputLength: 100,//限制最大字符，以防坑货
-        placeholder: info,
-        allowClear: true,
-        escapeMarkup: function (m) {
-            return m;
-        }
-    });
-    selectObj.empty();
-    selectObj.append("<option value=''>info</option>");
-    $.each(res, function (i, item) {
-        if (item.level == 0) {
-            selectObj.append("<option value=" + item.des + ">" + item.des + "</option>")
-        }
-
-    })
-}
-
-function getLel_two(btn, info, res) {
-
-    var selectObj = $("#" + btn);
-    //设置Select2的处理
-    selectObj.select2({
-        language: 'zh-CN',
-        maximumInputLength: 100,//限制最大字符，以防坑货
-        placeholder: info,
-        allowClear: true,
-        escapeMarkup: function (m) {
-            return m;
-        }
-    });
-    selectObj.empty();//清空下拉框
-    selectObj.append("<option value=''>info</option>");
-    $.each(res, function (i, item) {
-        if (item.level == 1)
-            selectObj.append("<option value=" + item.des + ">" + item.des + "</option>")
-    })
-}
-function getLel_thr(btn, info, res) {
-
-    var selectObj = $("#" + btn);
-    //设置Select2的处理
-    selectObj.select2({
-        language: 'zh-CN',
-        maximumInputLength: 100,//限制最大字符，以防坑货
-        placeholder: info,
-        allowClear: true,
-        escapeMarkup: function (m) {
-            return m;
-        }
-    });
-    selectObj.empty();//清空下拉框
-    selectObj.append("<option value=''>info</option>");
-    $.each(res, function (i, item) {
-        if (item.level == 2)
-            selectObj.append("<option value=" + item.des + ">" + item.des + "</option>")
-    })
-}
 function showLeftInfo(btn, info, res) {
-    var selectObj = $("#" + btn);
-    //设置Select2的处理
-    selectObj.select2({
-        language: 'zh-CN',
-        maximumInputLength: 100,//限制最大字符，以防坑货
-        placeholder: info,
-        allowClear: true,
-        escapeMarkup: function (m) {
-            return m;
-        }
-    });
+    var selectObj = creatSelect(btn, info);
     selectObj.empty();//清空下拉框
     selectObj.append("<option value=''>info</option>");
     $.each(res, function (i, item) {
@@ -247,6 +177,9 @@ function showLeftInfo(btn, info, res) {
 }
 //选项框控制
 function showDig() {
+    $("#guim").text("")
+    $('#zengzl').text("");
+    $("#fene").text("")
     showDataList()
     showDataGather()
 }

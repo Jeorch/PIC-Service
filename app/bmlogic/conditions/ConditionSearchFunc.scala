@@ -41,10 +41,9 @@ trait ConditionSearchFunc {
                 }.getOrElse(Nil)
             
             val product_lst =
-                oral_name_opt.map { x =>
+                product_name_opt.map { x =>
                     (from db() in "category" where("def" -> x) select(x => x.getAs[String]("parent").get)).toList
                 }.getOrElse(Nil)
-            
             Some($or((oral_lst ++ product_lst).distinct.map (x => DBObject("category" -> x))))
         }
     }

@@ -13,17 +13,18 @@ var showDataList = function() {
 }
 
 var pageResult = function(skip) {
-    var tmp = getSearchValue();
+    var c = $.extend(getSearchValue(), getTime())
     var data = JSON.stringify({
         "token": $.cookie("token"),
         "condition":{
-            "category": tmp.category,
-            "edge": tmp.edge
+            "category": c.category,
+            "oral_name": c.oral_name,
+            "product_name": c.product_name,
+            "edge": c.edge,
+            "date": c.date,
         },
         "skip": skip
     });
-
-    $("#tbody").empty();
     $.ajax({
         type: "POST",
         url: "/data/search",
@@ -33,6 +34,7 @@ var pageResult = function(skip) {
         contentType: "application/json,charset=utf-8",
         success: function (r) {
             if (r.status == "ok") {
+                $("#tbody").empty();
                 $("#pageview").show()
                 $.each(r.search_result, function(i, v){
                     $("#tbody").append(v.html)
@@ -46,10 +48,7 @@ var pageResult = function(skip) {
     });
 }
 
-/**
- * 显示主页的四个小汇总
- */
-var showDataGather = function() {
+var getTime = function() {
     var timeType = $("#timeType").val();
     var start = null;
     var end = null;
@@ -74,12 +73,22 @@ var showDataGather = function() {
             }
         }
     }
-    var c = $.extend(getSearchValue(), date)
+    return date;
+}
+
+/**
+ * 显示主页的四个小汇总
+ */
+var showDataGather = function() {
+
+    var c = $.extend(getSearchValue(), getTime())
 
     var data = JSON.stringify({
         "token": $.cookie("token"),
         "condition":{
             "category": c.category,
+            "oral_name": c.oral_name,
+            "product_name": c.product_name,
             "date": c.date,
             "edge": c.edge
         }
@@ -89,4 +98,57 @@ var showDataGather = function() {
     calcTrend(data)
     calcPercentage(data)
 
+}
+
+function calcMarket(data) {
+    $.ajax({
+        type: "POST",
+        url: "/data/calc/market",
+        dataType: "json",
+        cache: false,
+        data: data,
+        contentType: "application/json,charset=utf-8",
+        success: function (r) {
+            if (r.status == "ok") {
+                var market = r.result.calc.sales;
+                $("#guim").text(market)
+            }
+        }
+    });
+}
+
+function calcTrend(data) {
+    $.ajax({
+        type: "POST",
+        url: "/data/calc/trend",
+        dataType: "json",
+        cache: false,
+        data: data,
+        contentType: "application/json,charset=utf-8",
+        success: function (r) {
+            if (r.status == "ok") {
+                var trend = parseFloat(r.result.trend);
+                var treNum=(Math.floor(trend*100)/100)+ "%"
+                $('#zengzl').text(treNum);
+            }
+        }
+    });
+}
+
+function calcPercentage(data) {
+    $.ajax({
+        type: "POST",
+        url: "/data/calc/percentage",
+        dataType: "json",
+        cache: false,
+        data: data,
+        contentType: "application/json,charset=utf-8",
+        success: function (r) {
+            if (r.status == "ok") {
+                var percentage = parseFloat(r.result.percentage);
+                var percentNum=(Math.floor(percentage*10000)/100) +"%"
+                $('#fene').text(percentNum);
+            }
+        }
+    });
 }

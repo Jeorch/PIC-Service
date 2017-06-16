@@ -49,7 +49,7 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
     def conditionSearch(data : JsValue)
                        (pr : Option[Map[String, JsValue]])
                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
-        
+        import bmutil.alDateOpt._
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
             
@@ -72,7 +72,7 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
                 val html =
 					s"""<tr>
                       |     <td>$index</td>
-                      |     <td>2016/01</td>
+                      |     <td>${Timestamp2yyyyMM(x.get("date").get.as[Long])}</td>
                       |     <td>${x.get("province").get.as[String]}</td>
                       |     <td>${x.get("product_name").get.as[String]}</td>
                       |     <td>${x.get("sales").get.as[Long]}</td>

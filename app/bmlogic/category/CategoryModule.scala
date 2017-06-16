@@ -90,14 +90,16 @@ object CategoryModule extends ModuleTrait with CategoryData {
         val result = c match {
             case None => None
             case Some(ca) =>
-                val atc_one = ca.filter(x => x.get("level").get.as[Int] == 0)
-                val atc_tow = ca.filter(x => x.get("level").get.as[Int] == 1)
-                val atc_three = ca.filter(x => x.get("level").get.as[Int] == 2)
-                val oral_product = ca.filter(x => x.get("level").get.as[Int] == 3)
+                val atc_one = ca.filter(x => x.get("level").get.as[Int] == 0).map(x => x.get("des").get.as[String]).distinct
+                val atc_tow = ca.filter(x => x.get("level").get.as[Int] == 1).map(x => x.get("des").get.as[String]).distinct
+                val atc_three = ca.filter(x => x.get("level").get.as[Int] == 2).map(x => x.get("des").get.as[String]).distinct
+                val oral = ca.filter(x => x.get("level").get.as[Int] == 3).map(x => x.get("des").get.as[String]).distinct
+                val product = ca.filter(x => x.get("level").get.as[Int] == 3).map(x => x.get("def").get.as[String]).distinct
                 Some(Map("atc_one" -> toJson(atc_one),
                     "atc_tow" -> toJson(atc_tow),
                     "atc_three" -> toJson(atc_three),
-                    "oral_product" -> toJson(oral_product)))
+                    "oral" -> toJson(oral),
+                    "product" -> toJson(product)))
             case _ => ???
         }
         (result, None)

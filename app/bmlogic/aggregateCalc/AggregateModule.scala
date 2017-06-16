@@ -37,7 +37,7 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
             val parent_name_conditon =
                 if (oral_name_condition.isEmpty && product_name_condition.isEmpty) throw new Exception("calc percentage without oral name or product name")
                 else parentNameConditionParse(data)
-            
+
             val basic_conditions = (conditionParse(data, pr.get) :: dateConditionParse(data) :: Nil)
             
             val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "market size"), "sales" -> MongoDBObject("$sum" -> "$sales"))
@@ -105,7 +105,7 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
             val condition = (conditionParse(data, pr.get) :: dateConditionParse(data, true) ::
                 oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).
                 filterNot(_ == None).map(_.get)
-    
+
             val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "market trend"), "sales" -> MongoDBObject("$sum" -> "$sales"))
     
             val result = db.aggregate($and(condition), "retrieval", group){ x =>
