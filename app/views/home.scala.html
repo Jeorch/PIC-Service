@@ -66,13 +66,7 @@
         <div class="row">
             <div class="col-xs-3 col-sm-3 col-md-3 col-lg-2 main-left" style="background-color: #ccc;">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                        <!-- 		<div class="input-group input-group-md"> -->
-                        <!-- 			<div class="input-group-addon input-group-addon-md"> -->
-                        <!-- 				<span class="glyphicon glyphicon-search glyphicon-md"></span> -->
-                        <!-- 			</div> -->
-                        <!-- 			<input type="text" class="form-control input-md"  placeholder="请搜索关键词"> -->
-                        <!-- 			 data-toggle="tooltip" data-placement="top" title="回车搜索"  -->
-                        <!-- 		</div> -->
+
                     <div class="box-wrap2">
                         <input type="hidden" id="timeType" value="1"/>
                         <ul id="timeTab" class="nav nav-tabs" role="tablist">
@@ -92,14 +86,7 @@
                                         <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                                     </div>
                                 </div>
-                                    <!-- 至
-				            	<div class="form-group" style="margin: 0;">
-					                <div class="input-group date timepk_year" data-date="" data-link-field="dtp_input2">
-					                    <input class="form-control time" id="yearInpute" size="16" type="text" value="" readonly placeholder="结束时间">
-					                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-										<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-					                </div>
-				            	</div> -->
+
                             </div>
                             <div class="tab-pane" id="month">
                                 <div class="form-group" style="margin: 0;">
@@ -109,14 +96,7 @@
                                         <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                                     </div>
                                 </div>
-                                    <!-- 至
-				            	<div class="form-group" style="margin: 0;">
-					                <div class="input-group date timepk_month" data-date="" data-link-field="dtp_input2">
-					                    <input class="form-control time" id="monthInpute" size="16" type="text" value="" readonly placeholder="结束时间">
-					                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-										<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
-					                </div>
-				            	</div> -->
+
                             </div>
                             <div class="tab-pane" id="quarter">
                                 <div class="form-group" style="margin-bottom: 8px;">
@@ -348,8 +328,7 @@
                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 text-right"
                 style="height: 50px;">
                     <div class="footer2-box">
-                        @*<a href="Home.jsp">*@
-                        <a href="#">首页</a> <a href="#">帮助</a> <!-- <a href="#">设置</a> -->
+                        <a href="#">首页</a> <a href="#">帮助</a>
                     </div>
                 </div>
             </div>
@@ -366,38 +345,6 @@
     <script src="@routes.Assets.at("js/bootstrap/bootstrap-paginator.js")" ></script>
     <script src="@routes.Assets.at("js/page.js")" ></script>
     <script src="@routes.Assets.at("js/homeJs.js")"></script>
-    <script src="@routes.Assets.at("js/common2.js")"></script>
     <script src="@routes.Assets.at("js/search.js")"></script>
-    <script type="text/javascript">
-
-//            function errAlert() {
-//                new $.flavr({
-//                    animateEntrance: "flipInX",
-//                    animateClosing: "flipOutX",
-//                    content: "该功能暂未开放！",
-//                    buttons: {
-//                        info: {text: "知道了", style: "info"}
-//                    },
-//                    onClose: function () {
-//                        temp = false;
-//                    }
-//                });
-//            }
-
-            function logoutSys() {
-                cleanAllCookie();
-                location = "/login"
-            }
-
-            var cleanAllCookie = function() {
-                var keys = document.cookie.match(/[^ =;]+(?=\=)/g);
-                if(keys) {
-                    $.each(keys, function(i, v) {
-                        $.cookie(v, "", {"path": "/", "expires": -1 });
-                    })
-                }
-            }
-
-
-    </script>
+    <script src="@routes.Assets.at("js/login.js")"></script>
 }

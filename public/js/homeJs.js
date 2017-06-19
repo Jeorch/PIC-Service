@@ -56,31 +56,21 @@ $(document).ready(function () {
 
 $("#userInfo").click(function () {
     var token = $.cookie("token")
-    var d = JSON.stringify({
+    var data = JSON.stringify({
         "token": token
-    })
-    $.ajax({
-        type: "POST",
-        url: "/auth/checkAuthToken",
-        data: d,
-        contentType: "application/json,charset=utf-8",
-        error: function (request) {
-            window.location = "@routes.PagesController.login()"
+    });
 
-        },
-        success: function (data) {
-            if (data.status == "ok") {
-                $.cookie("screen_name", data.result.auth.screen_name);
-                $.cookie("email", data.result.auth.email);
-                $.cookie("phoneNo", data.result.phoneNo);
-                $.cookie("screen_photo", data.result.screen_photo);
-                window.open("/userInfo")
-            } else {
-                window.location = "@routes.PagesController.login()"
-
-            }
+    ajaxData("/auth/checkAuthToken", data, "POST", function(){
+        if (data.status == "ok") {
+            $.cookie("screen_name", data.result.auth.screen_name);
+            $.cookie("email", data.result.auth.email);
+            $.cookie("phoneNo", data.result.phoneNo);
+            $.cookie("screen_photo", data.result.screen_photo);
+            window.open("/userInfo")
+        } else {
+            window.location = "/login"
         }
-    })
+    }, function(e){console.error(e)})
 })
 
 //这个还可以在简化，@杨艳梅 回来你做
@@ -98,7 +88,6 @@ function showleft() {
                 showLeftInfo("dosage", "剂型", data.result.info[0].product_type)
                 showLeftInfo("specification", "规格", data.result.info[0].specifications)
                 showLeftInfo("package", "包装", data.result.info[0].package)
-
             }
         }
     })
@@ -158,15 +147,17 @@ function showLeftInfo(btn, info, res) {
     selectObj.empty();//清空下拉框
     selectObj.append("<option value=''>info</option>");
     $.each(res, function (i, item) {
-        selectObj.append("<option value=" + item + ">" + item+ "</option>")
+        selectObj.append("<option value=" + item + ">" + item + "</option>")
     })
 }
+
 //选项框控制
 function showDig() {
     $("#xssj").attr({"class":"screen-box","onclick":""})
     $("#guim").text("")
     $('#zengzl').text("");
     $("#fene").text("")
+    $("#chanps").text("")
     showDataList()
     showDataGather()
 }

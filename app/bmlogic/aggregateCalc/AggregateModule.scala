@@ -21,6 +21,7 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
         case msg_CalcTrend(data) => calcTrend(data)(pr)
         case msg_CalcTrend_Mat(data) => calcTrendMat(data)(pr)
         case msg_CalcMarketSize(data) => calcMarketSize2(data)(pr)
+        case msg_ProductQuantity(data) => productSize(data)(pr)
     
         case _ => ???
     }
@@ -159,7 +160,6 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
     
     /**
       * 市场规模：客户输入的市场的最新月份，累计一年的销售额
-      * 累计一年的条件没有添加，这个算是一个练习，@qianpeng
       */
     def calcMarketSize2(data : JsValue)
                        (pr : Option[Map[String, JsValue]])
@@ -189,6 +189,25 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
+    }
+    
+    
+    /**
+      *
+      * 计算产品数量
+      */
+    def productSize(data: JsValue)
+                   (pr : Option[Map[String, JsValue]])
+                   (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            import bmlogic.common.LeftAtcLinkAge._
+            val size = linkage(data)
+            
+            (Some(Map("size" -> toJson(size))), None)
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+       
     }
     
     def aggregateSalesResult(x : MongoDBObject, id : String) : Long = {

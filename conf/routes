@@ -20,6 +20,7 @@ POST    /data/search                            controllers.RetrievalController.
 POST    /data/calc/market                       controllers.RetrievalController.calcMarket
 POST    /data/calc/trend                        controllers.RetrievalController.calcTrend
 POST    /data/calc/percentage                   controllers.RetrievalController.calcPercentage
+POST    /data/calc/quantity                     controllers.RetrievalController.calcQuantity
 POST    /data/calc/units                        controllers.RetrievalController.calcUnits
 
 # 调试数据所用，以后去掉，不要调用

@@ -23,7 +23,7 @@
                         <div class=" height20"></div>
                         <div class=" width100">
                             <input type="text" id="name"  placeholder="用户名" style="background:url(@routes.Assets.at("images/icon_user3.png")) no-repeat top left; padding-left:45px;" />
-                            <div class="width100"><div class="pding_no" id="errText">你输入的用户名错误</div></div>
+                            <div class="width100"><div class="pding_no" id="errText" style="display: none;">你输入的用户名错误</div></div>
                             <div class="noErr" id="noErr"></div>
                             <input type="Password"  id="password" placeholder="密码" style="background:url(@routes.Assets.at("images/icon_pass3.png")) no-repeat top left; padding-left:45px;" />
                             <div class=" height20"></div>
@@ -44,31 +44,5 @@
         <div class=" height20"></div>
     </div>
 }{
-    <script type="text/javascript">
-        $("#errText").hide()
-        $("#sub").click(function(){
-            var d = JSON.stringify({
-                "user_name" : $("#name").val(),
-                "pwd" : $("#password").val()
-            })
 
-            $.ajax({
-                type: "POST",
-                url: "/auth/password",
-                data: d,
-                contentType: "application/json,charset=utf-8",
-                error: function(request) {
-                    $("#errText").show()
-                    $("#noErr").hide()
-                },
-                success: function(data) {
-                    if(data.status == "ok") {
-                      $.cookie("token",data.result.auth_token);
-                      $.cookie("user_name",data.result.user.user_name)
-                        window.location="@routes.PagesController.goHome()"
-                    }
-                }
-            })
-        })
-    </script>
 }

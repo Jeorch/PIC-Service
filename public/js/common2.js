@@ -20,7 +20,7 @@ var getSearchValue = function () {
     $.each(atc, function(i, v) {
         if(v.val() != "") {
             category = {
-                "category" : new Array(v.val())
+                "category" : v.val()
             }
         }
     })
@@ -49,37 +49,56 @@ var getSearchValue = function () {
     var manufacturetype = null;
     if($("#manufacturetype").val() != "") {
         manufacturetype = {
-            "": $("#manufacturetype").val()
+            "manufacture_type": $("#manufacturetype").val()
         }
     }
 
     var manufacture = null;
     if($("#manufacture").val() != "") {
         manufacture = {
-            "": $("#manufacture").val()
+            "manufacture_name": new Array($("#manufacture").val())
         }
     }
 
     var dosage = null;
     if($("#dosage").val() != "") {
         dosage = {
-            "": $("#dosage").val()
+            "product_type": $("#dosage").val()
         }
     }
 
     var specification = null
     if($("#specification").val()!= "") {
         specification = {
-            "": $("#specification").val()
+            "specifications": $("#specification").val() + " MG"
         }
     }
 
     var package = null;
     if($("#package").val() != "") {
         package = {
-            "": $("#package").val()
+            "package": $("#package").val()
         }
     }
+    return $.extend(category, edge, oral, product, manufacturetype, manufacture, dosage, specification, package)
+}
 
-    return $.extend(category, edge, oral, product)
+/**
+ * 公用ajax调用，初步版本
+ */
+var ajaxData = function(url, data, type, successfun, errorfun) {
+    $.ajax({
+        type: type,
+        url: url,
+        dataType: "json",
+        cache: false,
+        data: data,
+        contentType: "application/json,charset=utf-8",
+        success: function (data) {
+            successfun(data)
+        },
+        error: function (e) {
+            errorfun(e)
+        }
+    });
 }

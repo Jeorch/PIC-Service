@@ -191,9 +191,7 @@ object AuthModule extends ModuleTrait with AuthData {
         try {
             val auth = pr.map (x => x.get("auth").get).getOrElse(throw new Exception("token parse error"))
             val name_lst = (auth \ "scope" \ "manufacture_name").asOpt[List[String]].map (x => x.distinct.sorted).getOrElse(throw new Exception("token parse error"))
-
             (data \ "condition" \ "manufacture_name").asOpt[List[String]].map { x =>
-
                 val name_condition = x.distinct.sorted
                 var result = pr.get
                 var names : List[String] = Nil

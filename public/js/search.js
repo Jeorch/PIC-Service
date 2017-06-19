@@ -2,6 +2,9 @@
  * Created by qianpeng on 2017/6/15.
  */
 
+/**
+ * 重置按钮
+ */
 var reset = function() {
     $("#yearInputb").val("")
     $("#monthInputb").val("")
@@ -29,6 +32,8 @@ var showDataList = function() {
 }
 
 var pageResult = function(skip) {
+    searchCount++
+    $("#tbody").empty();
     var c = $.extend(getSearchValue(), getTime())
     var data = JSON.stringify({
         "token": $.cookie("token"),
@@ -38,37 +43,33 @@ var pageResult = function(skip) {
             "product_name": c.product_name,
             "edge": c.edge,
             "date": c.date,
+            "product_type": c.product_type,
+            "manufacture_name": c.manufacture_name,
+            "manufacture_type": c.manufacture_type,
+            "specifications": c.specifications,
+            "package": c.package
         },
         "skip": skip
     });
-    $.ajax({
-        type: "POST",
-        url: "/data/search",
-        dataType: "json",
-        cache: false,
-        data: data,
-        contentType: "application/json,charset=utf-8",
-        success: function (r) {
-            if (r.status == "ok") {
-                $("#tbody").empty();
-                $("#pageview").show()
-                $.each(r.search_result, function(i, v){
-                    $("#tbody").append(v.html)
-                })
-                Page(r)
-                searchCount++
-                if(searchCount == 4){
-                    $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
-                    searchCount = 0
-                }
-            }else{
+
+    ajaxData("/data/search", data, "POST", function(r){
+        if (r.status == "ok") {
+            $("#tbody").empty();
+            $("#pageview").show()
+            $.each(r.search_result, function(i, v){
+                $("#tbody").append(v.html)
+            })
+            Page(r)
+            if(searchCount == 5){
                 $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
-                searchCount = 0
-                $("#pageview").hide()
-                Page(null)
             }
+        }else{
+            $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
+            $("#pageview").hide()
+            Page(null)
         }
-    });
+        searchCount = 0
+    }, function(e){console.error(e)})
 }
 
 var getTime = function() {
@@ -103,99 +104,98 @@ var getTime = function() {
  * 显示主页的四个小汇总
  */
 var showDataGather = function() {
-
     var c = $.extend(getSearchValue(), getTime())
-
     var data = JSON.stringify({
         "token": $.cookie("token"),
         "condition":{
             "category": c.category,
             "oral_name": c.oral_name,
             "product_name": c.product_name,
-            "date": c.date,
-            "edge": c.edge
+            "date": c.date
         }
     });
 
     calcMarket(data)
     calcTrend(data)
     calcPercentage(data)
+    productSize(data)
 
 }
 
-function calcMarket(data) {
-    $.ajax({
-        type: "POST",
-        url: "/data/calc/market",
-        dataType: "json",
-        cache: false,
-        data: data,
-        contentType: "application/json,charset=utf-8",
-        success: function (r) {
-            if (r.status == "ok") {
-                var market = r.result.calc.sales;
-                $("#guim").text(market)
-                searchCount++
-                if(searchCount == 4){
-                    $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
-                    searchCount = 0
-                }
-            }else{
+/**
+ * 市场规模
+ */
+var calcMarket = function(data) {
+    searchCount++
+    ajaxData("/data/calc/market", data, "POST", function(r){
+        if (r.status == "ok") {
+            var market = r.result.calc.sales;
+            $("#guim").text(market)
+
+            if(searchCount == 5){
                 $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
-                searchCount = 0
             }
+        }else{
+            $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
         }
-    });
+        searchCount = 0
+    }, function (e) {console.error(e)})
 }
 
-function calcTrend(data) {
-    $.ajax({
-        type: "POST",
-        url: "/data/calc/trend",
-        dataType: "json",
-        cache: false,
-        data: data,
-        contentType: "application/json,charset=utf-8",
-        success: function (r) {
-            if (r.status == "ok") {
-                var trend = parseFloat(r.result.trend);
-                var treNum=(Math.floor(trend*100)/100)+ "%"
-                $('#zengzl').text(treNum);
-                searchCount++
-                if(searchCount == 4){
-                    $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
-                    searchCount = 0
-                }
-            }else {
+/**
+ * 市场增占率
+ */
+var calcTrend = function(data) {
+    searchCount++
+    ajaxData("/data/calc/trend", data, "POST", function (r) {
+        if (r.status == "ok") {
+            var trend = parseFloat(r.result.trend);
+            var treNum=(Math.floor(trend*100)/100)+ "%"
+            $('#zengzl').text(treNum);
+            if(searchCount == 5){
                 $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
-                searchCount = 0
             }
+        }else {
+            $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
         }
-    });
+        searchCount = 0
+    },function(e){console.error(e)})
 }
 
-function calcPercentage(data) {
-    $.ajax({
-        type: "POST",
-        url: "/data/calc/percentage",
-        dataType: "json",
-        cache: false,
-        data: data,
-        contentType: "application/json,charset=utf-8",
-        success: function (r) {
-            if (r.status == "ok") {
-                var percentage = parseFloat(r.result.percentage);
-                var percentNum=(Math.floor(percentage*10000)/100) +"%"
-                $('#fene').text(percentNum);
-                searchCount++
-                if(searchCount == 4){
-                    $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
-                    searchCount = 0
-                }
-            }else {
+/**
+ * 市场份额
+ */
+var calcPercentage = function(data) {
+    searchCount++
+    ajaxData("/data/calc/percentage", data, "POST", function (r) {
+        if (r.status == "ok") {
+            var percentage = parseFloat(r.result.percentage);
+            var percentNum=(Math.floor(percentage*10000)/100) +"%"
+            $('#fene').text(percentNum);
+            if(searchCount == 5){
                 $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
-                searchCount = 0
             }
+        }else {
+            $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
         }
-    });
+        searchCount = 0
+    }, function (e) {console.error(e)})
+}
+
+/**
+ * 产品数量
+ */
+var productSize = function(data) {
+    searchCount++
+    ajaxData("/data/calc/quantity", data, "POST", function(r){
+        if (r.status == "ok") {
+            $('#chanps').text(r.result.size);
+            if(searchCount == 5){
+                $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
+            }
+        }else {
+            $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
+        }
+        searchCount = 0
+    }, function(e){console.error(e)});
 }
