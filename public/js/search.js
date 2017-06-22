@@ -199,3 +199,41 @@ var productSize = function(data) {
         searchCount = 0
     }, function(e){console.error(e)});
 }
+
+var showData = function() {
+    var c = $.extend(getSearchValue(), getTime())
+    var token = {"token": $.cookie("token")}
+    var condition = {
+        "condition": {
+            "category": c.category,
+            "oral_name": c.oral_name,
+            "product_name": c.product_name,
+            "date": c.date
+        }
+    }
+    var reportid = ""
+    if(!$.isEmptyObject(JSON.parse(JSON.stringify(condition)).condition)) {
+        reportid = md5(JSON.stringify(token)+JSON.stringify(condition))
+        var data = JSON.stringify({
+            "reportid": reportid,
+            "token" : token.token,
+            "condition" : condition.condition
+        })
+        ajaxData("/data/reportparameter", data, "POST", function(r){}, function(e){console.error(e)})
+    }
+    return reportid
+}
+
+
+
+var report = function() {
+    var result = showData()
+    if(result != ""){
+        var w = window.open("")
+        w.window.location = "/report"+result
+    }else {
+        alert("error")
+    }
+
+}
+

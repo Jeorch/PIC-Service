@@ -63,7 +63,7 @@ trait ConditionSearchFunc {
         cat_condition
     }
     
-    def dateConditionParse(js : JsValue, flag: Boolean = false) : Option[DBObject] = {
+    def dateConditionParse(js : JsValue, flag: Boolean = false, month: Int = -12) : Option[DBObject] = {
         val data = (js \ "condition").asOpt[JsValue].map (x => x).getOrElse(throw new Exception("search condition parse error"))
         
         val date_input = (data \ "date").asOpt[JsValue].map (x => Some(x)).getOrElse(None)
@@ -82,17 +82,17 @@ trait ConditionSearchFunc {
                 val start_date = sdf.parse(start)
                 val end_date = sdf.parse(end)
                 if(!flag) Some($and("date" $lt end_date.getTime, "date" $gte start_date.getTime))
-                else Some($and("date" $lt start_date.getTime, "date" $gte getDateMatParse(start_date)))
+                else Some($and("date" $lt start_date.getTime, "date" $gte getDateMatParse(start_date, month).getTime))
             }
             case None => None
         }
     }
    
-    def getDateMatParse(date: Date): Long = {
+    def getDateMatParse(date: Date, month: Int) = {
         val c = Calendar.getInstance()
         c.setTime(date)
-        c.add(Calendar.MONTH, -12)
-        c.getTime.getTime
+        c.add(Calendar.MONTH, month)
+        c.getTime
     }
     
     def conditionParse(js : JsValue, pr : Map[String, JsValue]) : Option[DBObject] = {

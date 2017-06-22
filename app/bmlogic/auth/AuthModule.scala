@@ -167,7 +167,8 @@ object AuthModule extends ModuleTrait with AuthData {
                 map (x => x).getOrElse(throw new Exception("token parse error"))
 
             var result = pr.get
-            val lst = (data \ "condition" \ "category").asOpt[List[String]].map (x => x).getOrElse(Nil)
+            // val lst = (data \ "condition" \ "category").asOpt[List[String]].map (x => x).getOrElse(Nil)
+            val lst = (data \ "condition" \ "category").asOpt[String].map (x => x).getOrElse("") :: Nil
             val category_lst = productLevel2Category(lst).distinct.sorted
             val auth_cat_lst = productLevel2Category(product_level).distinct.sorted
             val reVal = if (auth_cat_lst.isEmpty) category_lst

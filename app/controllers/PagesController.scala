@@ -1,6 +1,7 @@
 package controllers
 
 
+import bmlogic.common.requestArgsQuery
 import play.api.mvc._
 
 /**
@@ -8,19 +9,21 @@ import play.api.mvc._
   */
 class PagesController extends Controller {
 
-//登陆跳转
+    //登陆跳转
     def goHome = Action {
         Ok(views.html.home())
     }
     
-//登陆
-    def login=Action{
+    //登陆
+    def login = Action{
         Ok(views.html.login())
     }
-//个人中心
-    def userInfo=Action{
+    
+    //个人中心
+    def userInfo = Action{
         Ok(views.html.useInfo())
     }
+    
     def contactus = Action {
         Ok(views.html.contactus())
     }
@@ -31,5 +34,10 @@ class PagesController extends Controller {
     
     def comingsoon = Action {
         Ok(views.html.comingsonn())
+    }
+    
+    //报告
+    def report(reportid: String) = Action {
+        Ok(views.html.reportbody(reportid))
     }
 }

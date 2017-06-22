@@ -28,14 +28,21 @@ POST    /data/adjust                            controllers.AdjustController.adj
 
 # retrieval 生成报告 End Point (详情参考概要设计，@Alfred)
 
-# 显示报告界面
+# 显示主页
 GET     /data/report                            controllers.PagesController.goHome
+
+# 报告页面
+GET     /report:reportid                        controllers.PagesController.report(reportid)
+POST    /data/reportparameter                   controllers.ReportController.reportparameter
+POST    /data/query/reportparameter             controllers.ReportController.queryreportparameter
+POST    /data/calc/report/summary               controllers.ReportController.reportcalcsummary
 
 #用户登录
 GET     /login                                  controllers.PagesController.login
 #个人中心
 GET     /userInfo                               controllers.PagesController.userInfo
-#参数
+
+#左侧下拉选项数据
 POST    /showConfig                             controllers.ConfigController.showConfig
 POST    /category                               controllers.CategoryController.category
 
@@ -43,8 +50,9 @@ POST    /category                               controllers.CategoryController.c
 GET     /assets/*file               			controllers.Assets.at(path="/public", file)
 
 
-# by clock
+# 帮助与关于
 GET     /contactus                      		controllers.PagesController.contactus
 GET     /aboutus                                controllers.PagesController.aboutus
 
-GET     /comingsoon                        controllers.PagesController.comingsoon
+# 尽请期待
+GET     /comingsoon                             controllers.PagesController.comingsoon
