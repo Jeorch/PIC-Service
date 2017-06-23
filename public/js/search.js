@@ -227,13 +227,14 @@ var showData = function() {
 
 
 var report = function() {
-    var result = showData()
-    if(result != ""){
-        var w = window.open("")
-        w.window.location = "/report"+result
-    }else {
-        alert("error")
-    }
-
+    // var result = showData()
+    // if(result != ""){
+    //     var w = window.open("")
+    //     w.window.location = "/report"+result
+    // }else {
+    //     alert("error")
+    // }
+    var w = window.open("")
+    w.window.location = "/report"+"aa"
 }
 

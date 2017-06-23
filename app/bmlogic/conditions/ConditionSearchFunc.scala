@@ -3,6 +3,7 @@ package bmlogic.conditions
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Date}
 
+import bmlogic.report.ReportModule.{getDateMatParse, sdf}
 import bmutil.dao.from
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
@@ -12,6 +13,12 @@ import play.api.libs.json.JsValue
   */
 trait ConditionSearchFunc {
     val sdf = new SimpleDateFormat("yyyyMM")
+    
+    def timeList(n: Int = 0, data: JsValue): List[String] = {
+        val start = (data \ "condition" \ "date" \ "start").get.as[String]
+        val end = (data \ "condition" \ "date" \ "end").get.as[String]
+        end :: start :: (n-n+1 to n).map( x =>sdf.format(getDateMatParse(sdf.parse(start), x * -12))).toList
+    }
     
     def oralNameConditionParse(js : JsValue) : Option[DBObject] = {
         val data = (js \ "condition").asOpt[JsValue].map (x => x)

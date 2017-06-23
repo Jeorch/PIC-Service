@@ -55,7 +55,7 @@ class ReportController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
 	})
 	
 	/**
-	  * 计算报告小结部分的数据
+	  * 计算报告部分的数据
 	  */
 	def reportcalcsummary = Action(request => requestArgsQuery().requestArgsV2(request) { jv =>
 		import bmpattern.LogMessage.common_log
@@ -63,7 +63,7 @@ class ReportController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
 		
 		MessageRoutes(msg_log(toJson(Map("method" -> toJson("reportparameter"))), jv)
 			:: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-			:: msg_CheckProductLevelScope(jv) :: msg_ReportGraph_One(jv)
+			:: msg_CheckProductLevelScope(jv) /*:: msg_ReportGraph_One(jv) :: msg_ReportGraph_Five(jv) :: msg_ReportGraph_Six(jv)*/ :: msg_ReportGraph_Eight(jv) :: msg_ReportGraph_Seven(jv)
 			:: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
 	})
 	
