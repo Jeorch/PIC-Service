@@ -166,7 +166,7 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 		
 		try {
 			val result = resultdata(dateCondition(timeList(1, data)))
-			(Some(Map("reportgraphfive" -> toJson(result))), None)
+			(Some(Map("reportgraphfive" -> toJson(result)) ++ pr.get), None)
 		} catch {
 			case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
@@ -207,7 +207,7 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 		
 		try {
 			val result = resultdata(dateCondition(timeList(1, data)))
-			(Some(Map("reportgraphsix" -> toJson(result))), None)
+			(Some(Map("reportgraphsix" -> toJson(result)) ++ pr.get), None)
 		} catch {
 			case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
@@ -243,7 +243,7 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 					x.get ++ Map("trend" -> toJson((x.get.get("sales").get.as[Double] - flag)/flag))
 				}
 			}
-			(Some(Map("reportgraphseven" -> toJson(lst))), None)
+			(Some(Map("reportgraphseven" -> toJson(lst)) ++ pr.get), None)
 		} catch {
 			case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
@@ -287,7 +287,7 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 		
 		try {
 			val result = resultdata(dateCondition(timeList(1, data)))
-			(Some(Map("reportgrapheight" -> toJson(result))), None)
+			(Some(Map("reportgrapheight" -> toJson(result)) ++ pr.get), None)
 		} catch {
 			case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
