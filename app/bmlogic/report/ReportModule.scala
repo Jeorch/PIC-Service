@@ -261,11 +261,9 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 				db.aggregate($and(condition), "retrieval", group) { z =>
 					val r = aggregateResult(z).sortBy(y => y._2).reverse
 					val sum = r.map(_._2).sum
-					val key = r.take(10).map (y =>y._1)
-					val value = r.take(10).map (y =>(y._2) / sum)
+					val keyvalue = r.take(10).map (y =>Map(y._1 -> toJson((y._2) / sum)))
 					val sales = r.take(10).map (y =>y._2)
-					Map("key" -> toJson(key),
-						"value" -> toJson(value),
+					Map("keyvalue" -> toJson(keyvalue),
 						"sales" -> toJson(sales),
 						"start" -> toJson((x \ "condition" \ "date" \ "start").as[String]),
 						"end" -> toJson((x \ "condition" \ "date" \ "end").as[String]))

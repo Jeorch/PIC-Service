@@ -175,10 +175,11 @@ object AuthModule extends ModuleTrait with AuthData {
                         else category_lst.takeWhile(auth_cat_lst.contains(_))
             if (!reVal.isEmpty)
                 result = result + ("search_category_condition" -> toJson(reVal))
-//            else if (reVal.isEmpty && !auth_cat_lst.isEmpty)
-//                result = result + ("search_category_condition" -> toJson(auth_cat_lst))
-//            else Unit
-            else result = result + ("Warning" -> toJson("没有搜索的全权限，请联系你的管理员添加"))
+            else if (reVal.isEmpty && !auth_cat_lst.isEmpty)
+                result = result + ("Warning" -> toJson("没有搜索的全权限，请联系你的管理员添加"))
+//                    ("search_category_condition" -> toJson(auth_cat_lst))
+            else Unit
+//            result = result + ("Warning" -> toJson("没有搜索的全权限，请联系你的管理员添加"))
             (Some(result), None)
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
