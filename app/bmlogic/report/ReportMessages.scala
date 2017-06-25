@@ -22,4 +22,7 @@ object ReportMessage {
 	case class msg_ReportGraph_Eight(data: JsValue) extends msg_ReportCommand //图8
 	
 	case class msg_PicReportCommand(data: JsValue) extends msg_ReportCommand
+	
+	case class  msg_ReportChart_one(data:JsValue) extends msg_ReportCommand//表一
+	
 }

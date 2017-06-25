@@ -99,21 +99,22 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
                 (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
-    //查询某商品数量
-    def productQuantity(data:JsValue)
-                       (pr : Option[Map[String, JsValue]])
-                       (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue])={
-        try{
-            val db=cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-            val condition=(productNameConditionParse(data)::Nil).filterNot(_==None).map(_.get)
-            val productNum = db.queryMultipleObject($or(condition), "retrieval").size
-            val result=Map("productQuantity"->toJson(productNum))
-            (Some(result), None)
-        }catch {
-            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
-        }
-        
-    }
+  
+//    //查询某商品数量
+//    def productQuantity(data:JsValue)
+//                       (pr : Option[Map[String, JsValue]])
+//                       (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue])={
+//        try{
+//            val db=cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+//            val condition=(productNameConditionParse(data)::Nil).filterNot(_==None).map(_.get)
+//            val productNum = db.queryMultipleObject($or(condition), "retrieval").size
+//            val result=Map("productQuantity"->toJson(productNum))
+//            (Some(result), None)
+//        }catch {
+//            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+//        }
+//
+//    }
 
     def pushProduct(data : JsValue)
                    (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
