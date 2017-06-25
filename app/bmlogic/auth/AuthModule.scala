@@ -141,7 +141,7 @@ object AuthModule extends ModuleTrait with AuthData {
                         if (edge_lst.contains(x))
                             edges = x :: edges
                         else
-                            result = result + ("Warning" -> toJson("没有搜索的全权限，请联系你的管理员添加"))
+                            result = result + ("Warning" -> toJson("没有区域搜索的全权限，请联系你的管理员添加"))
                     }
                 }
 
@@ -176,7 +176,7 @@ object AuthModule extends ModuleTrait with AuthData {
             if (!reVal.isEmpty)
                 result = result + ("search_category_condition" -> toJson(reVal))
             else if (reVal.isEmpty && !auth_cat_lst.isEmpty)
-                result = result + ("Warning" -> toJson("没有搜索的全权限，请联系你的管理员添加"))
+                result = result + ("Warning" -> toJson("没有药品类别搜索的全权限，请联系你的管理员添加"))
 //                    ("search_category_condition" -> toJson(auth_cat_lst))
             else Unit
 //            result = result + ("Warning" -> toJson("没有搜索的全权限，请联系你的管理员添加"))
@@ -205,7 +205,7 @@ object AuthModule extends ModuleTrait with AuthData {
                         if (name_lst.contains(x))
                             names = x :: names
                         else
-                            result = result + ("Warning" -> toJson("没有搜索的全权限，请联系你的管理员添加"))
+                            result = result + ("Warning" -> toJson("没有公司名称搜索的全权限，请联系你的管理员添加"))
                     }
                 }
 
