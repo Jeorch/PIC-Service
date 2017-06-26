@@ -386,7 +386,7 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 			val tl=db.queryObject(DBObject("manufacture"->x._1),"retrieval"){obj =>
 				Map(
 					"manufacture" -> toJson(obj.getAs[String]("manufacture").map (x => x).getOrElse(throw new Exception("product with manufacture"))),
-					"manufacture_type" -> toJson(obj.getAs[String]("manufacture_type").map (x => x).getOrElse(throw new Exception("product with manufacture type"))),
+					"manufacture_type" -> toJson(obj.getAs[String]("manufacture_type").map (x => x).getOrElse(throw new Exception("product with manufacture type")))
 				)
 			}
 			val typ=tl.map{x=>
