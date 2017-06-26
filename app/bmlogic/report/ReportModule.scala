@@ -35,7 +35,6 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 		case msg_ReportGraph_Six(data) => reportgraphsix(data)(pr)
 		case msg_ReportGraph_Seven(data) => reportgraphseven(data)(pr)
 		case msg_ReportGraph_Eight(data) => reportgrapheight(data)(pr)
-		case msg_ReportChart_one(data)=>reportChartOne(data)(pr)
 		case _ => ???
 	}
 	
@@ -67,28 +66,7 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 	def reportgraphone(data: JsValue)
 	                  (pr: Option[Map[String, JsValue]])
 	                  (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
-
-		def timeList(n: Int = 0): List[String] = {
-			val start = (data \ "condition" \ "date" \ "start").get.as[String]
-			val end = (data \ "condition" \ "date" \ "end").get.as[String]
-			end :: start :: (n-n+1 to n).map( x =>sdf.format(getDateMatParse(sdf.parse(start), x * -12))).toList
-		}
-
-		def dateCondition(lst: List[String]): List[JsValue] = {
-			val tmp = lst match {
-				case Nil => println("Nil"); None
-				case (head :: tail) => {
-					if(!tail.isEmpty) Some((head, tail.head)) else None
-				}
-				case _ => ???
-			}
-
-			if(lst.tail.isEmpty || tmp.isEmpty) Nil
-			else
-//				($and("date" $lt sdf.parse(tmp.get._1).getTime, "date" $gte sdf.parse(tmp.get._2).getTime))
-				toJson(Map("condition" -> toJson(Map("date" -> toJson(Map("start" -> toJson(tmp.get._2), "end" -> toJson(tmp.get._1))))))) :: dateCondition(lst.tail)
-		}
-
+		
 		def resultdata(timecount: List[JsValue]): List[Option[Map[String, JsValue]]] = {
 			val db=cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 			val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "reportgraphone"), "sales" -> MongoDBObject("$sum" -> "$sales"))
@@ -98,27 +76,24 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 					Map("sales" -> toJson(aggregateSalesResult(z, "reportgraphone")),
 						"start" -> toJson((x \ "condition" \ "date" \ "start").as[String]),
 						"end" -> toJson((x \ "condition" \ "date" \ "end").as[String])
-						)
+					)
 				}
 			}
 		}
-
+		
 		try {
 			var flag = 0D
-			val lst = resultdata(dateCondition(timeList(1))).reverse.map { x =>
+			val lst = resultdata(dateCondition(timeList(1, data))).reverse.map { x =>
 				if(flag == 0) {
 					flag = x.get.get("sales").get.as[Double]
-					 x.get ++ Map("trend" -> toJson(0))
+					x.get ++ Map("trend" -> toJson("null"))
 				}else {
 					x.get ++ Map("trend" -> toJson((x.get.get("sales").get.as[Double] - flag)/flag))
 				}
-				
 			}
-			(Some(Map("data" -> toJson(lst))), None)
+			(Some(Map("reportgraphone" -> toJson(lst))), None)
 		} catch {
-			case ex: Exception =>
-				println(ex)
-				(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+			case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
 	}
 	
@@ -153,32 +128,9 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 	                    (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
 		try {
 			val db=cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-		//	val oral_name= (data \ "condition"\"oral_name").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
-			val condition= (conditionParse(data, pr.get) :: oralNameConditionParse(data) :: dateConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
-			//val con=dateConditionParse
-		//	println(oral_name)
-			val group =MongoDBObject("_id"->"$manufacture_type", "sales" -> MongoDBObject("$sum" -> "$sales"))
-//			var interNum=null
-			var outerNum:Double=1
-			println("ok")
-			//val result=db.aggregate(MongoDBObject("oral_name"->oral_name),"retrieval",group)
-			val res=db.aggregate($and(condition),"retrieval",group)
-			{x=>
-				println(x)
-				val interNum=getByID(x,"内资")
-				println(interNum)
-				outerNum=getByID(x,"合资")
-				println(outerNum)
-				val per=outerNum/(interNum+outerNum)*100
-
-				Map("percent" -> toJson(per),
-				"start" -> toJson((data\ "condition" \ "date" \ "start").as[String]),
-				"end" -> toJson((data \ "condition" \ "date" \ "end").as[String])
-				)
-			}
-			println(res)
-			(res,None)
-			//(Some(Map("reportid" -> toJson(0))), None)
+			val result = (conditionParse(data, pr.get) :: oralNameConditionParse(data) :: dateConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
+			
+			(Some(Map("reportid" -> toJson(0))), None)
 		} catch {
 			case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
@@ -187,11 +139,38 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 	def reportgraphfive (data: JsValue)
 	                    (pr: Option[Map[String, JsValue]])
 	                    (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
-		try {
+		
+		def resultdata(timecount: List[JsValue]): List[Option[Map[String, JsValue]]] = {
 			val db=cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-			val result = (conditionParse(data, pr.get) :: oralNameConditionParse(data) :: dateConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
-			if (result.isEmpty) throw new Exception("unkonw error")
-			(Some(Map("reportid" -> toJson(0))), None)
+			val group = MongoDBObject("_id" -> "$oral_name", "sales" -> MongoDBObject("$sum" -> "$sales"))
+			timecount map{ x =>
+				val condition = (conditionParse(data, pr.get) :: oralNameConditionParse(data) :: dateConditionParse(x) :: Nil).filterNot(_ == None).map(_.get)
+				db.aggregate($and(condition), "retrieval", group) { z =>
+					val r = aggregateResult(z)
+					val sum = r.map(y => y._2).sum
+					val scale = r.map ( y => Map("key" -> toJson(y._1), "value" -> toJson((y._2 / sum))))
+					val sales = r.map ( y => Map("key" -> toJson(y._1), "value" -> toJson(y._2)))
+					Map("sales" -> toJson(sales),
+						"scale" -> toJson(scale),
+						"start" -> toJson((x \ "condition" \ "date" \ "start").as[String]),
+						"end" -> toJson((x \ "condition" \ "date" \ "end").as[String])
+					)
+				}
+			}
+		}
+		
+		def aggregateResult(x : MongoDBObject) : List[(String, Double)] = {
+			val ok = x.getAs[Number]("ok").get.intValue
+			if (ok == 0) throw new Exception("db aggregation error")
+			else {
+				val lst : MongoDBList = x.getAs[MongoDBList]("result").get
+				lst.toList.asInstanceOf[List[BasicDBObject]].map( z => (z.getString("_id"), z.getDouble("sales") / 100))
+			}
+		}
+		
+		try {
+			val result = resultdata(dateCondition(timeList(1, data)))
+			(Some(Map("reportgraphfive" -> toJson(result)) ++ pr.get), None)
 		} catch {
 			case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
@@ -200,24 +179,75 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 	def reportgraphsix (data: JsValue)
 	                   (pr: Option[Map[String, JsValue]])
 	                   (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
-		try {
+		
+		def resultdata(timecount: List[JsValue]): List[Option[Map[String, JsValue]]] = {
 			val db=cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-			val result = (conditionParse(data, pr.get) :: oralNameConditionParse(data) :: dateConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
-			
-			(Some(Map("reportid" -> toJson(0))), None)
+			val group = MongoDBObject("_id" -> MongoDBObject("product_name" -> "$product_name","manufacture" -> "$manufacture","product_type" -> "$product_type"), "sales" -> MongoDBObject("$sum" -> "$sales"))
+			timecount map{ x =>
+				val condition = (conditionParse(data, pr.get) :: oralNameConditionParse(data) :: dateConditionParse(x) :: Nil).filterNot(_ == None).map(_.get)
+				db.aggregate($and(condition), "retrieval", group) { z =>
+					val r = aggregateResult(z)
+					val key = r.map (y =>y._1)
+					val value = r.map (y =>y._2)
+					Map("key" -> toJson(key),
+						"value" -> toJson(value),
+						"start" -> toJson((x \ "condition" \ "date" \ "start").as[String]),
+						"end" -> toJson((x \ "condition" \ "date" \ "end").as[String]))
+				}
+			}
+		}
+		
+		def aggregateResult(x : MongoDBObject) : List[(String, Double)] = {
+			val ok = x.getAs[Number]("ok").get.intValue
+			if (ok == 0) throw new Exception("db aggregation error")
+			else {
+				val lst : MongoDBList = x.getAs[MongoDBList]("result").get
+				lst.toList.asInstanceOf[List[BasicDBObject]].map { z =>
+					val key = z.getAs[BasicDBObject]("_id")
+					(key.get.getString("product_name") + key.get.getString("manufacture") + key.get.getString("product_type"), z.getDouble("sales") / 100)
+				}
+			}
+		}
+		
+		try {
+			val result = resultdata(dateCondition(timeList(1, data)))
+			(Some(Map("reportgraphsix" -> toJson(result)) ++ pr.get), None)
 		} catch {
 			case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
 	}
 	
 	def reportgraphseven (data: JsValue)
-	                  (pr: Option[Map[String, JsValue]])
-	                  (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
-		try {
+	                     (pr: Option[Map[String, JsValue]])
+	                     (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+		
+		def resultdata(timecount: List[JsValue]): List[Option[Map[String, JsValue]]] = {
 			val db=cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-			val result = (conditionParse(data, pr.get) :: oralNameConditionParse(data) :: dateConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
-			
-			(Some(Map("reportid" -> toJson(0))), None)
+			val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "oral_sum"), "sales" -> MongoDBObject("$sum" -> "$sales"))
+			val lst = pr.get.get("reportgrapheight").get.as[List[Map[String, JsValue]]]
+			timecount map{ x =>
+				val topsalessum = lst.find(z => z.get("start").get.as[String] == (x \ "condition" \ "date" \ "start").as[String]).map(y => y.get("sales").get.as[List[Double]].sum).getOrElse(throw new Exception())
+				val condition = (conditionParse(data, pr.get) :: oralNameConditionParse(data) :: dateConditionParse(x) :: Nil).filterNot(_ == None).map(_.get)
+				db.aggregate($and(condition), "retrieval", group) { z =>
+					val sum = aggregateSalesResult(z, "oral_sum")
+					Map("sales" -> toJson(topsalessum / sum),
+						"start" -> toJson((x \ "condition" \ "date" \ "start").as[String]),
+						"end" -> toJson((x \ "condition" \ "date" \ "end").as[String]))
+				}
+			}
+		}
+		
+		try {
+			var flag = 0D
+			val lst = resultdata(dateCondition(timeList(1, data))).reverse.map { x =>
+				if(flag == 0) {
+					flag = x.get.get("sales").get.as[Double]
+					x.get ++ Map("trend" -> toJson("null"))
+				}else {
+					x.get ++ Map("trend" -> toJson((x.get.get("sales").get.as[Double] - flag)/flag))
+				}
+			}
+			(Some(Map("reportgraphseven" -> toJson(lst)) ++ pr.get), None)
 		} catch {
 			case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
@@ -226,16 +256,45 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 	def reportgrapheight (data: JsValue)
 	                     (pr: Option[Map[String, JsValue]])
 	                     (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
-		try {
+		
+		def resultdata(timecount: List[JsValue]): List[Option[Map[String, JsValue]]] = {
 			val db=cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-			val result = (conditionParse(data, pr.get) :: oralNameConditionParse(data) :: dateConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
-			
-			(Some(Map("reportid" -> toJson(0),
-					  "report" -> toJson(0))), None)
+			val group = MongoDBObject("_id" -> MongoDBObject("product_name" -> "$product_name"), "sales" -> MongoDBObject("$sum" -> "$sales"))
+			timecount map{ x =>
+				val condition = (conditionParse(data, pr.get) :: oralNameConditionParse(data) :: dateConditionParse(x) :: Nil).filterNot(_ == None).map(_.get)
+				db.aggregate($and(condition), "retrieval", group) { z =>
+					val r = aggregateResult(z).sortBy(y => y._2).reverse
+					val sum = r.map(_._2).sum
+					val keyvalue = r.take(10).map (y =>Map(y._1 -> toJson((y._2) / sum)))
+					val sales = r.take(10).map (y =>y._2)
+					Map("keyvalue" -> toJson(keyvalue),
+						"sales" -> toJson(sales),
+						"start" -> toJson((x \ "condition" \ "date" \ "start").as[String]),
+						"end" -> toJson((x \ "condition" \ "date" \ "end").as[String]))
+				}
+			}
+		}
+		
+		def aggregateResult(x : MongoDBObject) : List[(String, Double)] = {
+			val ok = x.getAs[Number]("ok").get.intValue
+			if (ok == 0) throw new Exception("db aggregation error")
+			else {
+				val lst : MongoDBList = x.getAs[MongoDBList]("result").get
+				lst.toList.asInstanceOf[List[BasicDBObject]].map { z =>
+					val key = z.getAs[BasicDBObject]("_id")
+					(key.get.getString("product_name"), z.getDouble("sales") / 100)
+				}
+			}
+		}
+		
+		try {
+			val result = resultdata(dateCondition(timeList(1, data)))
+			(Some(Map("reportgrapheight" -> toJson(result)) ++ pr.get), None)
 		} catch {
 			case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
 	}
+	
 	//表一
 	def reportChartOne(data: JsValue)
 					  (pr: Option[Map[String, JsValue]])
@@ -319,7 +378,6 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 				}.getOrElse(throw new Exception("db aggregation error"))
 		}
 	}
-	
 	
 	def getByID(x : MongoDBObject, id : String) : Double = {
 		val ok = x.getAs[Number]("ok").get.intValue
