@@ -321,21 +321,33 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 	}
 	
 	
-	def getByID(x : MongoDBObject, id : String) : Double ={
+	def getByID(x : MongoDBObject, id : String) : Double = {
 		val ok = x.getAs[Number]("ok").get.intValue
 		if (ok == 0) throw new Exception("db aggregation error")
 		else {
-			val lst : MongoDBList = x.getAs[MongoDBList]("result").get
+			val lst: MongoDBList = x.getAs[MongoDBList]("result").get
 			val tmp = lst.toList.asInstanceOf[List[BasicDBObject]]
-			if(tmp.isEmpty) throw new Exception("db aggregation find None")
+			if (tmp.isEmpty) throw new Exception("db aggregation find None")
 			else {
-				val res=tmp.find(x=>x.getString("_id")==id)
+				val res = tmp.find(x => x.getString("_id") == id)
 				res.get.getDouble("sales")
 			}
-			
+		}
+	}
+	
+	def dateCondition(lst: List[String]): List[JsValue] = {
+		val tmp = lst match {
+			case Nil => println("Nil"); None
+			case (head :: tail) => if(!tail.isEmpty) Some((head, tail.head)) else None
+			case _ => ???
 		}
 		
+		if(lst.tail.isEmpty || tmp.isEmpty) Nil
+		else
+		//				($and("date" $lt sdf.parse(tmp.get._1).getTime, "date" $gte sdf.parse(tmp.get._2).getTime))
+			toJson(Map("condition" -> toJson(Map("date" -> toJson(Map("start" -> toJson(tmp.get._2), "end" -> toJson(tmp.get._1))))))) :: dateCondition(lst.tail)
 	}
+	
 	def getObj(x : MongoDBObject) : List[BasicDBObject] ={
 		val ok = x.getAs[Number]("ok").get.intValue
 		if (ok == 0) throw new Exception("db aggregation error")
