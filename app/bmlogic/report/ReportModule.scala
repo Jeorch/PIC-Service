@@ -126,20 +126,31 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 	def reportgraphfour (data: JsValue)
 	                    (pr: Option[Map[String, JsValue]])
 	                    (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+		
+		def getByID(x : MongoDBObject, id : String) : Double = {
+			val ok = x.getAs[Number]("ok").get.intValue
+			if (ok == 0) throw new Exception("db aggregation error")
+			else {
+				val lst: MongoDBList = x.getAs[MongoDBList]("result").get
+				val tmp = lst.toList.asInstanceOf[List[BasicDBObject]]
+				if (tmp.isEmpty) throw new Exception("db aggregation find None")
+				else {
+					val res = tmp.find(x => x.getString("_id") == id)
+					res.get.getDouble("sales")
+				}
+			}
+		}
+		
 		try {
-			val db=cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+			val db = cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
-			val condition= (conditionParse(data, pr.get)::categoryConditionParse(data,pr.get) :: oralNameConditionParse(data) :: dateConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
-			val group =MongoDBObject("_id"->"$manufacture_type", "sales" -> MongoDBObject("$sum" -> "$sales"))
-			var outerNum:Double=1
-			println("ok")
-			val res=db.aggregate($and(condition),"retrieval",group)
-			{x=>
-				val interNum=getByID(x,"内资")
-				println(interNum)
-				outerNum=getByID(x,"合资")
-				println(outerNum)
-				val per=outerNum/(interNum+outerNum)*100
+			val condition = (conditionParse(data, pr.get) :: categoryConditionParse(data,pr.get) :: oralNameConditionParse(data) :: dateConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
+			val group = MongoDBObject("_id" -> "$manufacture_type", "sales" -> MongoDBObject("$sum" -> "$sales"))
+			
+			val res = db.aggregate($and(condition), "retrieval", group) { x=>
+				val interNum = getByID(x,"内资")
+				val outerNum = Some(getByID(x,"合资")).getOrElse(1)
+				val per = outerNum / (interNum+outerNum) * 100
 
 				Map("percent" -> toJson(per),
 					"内资"->toJson(interNum),
@@ -320,86 +331,87 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 		
 		val db = cm.modules.get.get("db").map(x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 		val group = MongoDBObject("_id"->"$manufacture", "sales" -> MongoDBObject("$sum" -> "$sales"))
-		val condition= (conditionParse(data, pr.get)::categoryConditionParse(data,pr.get) ::oralNameConditionParse(data) :: dateConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
-		var marketShare:List[Map[String,JsValue]]=null
-		//前十数据
-		val topTen:ArrayBuffer[(String,Double)]=new ArrayBuffer[(String, Double)]()
-		val allRes=db.aggregate($and(condition),"retrieval",group){x=>
-			val tmp=getObj(x).map{y=>
-				val manufacture=y.getString("_id")
-				val saleQuantity=y.getDouble("sales")
-				val kv=manufacture->saleQuantity
-				kv
-			}
-			val sum:Double=tmp.map(x=>x._2.toDouble).reduce((a,b)=>a+b)
-			val res=tmp.sortBy(x=>x._2.toDouble).reverse.take(10)
-			val top=res.map{ x=>
-				topTen.append(x)
-				Map(x._1->x._2)
-			}
-			marketShare=res.map(x=>Map(x._1->toJson(x._2.toDouble/sum)))
-			Map("top10"->toJson(marketShare),
-			"rawData"->toJson(top)
-			)
-		}
-
-		val per_year_start=(data \ "condition"\"date" \ "start").get.as[String]
-		val per_year_last=(data\"condition" \"date"\ "end").get.as[String]
-		val per_start=updateMonth(per_year_start,-12)
-		val per_end=updateMonth(per_year_last,-12)
-		val time=toJson(Map("condition" -> toJson(Map("date" -> toJson(Map("start" -> toJson(per_start), "end" -> toJson(per_end)))))))
-		val perCondition= (conditionParse(data, pr.get) :: categoryConditionParse(data,pr.get)::oralNameConditionParse(data) :: dateConditionParse(time) :: Nil).filterNot(_ == None).map(_.get)
-		val preData:ArrayBuffer[(String,Double)]=new ArrayBuffer[(String, Double)]()
-		val preRes=db.aggregate($and(perCondition),"retrieval",group){x=>
-			val tmp=getObj(x).map{y=>
-				val manufacture=y.getString("_id")
-				val saleQuantity=y.getDouble("sales")
-				val kv=Map(manufacture->saleQuantity)
-				preData.append((manufacture,saleQuantity))
-				kv
-			}
-			Map("pre_sale"->toJson(tmp))
-		}
+		val condition = (conditionParse(data, pr.get)::categoryConditionParse(data,pr.get) ::oralNameConditionParse(data) :: dateConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
 		
-		val percentGrowth=topTen.map{ x=>
-			val now=x._2
-			val past=preData.toList.filter(y=>y._1==x._1).head._2
-			val growth=(now-past)/past*100
-			Map(x._1->growth)
-		}
-		val productGroup=MongoDBObject("_id"->"$manufacture",
-			"product_unit"->MongoDBObject("$push"->"$product_unit"))
-		val productArr:ArrayBuffer[(String,Int)]=new ArrayBuffer()
-		val proRes=db.aggregate($and(condition),"retrieval",productGroup){x=>
-			val tmp=getObj(x).map{y=>
-				val manufacture=y.getString("_id")
-				val product_unit=y.getAs[List[String]]("product_unit").get.distinct.size
-				productArr.append((manufacture,product_unit))
-				Map(manufacture->product_unit)
-			}
-			Map("production"->toJson(tmp))
-		}
-		val productNum=topTen.map{x=>
-			productArr.filter(y=>y._1==x._1).map(z=>Map(z._1->z._2)).head
-		}
-		val com_type=topTen.map{x=>
-			val tl=db.queryObject(DBObject("manufacture"->x._1),"retrieval"){obj =>
-				Map(
-					"manufacture" -> toJson(obj.getAs[String]("manufacture").map (x => x).getOrElse(throw new Exception("product with manufacture"))),
-					"manufacture_type" -> toJson(obj.getAs[String]("manufacture_type").map (x => x).getOrElse(throw new Exception("product with manufacture type")))
-				)
-			}
-			val typ=tl.map{x=>
-				Map(x.get("manufacture").get.as[String]->x.get("manufacture_type").get.as[String])
-			}
-			typ
-		}
-		(Some(Map(
-			"marketShare"->toJson(marketShare),
-			"percentGrowth" -> toJson(percentGrowth),
-			"productNumber"->toJson(productNum),
-			"manufacture_type"->toJson(com_type)
-		)),None)
+		
+//		var marketShare:List[Map[String,JsValue]] = null
+//		//前十数据
+//		val topTen: ArrayBuffer[(String,Double)] = new ArrayBuffer[(String, Double)]()
+//		val allRes = db.aggregate($and(condition),"retrieval",group) { x =>
+//			val tmp = getObj(x).map { y =>
+//				val manufacture = y.getString("_id")
+//				val saleQuantity = y.getDouble("sales")
+//				manufacture -> saleQuantity
+//			}
+////			val sum: Double = tmp.map(x => x._2.toDouble).sum
+//			val sum: Double = tmp.map(x => x._2.toDouble).reduce((a, b) => a + b)
+//			val res = tmp.sortBy(x => x._2.toDouble).reverse.take(10)
+//			val top = res.map { x =>
+//				topTen.append(x)
+//				Map(x._1 -> x._2)
+//			}
+//			marketShare = res.map(x => Map(x._1->toJson(x._2.toDouble/sum)))
+//			Map("top10"->toJson(marketShare), "rawData"->toJson(top))
+//		}
+//
+//		val per_year_start=(data \ "condition" \ "date" \ "start").get.as[String]
+//		val per_year_last=(data \ "condition" \ "date" \ "end").get.as[String]
+//		val per_start=updateMonth(per_year_start,-12)
+//		val per_end=updateMonth(per_year_last,-12)
+//		val time=toJson(Map("condition" -> toJson(Map("date" -> toJson(Map("start" -> toJson(per_start), "end" -> toJson(per_end)))))))
+//		val perCondition= (conditionParse(data, pr.get) :: categoryConditionParse(data,pr.get)::oralNameConditionParse(data) :: dateConditionParse(time) :: Nil).filterNot(_ == None).map(_.get)
+//		val preData:ArrayBuffer[(String,Double)]=new ArrayBuffer[(String, Double)]()
+//		val preRes=db.aggregate($and(perCondition),"retrieval",group){x=>
+//			val tmp=getObj(x).map{y=>
+//				val manufacture=y.getString("_id")
+//				val saleQuantity=y.getDouble("sales")
+//				val kv=Map(manufacture->saleQuantity)
+//				preData.append((manufacture,saleQuantity))
+//				kv
+//			}
+//			Map("pre_sale"->toJson(tmp))
+//		}
+//
+//		val percentGrowth=topTen.map{ x=>
+//			val now=x._2
+//			val past=preData.toList.filter(y=>y._1==x._1).head._2
+//			val growth=(now-past)/past*100
+//			Map(x._1->growth)
+//		}
+//		val productGroup=MongoDBObject("_id"->"$manufacture", "product_unit"->MongoDBObject("$push"->"$product_unit"))
+//		val productArr:ArrayBuffer[(String,Int)]=new ArrayBuffer()
+//		val proRes=db.aggregate($and(condition),"retrieval",productGroup){ x =>
+//			val tmp=getObj(x).map{y=>
+//				val manufacture=y.getString("_id")
+//				val product_unit=y.getAs[List[String]]("product_unit").get.distinct.size
+//				productArr.append((manufacture,product_unit))
+//				Map(manufacture->product_unit)
+//			}
+//			Map("production"->toJson(tmp))
+//		}
+//		val productNum=topTen.map{x=>
+//			productArr.filter(y=>y._1==x._1).map(z=>Map(z._1->z._2)).head
+//		}
+//		val com_type=topTen.map{x=>
+//			val tl=db.queryObject(DBObject("manufacture"->x._1),"retrieval"){obj =>
+//				Map(
+//					"manufacture" -> toJson(obj.getAs[String]("manufacture").map (x => x).getOrElse(throw new Exception("product with manufacture"))),
+//					"manufacture_type" -> toJson(obj.getAs[String]("manufacture_type").map (x => x).getOrElse(throw new Exception("product with manufacture type")))
+//				)
+//			}
+//			val typ=tl.map{x=>
+//				Map(x.get("manufacture").get.as[String]->x.get("manufacture_type").get.as[String])
+//			}
+//			typ
+//		}
+//		(Some(Map(
+//			"marketShare"->toJson(marketShare),
+//			"percentGrowth" -> toJson(percentGrowth),
+//			"productNumber"->toJson(productNum),
+//			"manufacture_type"->toJson(com_type)
+//		)),None)
+		
+		(Some(Map("" -> toJson(0))),None)
 	}
 	
 	def reportparameter(obj: DBObject): Map[String, JsValue] = {
@@ -407,31 +419,17 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 		Map("condition" -> parse(condition))
 	}
 	
-	def aggregateSalesResult(x : MongoDBObject, id : String) : Long = {
+	def aggregateSalesResult(x : MongoDBObject, id : String): Double = {
 		val ok = x.getAs[Number]("ok").get.intValue
 		if (ok == 0) throw new Exception("db aggregation error")
 		else {
 			val lst : MongoDBList = x.getAs[MongoDBList]("result").get
 			val tmp = lst.toList.asInstanceOf[List[BasicDBObject]]
-			if(tmp.isEmpty) 0L
+			if(tmp.isEmpty) 0D
 			else
 				tmp.find(y => y.getAs[BasicDBObject]("_id").get.getString("ms") == id).map { z =>
-					z.getLong("sales") / 100
+					z.getDouble("sales") / 100
 				}.getOrElse(throw new Exception("db aggregation error"))
-		}
-	}
-	
-	def getByID(x : MongoDBObject, id : String) : Double = {
-		val ok = x.getAs[Number]("ok").get.intValue
-		if (ok == 0) throw new Exception("db aggregation error")
-		else {
-			val lst: MongoDBList = x.getAs[MongoDBList]("result").get
-			val tmp = lst.toList.asInstanceOf[List[BasicDBObject]]
-			if (tmp.isEmpty) throw new Exception("db aggregation find None")
-			else {
-				val res = tmp.find(x => x.getString("_id") == id)
-				res.get.getDouble("sales")
-			}
 		}
 	}
 	
@@ -448,19 +446,15 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 			toJson(Map("condition" -> toJson(Map("date" -> toJson(Map("start" -> toJson(tmp.get._2), "end" -> toJson(tmp.get._1))))))) :: dateCondition(lst.tail)
 	}
 	
-	def getObj(x : MongoDBObject) : List[BasicDBObject] ={
+	def getObj(x : MongoDBObject) : List[BasicDBObject] = {
 		val ok = x.getAs[Number]("ok").get.intValue
 		if (ok == 0) throw new Exception("db aggregation error")
 		else {
 			val lst : MongoDBList = x.getAs[MongoDBList]("result").get
 			val tmp = lst.toList.asInstanceOf[List[BasicDBObject]]
 			if(tmp.isEmpty) throw new Exception("db aggregation find None")
-			else {
-				tmp
-			}
-			
+			else tmp
 		}
-		
 	}
 	
 	
