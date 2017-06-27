@@ -122,11 +122,13 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 			case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
 	}
+
+
 	
 	def reportgraphfour (data: JsValue)
 	                    (pr: Option[Map[String, JsValue]])
 	                    (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
-		
+
 		def getByID(x : MongoDBObject, id : String) : Double = {
 			val ok = x.getAs[Number]("ok").get.intValue
 			if (ok == 0) throw new Exception("db aggregation error")
@@ -140,28 +142,35 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 				}
 			}
 		}
-		
-		try {
-			val db = cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-
-			val condition = (conditionParse(data, pr.get) :: categoryConditionParse(data,pr.get) :: oralNameConditionParse(data) :: dateConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
-			val group = MongoDBObject("_id" -> "$manufacture_type", "sales" -> MongoDBObject("$sum" -> "$sales"))
-			
-			val res = db.aggregate($and(condition), "retrieval", group) { x=>
-				val interNum = getByID(x,"内资")
-				val outerNum = Some(getByID(x,"合资")).getOrElse(1)
-				val per = outerNum / (interNum+outerNum) * 100
-
-				Map("percent" -> toJson(per),
-					"内资"->toJson(interNum),
-					"外资"->toJson(outerNum),
-					"start" -> toJson((data\ "condition" \ "date" \ "start").as[String]),
-					"end" -> toJson((data \ "condition" \ "date" \ "end").as[String])
-				)
+		def resultdata(timecount: List[JsValue]): List[Option[Map[String, JsValue]]] = {
+			val db=cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+			timecount map { x =>
+				val condition = (conditionParse(data, pr.get)::categoryConditionParse(data,pr.get) :: oralNameConditionParse(data) :: dateConditionParse(x) :: Nil).filterNot(_ == None).map(_.get)
+				val group = MongoDBObject("_id" -> "$manufacture_type", "sales" -> MongoDBObject("$sum" -> "$sales"))
+				db.aggregate($and(condition), "retrieval", group) { z =>
+					val interNum = getByID(z,"内资")
+					val outerNum = Some(getByID(z,"合资")).getOrElse(1D)
+					val per = outerNum / (interNum+outerNum) * 100
+					Map("percent" -> toJson(per),
+						"inter"->toJson(interNum),
+						"outer"->toJson(outerNum),
+						"start" -> toJson((data\ "condition" \ "date" \ "start").as[String]),
+						"end" -> toJson((data \ "condition" \ "date" \ "end").as[String])
+					)
+				}
 			}
-			(res,None)
+		}
+		try {
+			timeList(4, data).foreach(x=>println(x))
+			println(dateCondition(timeList(4,data)))
+			val lst=resultdata(dateCondition(timeList(4,data)))
+			
+			(Some(Map("ReportGraphFour" -> toJson(lst))), None)
+			
 		} catch {
-			case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+			case ex: Exception =>
+				println(ex)
+				(None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
 	}
 	
