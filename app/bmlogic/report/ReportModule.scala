@@ -173,17 +173,14 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 				}
 				Some(res)
 			}
-			
 		}
+		
 		try {
-			
-			val lst=resultdata(dateCondition(timeList(4,data)))
-			(Some(Map("ReportGraphFour" -> toJson(lst))), None)
+			val lst=resultdata(dateCondition(timeList(1,data)))
+			(Some(Map("reportgraphfour" -> toJson(lst)) ++ pr.get), None)
 			
 		} catch {
-			case ex: Exception =>
-				
-				(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+			case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
 	}
 	
@@ -238,10 +235,8 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 				val condition = (conditionParse(data, pr.get) :: oralNameConditionParse(data) :: dateConditionParse(x) :: Nil).filterNot(_ == None).map(_.get)
 				db.aggregate($and(condition), "retrieval", group) { z =>
 					val r = aggregateResult(z)
-					val key = r.map (y =>y._1)
-					val value = r.map (y =>y._2)
-					Map("key" -> toJson(key),
-						"value" -> toJson(value),
+					val keyvalue = r.map (y =>Map(y._1 -> y._2))
+					Map("keyvalue" -> toJson(keyvalue),
 						"start" -> toJson((x \ "condition" \ "date" \ "start").as[String]),
 						"end" -> toJson((x \ "condition" \ "date" \ "end").as[String]))
 				}
