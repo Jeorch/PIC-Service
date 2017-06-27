@@ -147,34 +147,9 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 			timecount map { x =>
 				val condition = (conditionParse(data, pr.get)::categoryConditionParse(data,pr.get) :: oralNameConditionParse(data) :: dateConditionParse(x) :: Nil).filterNot(_ == None).map(_.get)
 				val group = MongoDBObject("_id" -> "$manufacture_type", "sales" -> MongoDBObject("$sum" -> "$sales"))
-//				db.aggregate($and(condition), "retrieval", group) { z =>
-//					if(z==None){
-//						Map("start" -> toJson((data\ "condition" \ "date" \ "start").as[String]),
-//							"end" -> toJson((data \ "condition" \ "date" \ "end").as[String])
-//
-//						)
-//					}else{
-//						val interNum = Some(getByID(z,"内资")).getOrElse(0D)
-//						val outerNum = Some(getByID(z,"合资")).getOrElse(1D)
-//						val per = outerNum / (interNum+outerNum) * 100
-//						Map("percent" -> toJson(per),
-//							"inter"->toJson(interNum),
-//							"outer"->toJson(outerNum),
-//							"start" -> toJson((data\ "condition" \ "date" \ "start").as[String]),
-//							"end" -> toJson((data \ "condition" \ "date" \ "end").as[String])
-//						)
-//					}
-//
-//				}
-				
 				var res=Map(""->toJson(0))
 				try{
 					res=db.aggregate($and(condition), "retrieval", group) { z =>
-					if(z==None){
-						Map("start" -> toJson((data\ "condition" \ "date" \ "start").as[String]),
-							"end" -> toJson((data \ "condition" \ "date" \ "end").as[String])
-						)
-					}else{
 						val interNum = Some(getByID(z,"内资")).getOrElse(0D)
 						val outerNum = Some(getByID(z,"合资")).getOrElse(1D)
 						val per = outerNum / (interNum+outerNum) * 100
@@ -184,7 +159,6 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 							"start" -> toJson((data\ "condition" \ "date" \ "start").as[String]),
 							"end" -> toJson((data \ "condition" \ "date" \ "end").as[String])
 						)
-					}
 					
 				}.get
 				}catch {
