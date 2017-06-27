@@ -156,8 +156,8 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 						Map("percent" -> toJson(per),
 							"inter"->toJson(interNum),
 							"outer"->toJson(outerNum),
-							"start" -> toJson((data\ "condition" \ "date" \ "start").as[String]),
-							"end" -> toJson((data \ "condition" \ "date" \ "end").as[String])
+							"start" -> toJson((x\ "condition" \ "date" \ "start").as[String]),
+							"end" -> toJson((x \ "condition" \ "date" \ "end").as[String])
 						)
 					
 				}.get
@@ -432,6 +432,7 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 //			"productNumber"->toJson(productNum),
 //			"manufacture_type"->toJson(com_type)
 //		)),None)
+		
 		
 		(Some(Map("" -> toJson(0))),None)
 	}
