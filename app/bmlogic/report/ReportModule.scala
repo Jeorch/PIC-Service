@@ -147,29 +147,68 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 			timecount map { x =>
 				val condition = (conditionParse(data, pr.get)::categoryConditionParse(data,pr.get) :: oralNameConditionParse(data) :: dateConditionParse(x) :: Nil).filterNot(_ == None).map(_.get)
 				val group = MongoDBObject("_id" -> "$manufacture_type", "sales" -> MongoDBObject("$sum" -> "$sales"))
-				db.aggregate($and(condition), "retrieval", group) { z =>
-					val interNum = getByID(z,"内资")
-					val outerNum = Some(getByID(z,"合资")).getOrElse(1D)
-					val per = outerNum / (interNum+outerNum) * 100
-					Map("percent" -> toJson(per),
-						"inter"->toJson(interNum),
-						"outer"->toJson(outerNum),
-						"start" -> toJson((data\ "condition" \ "date" \ "start").as[String]),
-						"end" -> toJson((data \ "condition" \ "date" \ "end").as[String])
-					)
+//				db.aggregate($and(condition), "retrieval", group) { z =>
+//					if(z==None){
+//						Map("start" -> toJson((data\ "condition" \ "date" \ "start").as[String]),
+//							"end" -> toJson((data \ "condition" \ "date" \ "end").as[String])
+//
+//						)
+//					}else{
+//						val interNum = Some(getByID(z,"内资")).getOrElse(0D)
+//						val outerNum = Some(getByID(z,"合资")).getOrElse(1D)
+//						val per = outerNum / (interNum+outerNum) * 100
+//						Map("percent" -> toJson(per),
+//							"inter"->toJson(interNum),
+//							"outer"->toJson(outerNum),
+//							"start" -> toJson((data\ "condition" \ "date" \ "start").as[String]),
+//							"end" -> toJson((data \ "condition" \ "date" \ "end").as[String])
+//						)
+//					}
+//
+//				}
+				
+				var res=Map(""->toJson(0))
+				try{
+					res=db.aggregate($and(condition), "retrieval", group) { z =>
+					if(z==None){
+						Map("start" -> toJson((data\ "condition" \ "date" \ "start").as[String]),
+							"end" -> toJson((data \ "condition" \ "date" \ "end").as[String])
+						)
+					}else{
+						val interNum = Some(getByID(z,"内资")).getOrElse(0D)
+						val outerNum = Some(getByID(z,"合资")).getOrElse(1D)
+						val per = outerNum / (interNum+outerNum) * 100
+						Map("percent" -> toJson(per),
+							"inter"->toJson(interNum),
+							"outer"->toJson(outerNum),
+							"start" -> toJson((data\ "condition" \ "date" \ "start").as[String]),
+							"end" -> toJson((data \ "condition" \ "date" \ "end").as[String])
+						)
+					}
+					
+				}.get
+				}catch {
+					case ex:Exception=>
+						res=Map(
+							"percent" -> toJson("暂无数据"),
+							"inter"->toJson("暂无数据"),
+							"outer"->toJson("暂无数据"),
+							"start" -> toJson((x\ "condition" \ "date" \ "start").as[String]),
+							"end" -> toJson((x \ "condition" \ "date" \ "end").as[String])
+						)
 				}
+				Some(res)
 			}
+			
 		}
 		try {
-			timeList(4, data).foreach(x=>println(x))
-			println(dateCondition(timeList(4,data)))
-			val lst=resultdata(dateCondition(timeList(4,data)))
 			
+			val lst=resultdata(dateCondition(timeList(4,data)))
 			(Some(Map("ReportGraphFour" -> toJson(lst))), None)
 			
 		} catch {
 			case ex: Exception =>
-				println(ex)
+				
 				(None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
 	}
