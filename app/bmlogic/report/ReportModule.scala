@@ -35,6 +35,14 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 		case msg_ReportGraph_Six(data) => reportgraphsix(data)(pr)
 		case msg_ReportGraph_Seven(data) => reportgraphseven(data)(pr)
 		case msg_ReportGraph_Eight(data) => reportgrapheight(data)(pr)
+		
+		/************************************************************/
+		case msg_ReportTable_Sales(data) => reporttablesales(data)(pr)
+		case msg_ReportTable_ProductUnitCount(data) => reporttableproductunitcount(data)(pr)
+		case msg_ReportTable_Calc(data) => reporttablescalc(data)(pr)
+		case msg_ReportTable_One(data) => reportTableone(data)(pr)
+		
+		
 		case _ => ???
 	}
 	
@@ -63,9 +71,9 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 	}
 	
 	
-	def reportgraphone(data: JsValue)
-	                  (pr: Option[Map[String, JsValue]])
-	                  (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+	def reportgraphone (data: JsValue)
+	                   (pr: Option[Map[String, JsValue]])
+	                   (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
 		
 		def resultdata(timecount: List[JsValue]): List[Option[Map[String, JsValue]]] = {
 			val db=cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
@@ -123,8 +131,6 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 		}
 	}
 
-
-	
 	def reportgraphfour (data: JsValue)
 	                    (pr: Option[Map[String, JsValue]])
 	                    (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
@@ -147,30 +153,40 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 			timecount map { x =>
 				val condition = (conditionParse(data, pr.get)::categoryConditionParse(data,pr.get) :: oralNameConditionParse(data) :: dateConditionParse(x) :: Nil).filterNot(_ == None).map(_.get)
 				val group = MongoDBObject("_id" -> "$manufacture_type", "sales" -> MongoDBObject("$sum" -> "$sales"))
-				db.aggregate($and(condition), "retrieval", group) { z =>
-					val interNum = getByID(z,"内资")
-					val outerNum = Some(getByID(z,"合资")).getOrElse(1D)
-					val per = outerNum / (interNum+outerNum) * 100
-					Map("percent" -> toJson(per),
-						"inter"->toJson(interNum),
-						"outer"->toJson(outerNum),
-						"start" -> toJson((data\ "condition" \ "date" \ "start").as[String]),
-						"end" -> toJson((data \ "condition" \ "date" \ "end").as[String])
-					)
+				var res=Map(""->toJson(0))
+				try{
+					res=db.aggregate($and(condition), "retrieval", group) { z =>
+						val interNum = Some(getByID(z,"内资")).getOrElse(0D)
+						val outerNum = Some(getByID(z,"合资")).getOrElse(1D)
+						val per = outerNum / (interNum+outerNum) * 100
+						Map("percent" -> toJson(per),
+							"inter"->toJson(interNum),
+							"outer"->toJson(outerNum),
+							"start" -> toJson((x\ "condition" \ "date" \ "start").as[String]),
+							"end" -> toJson((x \ "condition" \ "date" \ "end").as[String])
+						)
+					
+				}.get
+				}catch {
+					case ex:Exception=>
+						res=Map(
+							"percent" -> toJson("暂无数据"),
+							"inter"->toJson("暂无数据"),
+							"outer"->toJson("暂无数据"),
+							"start" -> toJson((x\ "condition" \ "date" \ "start").as[String]),
+							"end" -> toJson((x \ "condition" \ "date" \ "end").as[String])
+						)
 				}
+				Some(res)
 			}
 		}
+		
 		try {
-			timeList(4, data).foreach(x=>println(x))
-			println(dateCondition(timeList(4,data)))
-			val lst=resultdata(dateCondition(timeList(4,data)))
-			
-			(Some(Map("ReportGraphFour" -> toJson(lst))), None)
+			val lst=resultdata(dateCondition(timeList(1,data)))
+			(Some(Map("reportgraphfour" -> toJson(lst)) ++ pr.get), None)
 			
 		} catch {
-			case ex: Exception =>
-				println(ex)
-				(None, Some(ErrorCode.errorToJson(ex.getMessage)))
+			case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
 	}
 	
@@ -225,10 +241,8 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 				val condition = (conditionParse(data, pr.get) :: oralNameConditionParse(data) :: dateConditionParse(x) :: Nil).filterNot(_ == None).map(_.get)
 				db.aggregate($and(condition), "retrieval", group) { z =>
 					val r = aggregateResult(z)
-					val key = r.map (y =>y._1)
-					val value = r.map (y =>y._2)
-					Map("key" -> toJson(key),
-						"value" -> toJson(value),
+					val keyvalue = r.map (y =>Map(y._1 -> y._2))
+					Map("keyvalue" -> toJson(keyvalue),
 						"start" -> toJson((x \ "condition" \ "date" \ "start").as[String]),
 						"end" -> toJson((x \ "condition" \ "date" \ "end").as[String]))
 				}
@@ -333,10 +347,72 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 		}
 	}
 	
+	
+	def reporttablesales (data: JsValue)
+	                     (pr: Option[Map[String, JsValue]])
+	                     (implicit cm: CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+		
+		def resultdata(timecount: List[JsValue]): List[Option[Map[String, JsValue]]] = {
+			val db = cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+			val group = MongoDBObject("_id" -> MongoDBObject("manufacture" -> "$manufacture", "manufacture_type" -> "$manufacture_type"), "sales" -> MongoDBObject("$sum" -> "$sales"))
+			timecount map { x =>
+				val condition = (conditionParse(data, pr.get) :: oralNameConditionParse(data) :: dateConditionParse(x) :: Nil).filterNot(_ == None).map(_.get)
+				db.aggregate($and(condition), "retrieval", group) { z =>
+					val r = aggregateResult(z)
+					Map("sales" -> toJson(0),
+						"start" -> toJson((x \ "condition" \ "date" \ "start").as[String]),
+						"end" -> toJson((x \ "condition" \ "date" \ "end").as[String])
+					)
+				}
+			}
+		}
+		
+		def aggregateResult(x : MongoDBObject) : List[(String, Double)] = {
+			val ok = x.getAs[Number]("ok").get.intValue
+			if (ok == 0) throw new Exception("db aggregation error")
+			else {
+				val lst : MongoDBList = x.getAs[MongoDBList]("result").get
+//				lst.toList.asInstanceOf[List[BasicDBObject]].map( z => (z.getString("_id"), z.getDouble("sales") / 100))
+				println(lst.toList.asInstanceOf[List[BasicDBObject]])
+			}
+			Nil
+		}
+		
+		try {
+			resultdata(dateCondition(timeList(1, data)))
+		} catch {
+			case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+		}
+		
+		(Some(Map("" -> toJson(0))), None)
+	}
+	
+	def reporttableproductunitcount (data: JsValue)
+	                                (pr: Option[Map[String, JsValue]])
+	                                (implicit cm: CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+		
+		(Some(Map("" -> toJson(0))), None)
+	}
+	
+	def reporttablescalc (data: JsValue)
+	                     (pr: Option[Map[String, JsValue]])
+	                     (implicit cm: CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+		
+		(Some(Map("" -> toJson(0))), None)
+	}
+	
+	def reportTableone (data: JsValue)
+	                   (pr: Option[Map[String, JsValue]])
+	                   (implicit cm: CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+		
+		(Some(Map("" -> toJson(0))), None)
+	}
+	
+	
 	//表一
-	def reportChartOne(data: JsValue)
-					  (pr: Option[Map[String, JsValue]])
-					  (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+	def reportChartOne (data: JsValue)
+					   (pr: Option[Map[String, JsValue]])
+					   (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
 		
 		val db = cm.modules.get.get("db").map(x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 		val group = MongoDBObject("_id"->"$manufacture", "sales" -> MongoDBObject("$sum" -> "$sales"))
@@ -420,6 +496,7 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 //			"manufacture_type"->toJson(com_type)
 //		)),None)
 		
+		
 		(Some(Map("" -> toJson(0))),None)
 	}
 	
@@ -465,7 +542,6 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 			else tmp
 		}
 	}
-	
 	
 	def updateMonth(date:String,month:Int):String  ={
 		val c = Calendar.getInstance()

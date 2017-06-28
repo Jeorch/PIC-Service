@@ -36,8 +36,7 @@ GET     /report:reportid                        controllers.PagesController.repo
 POST    /data/reportparameter                   controllers.ReportController.reportparameter
 POST    /data/query/reportparameter             controllers.ReportController.queryreportparameter
 POST    /data/calc/report/summary               controllers.ReportController.reportcalcsummary
-POST    /data/calc/report/graphfour             controllers.ReportController.graphfour
-POST    /data/calc/report/chatOne               controllers.ReportController.chartOne
+
 #用户登录
 GET     /login                                  controllers.PagesController.login
 #管理員界面
