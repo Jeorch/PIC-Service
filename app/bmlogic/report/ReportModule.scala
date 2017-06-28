@@ -35,6 +35,14 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 		case msg_ReportGraph_Six(data) => reportgraphsix(data)(pr)
 		case msg_ReportGraph_Seven(data) => reportgraphseven(data)(pr)
 		case msg_ReportGraph_Eight(data) => reportgrapheight(data)(pr)
+		
+		/************************************************************/
+		case msg_ReportTable_Sales(data) => reporttablesales(data)(pr)
+		case msg_ReportTable_ProductUnitCount(data) => reporttableproductunitcount(data)(pr)
+		case msg_ReportTable_Calc(data) => reporttablescalc(data)(pr)
+		case msg_ReportTable_One(data) => reportTableone(data)(pr)
+		
+		
 		case _ => ???
 	}
 	
@@ -63,9 +71,9 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 	}
 	
 	
-	def reportgraphone(data: JsValue)
-	                  (pr: Option[Map[String, JsValue]])
-	                  (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+	def reportgraphone (data: JsValue)
+	                   (pr: Option[Map[String, JsValue]])
+	                   (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
 		
 		def resultdata(timecount: List[JsValue]): List[Option[Map[String, JsValue]]] = {
 			val db=cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
@@ -123,8 +131,6 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 		}
 	}
 
-
-	
 	def reportgraphfour (data: JsValue)
 	                    (pr: Option[Map[String, JsValue]])
 	                    (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
@@ -341,10 +347,72 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 		}
 	}
 	
+	
+	def reporttablesales (data: JsValue)
+	                     (pr: Option[Map[String, JsValue]])
+	                     (implicit cm: CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+		
+		def resultdata(timecount: List[JsValue]): List[Option[Map[String, JsValue]]] = {
+			val db = cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+			val group = MongoDBObject("_id" -> MongoDBObject("manufacture" -> "$manufacture", "manufacture_type" -> "$manufacture_type"), "sales" -> MongoDBObject("$sum" -> "$sales"))
+			timecount map { x =>
+				val condition = (conditionParse(data, pr.get) :: oralNameConditionParse(data) :: dateConditionParse(x) :: Nil).filterNot(_ == None).map(_.get)
+				db.aggregate($and(condition), "retrieval", group) { z =>
+					val r = aggregateResult(z)
+					Map("sales" -> toJson(0),
+						"start" -> toJson((x \ "condition" \ "date" \ "start").as[String]),
+						"end" -> toJson((x \ "condition" \ "date" \ "end").as[String])
+					)
+				}
+			}
+		}
+		
+		def aggregateResult(x : MongoDBObject) : List[(String, Double)] = {
+			val ok = x.getAs[Number]("ok").get.intValue
+			if (ok == 0) throw new Exception("db aggregation error")
+			else {
+				val lst : MongoDBList = x.getAs[MongoDBList]("result").get
+//				lst.toList.asInstanceOf[List[BasicDBObject]].map( z => (z.getString("_id"), z.getDouble("sales") / 100))
+				println(lst.toList.asInstanceOf[List[BasicDBObject]])
+			}
+			Nil
+		}
+		
+		try {
+			resultdata(dateCondition(timeList(1, data)))
+		} catch {
+			case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+		}
+		
+		(Some(Map("" -> toJson(0))), None)
+	}
+	
+	def reporttableproductunitcount (data: JsValue)
+	                                (pr: Option[Map[String, JsValue]])
+	                                (implicit cm: CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+		
+		(Some(Map("" -> toJson(0))), None)
+	}
+	
+	def reporttablescalc (data: JsValue)
+	                     (pr: Option[Map[String, JsValue]])
+	                     (implicit cm: CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+		
+		(Some(Map("" -> toJson(0))), None)
+	}
+	
+	def reportTableone (data: JsValue)
+	                   (pr: Option[Map[String, JsValue]])
+	                   (implicit cm: CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+		
+		(Some(Map("" -> toJson(0))), None)
+	}
+	
+	
 	//表一
-	def reportChartOne(data: JsValue)
-					  (pr: Option[Map[String, JsValue]])
-					  (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+	def reportChartOne (data: JsValue)
+					   (pr: Option[Map[String, JsValue]])
+					   (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
 		
 		val db = cm.modules.get.get("db").map(x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 		val group = MongoDBObject("_id"->"$manufacture", "sales" -> MongoDBObject("$sum" -> "$sales"))
@@ -474,7 +542,6 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 			else tmp
 		}
 	}
-	
 	
 	def updateMonth(date:String,month:Int):String  ={
 		val c = Calendar.getInstance()
