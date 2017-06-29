@@ -20,7 +20,7 @@ $("#grid").kendoGrid({
 	                type : "post"
             },
             create: {
-	                url: "../userInfo/saveOrUpdate",
+	                url: "../auth/pushUser ",
 	                dataType: "json",
 	                contentType : "application/json",
 	                type : "post"
@@ -43,11 +43,13 @@ $("#grid").kendoGrid({
 			model : {
 				id : "id",
 				fields : {
-					loginName : {
+					user_name : {
 						type : "string",
 						validation: { required: true,validationMessage : "用户名不能为空并保证唯一。"  } ,
-					},status: {
-						type : "string",
+					},pwd : {
+                        type : "string",
+                    },status: {
+						type : "number",
 						validation: { required: true,validationMessage : "用户状态不能为空。"  }
 					}
 				}
@@ -119,11 +121,16 @@ $("#grid").kendoGrid({
          title: "用户名",
          width: 120
      }, {
-         field: "status",
-         title: "用户状态",
-         values : [{"value": 1, "text": "正常开通" },{"value": 0,"text": "暂不开通"}],
-     	 width: 75
+         field: "pwd",
+         title: "密码",
+     	 width: 1,
+         visible: false
      }, {
+        field: "status",
+        title: "用户状态",
+        values : [{"value": 1, "text": "正常开通" },{"value": 0,"text": "暂不开通"}],
+        width: 75
+    }, {
          field: "createDate",
          title: "创建时间",
          format: "{0: yyyy-MM-dd HH:mm:ss}", //格式化时间  
@@ -147,7 +154,7 @@ $("#grid").kendoGrid({
     toolbar: [{ name: "create", text: "新增用户" }, {  template: kendo.template($("#template").html())}],
     edit: function(e) {
         if (!e.model.isNew()) {
-        	e.container.find("input[name=loginName]")[0].disabled = true;
+        	e.container.find("input[name=user_name]")[0].disabled = true;
         }
         $("label[for='createDate']").remove();
     	$("div[data-container-for='createDate']").remove();

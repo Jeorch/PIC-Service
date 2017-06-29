@@ -23,6 +23,10 @@ class PagesController extends Controller {
     def admin = Action{
         Ok(views.html.admin())
     }
+    //管理員界面
+    def userManage = Action{
+        Ok(views.html.admin())
+    }
 
     //个人中心
     def userInfo = Action{
