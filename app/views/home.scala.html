@@ -31,49 +31,76 @@
         <div class="navbar navbar-default navbar-static-top" style="margin-bottom: 0;">
             <div class="row hoemTop">
                     <!--  class="img-responsive " -->
-                <div class="col-xs-1 col-sm-1 col-md-2 col-lg-2" style="padding-left: 45px;">
+                <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2" style="padding-left: 45px;">
                     <a href="#"><img src="@routes.Assets.at("images/logo.gif")" alt="" /></a>
                 </div>
-                <div class="col-xs-8 col-sm-5 col-md-6 col-lg-8 header-title" style="height: 70px;">
-                    <div class="col-xs-10 col-sm-10 col-md-10 col-lg-8" style="padding-left: 0;">
-                        <h2>中国等级医院药品销售信息库</h2>
+                @*<div class="col-xs-8 col-sm-5 col-md-6 col-lg-8 header-title" style="height: 70px;">*@
+                    @*<div class="col-xs-10 col-sm-10 col-md-10 col-lg-8" style="padding-left: 0;">*@
+                        @*<h2>中国等级医院药品销售信息库</h2>*@
+                    @*</div>*@
+                @*</div>*@
+                <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 header-title" style="height: 70px;">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding-left: 0;">
+                        <div class="row">
+                            <h2 class="col-xs-9">中国等级医院药品销售信息库</h2>
+                            <ol class="col-xs-3 breadcrumb">
+                                <li href="#">PIC</li>
+                                <li href="#">
+                                    <i class="glyphicon glyphicon-home"></i>
+                                    首页
+                                </li>
+                            </ol>
+                        </div>
                     </div>
                 </div>
-                <form id="subForm" name="subForm" method="post"></form>
-                <div class="col-xs-3 col-sm-5 col-md-4 col-lg-2 text-center">
-                    <div class="language-box">
-                        <div id="btnGroup" class="btn-group btn-group-lg">
-                            <button type="button" id="en" class="btn btn-default">EN</button>
-                            <button id="btnShow" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                <span id="jxname">NULL</span> <span class="caret"></span>
-                            </button>
-                            <div id="content" class="dropdown-menu" role="menu" style="padding: 0;">
-                                <div class="drop-down">
-                                    <div class="manager-text">
-                                        <span class="userName">NULL</span>
-                                    </div>
-                                    <div class="personal-text">
-                                        <a class="border-left" id="userInfo">个人资料</a> <a href="#" onclick="logoutSys()">退出</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
+
+                <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 text-center">
+
+                    @*<div class="language-box">*@
+                        @*<div id="btnGroup" class="btn-group btn-group-lg">*@
+                            @*<button type="button" id="en" class="btn btn-default">EN</button>*@
+                            @*<button id="btnShow" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">*@
+                                @*<span id="jxname">NULL</span> <span class="caret"></span>*@
+                            @*</button>*@
+                            @*<div id="content" class="dropdown-menu" role="menu" style="padding: 0;">*@
+                                @*<div class="drop-down">*@
+                                    @*<div class="manager-text">*@
+                                        @*<span class="userName">NULL</span>*@
+                                    @*</div>*@
+                                    @*<div class="personal-text">*@
+                                        @*<a class="border-left" id="userInfo">个人资料</a> <a href="#" onclick="logoutSys()">退出</a>*@
+                                    @*</div>*@
+                                @*</div>*@
+                            @*</div>*@
+                        @*</div>*@
+                    @*</div>*@
+                    <div class="btn-group" style="padding-top: 23px">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img src="..." alt="..." class="img-circle">
+                            用户名 <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="#" onclick="logoutSys()">退出</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#" id="userInfo">个人资料</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-2 main-left" style="background-color: #ccc;">
+            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-2 main-left" style="background-color: rgb(245, 245, 245);">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 
                     <div class="box-wrap2">
                         <input type="hidden" id="timeType" value="1"/>
                         <ul id="timeTab" class="nav nav-tabs" role="tablist">
-                            <li role="presentation" class="active"><a id="tabYear" href="#year" aria-controls="year" role="tab" data-toggle="tab">
+                            <li role="presentation" class="active fontCon"><a id="tabYear" href="#year" aria-controls="year" role="tab" data-toggle="tab">
                                 年</a></li>
-                            <li role="presentation" class=""><a id="tabMonth" href="#month" aria-controls="month" role="tab" data-toggle="tab">
+                            <li role="presentation" class="fontCon"><a id="tabMonth" href="#month" aria-controls="month" role="tab" data-toggle="tab">
                                 月</a></li>
-                            <li role="presentation" class=""><a id="tabQuarter" href="#quarter" aria-controls="quarter" role="tab" da a-toggle="tab">
+                            <li role="presentation" class="fontCon"><a id="tabQuarter" href="#quarter" aria-controls="quarter" role="tab" da a-toggle="tab">
                                 季度</a></li>
                         </ul>
                         <div class="tab-content">
@@ -114,40 +141,76 @@
                             </div>
                         </div>
                     </div>
+                    @*<div class="box-wrap">*@
+                        @*<select id="ATC1" class="selectWidth" name="atc1Name"></select>*@
+                    @*</div>*@
+
+                    @*<div class="box-wrap">*@
+                        @*<select id="ATC2" class="selectWidth" name="atc2Name"></select>*@
+                    @*</div>*@
+                    @*<div class="box-wrap">*@
+                        @*<select id="ATC3" class="selectWidth" name="atc3Name"></select>*@
+                    @*</div>*@
+                    @*<div class="box-wrap">*@
+                        @*<select id="genericnameinfo" class="selectWidth" name="genericnameName"></select>*@
+                    @*</div>*@
+                    @*<div class="box-wrap">*@
+                        @*<select id="product" class="selectWidth" name="productName"></select>*@
+                    @*</div>*@
+                    @*<div class="box-wrap">*@
+                        @*<select id="province" class="selectWidth" name="provinceName"></select>*@
+                    @*</div>*@
+                    @*<div class="box-wrap">*@
+                        @*<select id="manufacturetype" class="selectWidth" name="manuTypeName"></select>*@
+                    @*</div>*@
+                    @*<div class="box-wrap">*@
+                        @*<select id="manufacture" class="selectWidth" name="manuName"></select>*@
+                    @*</div>*@
+                    @*<div class="box-wrap">*@
+                        @*<select id="dosage" class="selectWidth" name="dosageformName"></select>*@
+                    @*</div>*@
+                    @*<div class="box-wrap">*@
+                        @*<select id="specification" class="selectWidth" name="specificationsName"></select>*@
+                    @*</div>*@
+                    @*<div class="box-wrap">*@
+                        @*<select id="package" class="selectWidth" name="packagingName"></select>*@
+                    @*</div>*@
+
                     <div class="box-wrap">
-                        <select id="ATC1" class="selectWidth" name="atc1Name"></select>
+                        <select id="ATC1" class="selectWidth" name="atc1Name"><option>1aa</option></select>
                     </div>
 
                     <div class="box-wrap">
-                        <select id="ATC2" class="selectWidth" name="atc2Name"></select>
+                        <select id="ATC2" class="selectWidth" name="atc2Name"><i class="glyphicon glyphicon-briefcase"></i></select>
                     </div>
                     <div class="box-wrap">
-                        <select id="ATC3" class="selectWidth" name="atc3Name"></select>
+                        <select id="ATC3" class="selectWidth" name="atc3Name"><i class="glyphicon glyphicon-briefcase"></i></select>
                     </div>
                     <div class="box-wrap">
-                        <select id="genericnameinfo" class="selectWidth" name="genericnameName"></select>
+                        <select id="genericnameinfo" class="selectWidth" name="genericnameName"><i class="glyphicon glyphicon-subscript"></i> </select>
                     </div>
                     <div class="box-wrap">
-                        <select id="product" class="selectWidth" name="productName"></select>
+                        <select id="product" class="selectWidth" name="productName"><i class="glyphicon glyphicon-th"></i></select>
                     </div>
                     <div class="box-wrap">
-                        <select id="province" class="selectWidth" name="provinceName"></select>
+                        <select id="province" class="selectWidth" name="provinceName"><i class="glyphicon glyphicon-globe"></i></select>
                     </div>
                     <div class="box-wrap">
-                        <select id="manufacturetype" class="selectWidth" name="manuTypeName"></select>
+                        <select id="manufacturetype" class="selectWidth" name="manuTypeName"><i class="glyphicon glyphicon-tags"></i></select>
                     </div>
                     <div class="box-wrap">
-                        <select id="manufacture" class="selectWidth" name="manuName"></select>
+                        <select id="manufacture" class="selectWidth" name="manuName"><i class="glyphicon glyphicon-wrench"></i></select>
                     </div>
                     <div class="box-wrap">
-                        <select id="dosage" class="selectWidth" name="dosageformName"></select>
+                        <select id="dosage" class="selectWidth" name="dosageformName"><i class="glyphicon glyphicon-book"></i></select>
                     </div>
                     <div class="box-wrap">
-                        <select id="specification" class="selectWidth" name="specificationsName"></select>
+                        <select id="specification" class="selectWidth" name="specificationsName"><i class="glyphicon glyphicon-info-sign"></i></select>
                     </div>
                     <div class="box-wrap">
-                        <select id="package" class="selectWidth" name="packagingName"></select>
+                        <select id="package" class="selectWidth" name="packagingName"><i class="glyphicon glyphicon-lock"></i></select>
                     </div>
+
 
                     <div class="screen-box" id="screen_box"><!-- class="screen-box" -->
                         <div class="col-xs-6 col-sm-6 col-md-4 col-lg-4"><a id="reset" class="search-btn" onclick="reset()">
@@ -328,7 +391,7 @@
                 <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 text-right"
                 style="height: 50px;">
                     <div class="footer2-box">
-                        <a href="#">首页</a> <a href="#">帮助</a>
+                         <a href="#">帮助</a>
                     </div>
                 </div>
             </div>
@@ -338,6 +401,22 @@
         </div>
     </div>
 } {
+    <script>
+            $(function () {
+                $("#ATC1").select2({
+                    templateResult: formatState,
+                    templateSelection: formatState
+                });
+            });
+
+            function formatState(state) {
+                if (!state.id) { return state.text; }
+                var $state = $(
+                        '<span>'+'<i class="glyphicon glyphicon-briefcase"></i>' + state.element.value.toLowerCase() + '.ico" class="img-flag" /> ' + state.text + '</span>'
+                );
+                return $state;
+            };
+    </script>
     <script src="@routes.Assets.at("js/Select2/select2.js")"></script>
     <script src="@routes.Assets.at("js/Select2/zh-CN.js")"></script>
     <script src="@routes.Assets.at("js/bootstrap/bootstrap-datetimepicker.min.js")" ></script>

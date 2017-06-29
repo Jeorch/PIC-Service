@@ -20,13 +20,13 @@ html,body{overflow: hidden;}
 
 .container-fluid{
 	padding-right: 0;
-    padding-left: 0;
+	padding-left: 0;
 }
 /*报告也的表格样式*/
 .tableHead1{
 	background-color: #C24B51/* #4E67C8 */;
 	color: #FFFFFF;
-	
+
 }
 .tableHead2{
 	background-color: #DF8A68/* #95A4DE */;
@@ -36,40 +36,40 @@ html,body{overflow: hidden;}
 .treven{background-color: #ECCA95/* #E9EBF5 */;}
 /*显示TopFour加载图*/
 .topFourLoad{
-	position: absolute; 
-	top: 40%; 
+	position: absolute;
+	top: 40%;
 	left: 47%;
-	filter:alpha(opacity=85);   
-    -moz-opacity:0.85;   
-    -khtml-opacity: 0.85;
-    opacity: 0.85;
-    display: block;
+	filter:alpha(opacity=85);
+	-moz-opacity:0.85;
+	-khtml-opacity: 0.85;
+	opacity: 0.85;
+	display: block;
 }
 .loadNone{
 	display: none;
 }
 /*显示导出Excel的加载图*/
 .excelDataLoad{
-	position: absolute; 
+	position: absolute;
 	z-index:9999;
-	left: 0; 
+	left: 0;
 	top: 0;
 	width:100%;
 	height:100%;
 	padding-top:45%;
 	background-color:#F3F3F3;
-	filter:alpha(opacity=55);   
-    -moz-opacity:0.55;   
-    -khtml-opacity: 0.55;
-    opacity: 0.55;
+	filter:alpha(opacity=55);
+	-moz-opacity:0.55;
+	-khtml-opacity: 0.55;
+	opacity: 0.55;
 	display: block;
 }
-	
+
 .selectWidth{width: 90%;display: none;}
 .selectul{max-height: 200px; overflow-y: auto;}
 /*首页顶部开始*/
 .hoemTop {
-	background: #f2f2f2;
+	background: rgb(245, 245, 245);
 }
 /* [class*="col-"]{
 	border: 1px solid red;
@@ -222,7 +222,7 @@ html,body{overflow: hidden;}
 .footer-box a {
 	line-height: 50px;
 	margin: 0 10px;
-	color: #808080;
+	color: #fefefd;
 	font-size: 14px;
 }
 
@@ -237,7 +237,7 @@ html,body{overflow: hidden;}
 .footer2-wrap {
 	height: 60px;
 	border-top: 1px solid #a2b1b0;
-	background: #f2f2f2;/* #f2f2f2 */
+	background: rgb(189, 189, 189);/* #f2f2f2 */
 } /*width:100%; height:60px; margin:0;  #f2f2f2*/
 .footer2-box {
 	width: 230px;
@@ -254,13 +254,13 @@ html,body{overflow: hidden;}
 
 .footer2-boxlogo a {
 	line-height: 60px;
-	color: #808080;
+	color: #fefefd;
 	font-size: 14px;
 }
 
 .footer2-boxlogo a:link, a:hover, a:active {
 	text-decoration: none;
-	color: #a2a1a1;
+	color: #fefefd;
 }
 
 .footer2-box a {
@@ -345,7 +345,7 @@ html,body{overflow: hidden;}
 }
 
 .screen-box a.search-btn {
-	background: #1991d6 none repeat scroll 0 0;
+	background: rgb(136, 202, 215) none repeat scroll 0 0;
 	margin: 0;
 }
 
@@ -378,8 +378,8 @@ html,body{overflow: hidden;}
 }
 
 .selectContent{
-	height: 200px; 
-	position: relative; 
+	height: 200px;
+	position: relative;
 	z-index: 555;
 	overflow:auto;
 	background-color:#FFFFFF;
@@ -453,9 +453,9 @@ html,body{overflow: hidden;}
 
 .brief-introduction {
 	padding: 28px;
-	background: #e6e6e6;
-	border-right: 2px solid #b3b3b3;
-	border-bottom: 2px solid #b3b3b3;
+	background: rgb(230, 230, 230);
+	border-right: 2px solid rgb(220, 220, 220);
+	border-bottom: 1px solid rgb(220, 220, 220);
 }
 
 .brief-text {
@@ -475,7 +475,7 @@ html,body{overflow: hidden;}
 /* .brief-picture { margin:20px 0 0 0; } */
 .brief-picture img {
 	width: 100%;
-/* 	height: 100%; */
+	/* 	height: 100%; */
 }
 
 .reveal-box {
@@ -517,11 +517,11 @@ html,body{overflow: hidden;}
 .footer-text a {
 	font-size: 18px;
 	margin: 0 20px;
-	color: #808080;
+	color: rgb(245, 245, 245);
 }
 
 .footer-text a:hover {
-	color: #a2a1a1;
+	color: rgb(245, 245, 245);
 }
 
 /**页面1右侧结束*/
@@ -531,16 +531,16 @@ html,body{overflow: hidden;}
 /*页面2开始*/
 /*页面2右侧开始*/
 .thtext-center>thead>tr>th, .thtext-center>tbody>tr>th, .thtext-center>tfoot>tr>th
-	{
+{
 	text-align: center;
 	padding: 15px;
 	background: #999 none repeat scroll 0 0;
-	border-right: 1px solid #ccc;
+	border-right: 1px solid rgb(245, 245, 245);
 	color: #fff;
 }
 
 .thtext-center>thead>tr>td, .thtext-center>tbody>tr>td, .thtext-center>tfoot>tr>td
-	{
+{
 	cursor: pointer;
 	text-align: center;
 	color: #999;
@@ -554,7 +554,7 @@ html,body{overflow: hidden;}
 
 .more-btn {
 	background: rgba(0, 0, 0, 0) url("../images/triangle-bg.png") no-repeat
-		scroll 0 0;
+	scroll 0 0;
 	color: #fff;
 	display: block;
 	height: 31px;
@@ -662,6 +662,9 @@ html,body{overflow: hidden;}
 	font-weight: bold;
 }
 
+.fontCon>a{
+	color: rgb(136, 202, 215)
+}
 article {
 	clear: both;
 	font: 300 15px/1.2 Raleway, "Microsoft YaHei", Dosis, sans-serif;
