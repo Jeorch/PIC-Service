@@ -19,7 +19,6 @@ class AuthController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : A
     def authPushUser = Action (request => requestArgsQuery().requestArgsV2(request) { jv =>
             import bmpattern.LogMessage.common_log
             import bmpattern.ResultMessage.common_result
-            println("--Im in authPushUser--")
             MessageRoutes(msg_log(toJson(Map("method" -> toJson("push user"))), jv)
                 :: msg_AuthPushUser(jv) :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
         })

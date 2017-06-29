@@ -19,7 +19,7 @@ class UserManageController@Inject()(as_inject : ActorSystem, dbt : DBTrait, att 
     def queryUsers = Action(request => requestArgsQuery().requestArgsV2(request) { jv =>
         import bmpattern.LogMessage.common_log
         import bmpattern.ResultMessage.lst_result
-        println("---Im in UserManageController---")
+//        println("---Im in UserManageController---")
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("queryUsers"))), jv)
             :: msg_userManage_query(jv) :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })

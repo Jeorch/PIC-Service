@@ -43,19 +43,13 @@ object AuthModule extends ModuleTrait with AuthData {
             val o : DBObject = data
 
             val user_name = (data \ "user_name").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
-            println("---here00---")
-            val status = (data \ "status").asOpt[Int].map (x => x).getOrElse(throw new Exception("input error"))
-            println("---here01---")
-            println("---status---"+status)
+//            val status = (data \ "status").asOpt[Int].map (x => x).getOrElse(throw new Exception("input error"))
             val pwd = (data \ "pwd").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
-//            val pwd = user_name
-            println("--"+pwd+"--")
 
             o += "user_id" -> Sercurity.md5Hash(user_name + pwd + Sercurity.getTimeSpanWithMillSeconds)
             o += "date" -> date.asInstanceOf[Number]
             o += "createDate" -> date.asInstanceOf[Number]
             o += "updateDate" -> date.asInstanceOf[Number]
-//            o += "pwd" -> date.asInstanceOf[String]
 
             db.insertObject(o, "users", "user_name")
             val result = toJson(o - "pwd" - "phoneNo" - "email" - "date" - "createDate" - "updateDate" - "status" + ("expire_in" -> toJson(date + 60 * 60 * 1000 * 24))) // token 默认一天过期
