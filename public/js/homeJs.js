@@ -53,26 +53,27 @@ $(document).ready(function () {
     showAtcInfo()
     showleft()
 
+    $("#userInfo").click(function () {
+        var token = $.cookie("token")
+        var data = JSON.stringify({
+            "token": token
+        });
+
+        ajaxData("/auth/checkAuthToken", data, "POST", function(r){
+            if (r.status == "ok") {
+                $.cookie("screen_name", r.result.auth.screen_name);
+                $.cookie("email", r.result.auth.email);
+                $.cookie("phoneNo", r.result.phoneNo);
+                $.cookie("screen_photo", r.result.screen_photo);
+                window.open("/userInfo")
+            } else {
+                window.location = "/login"
+            }
+        }, function(e){console.error(e)})
+    })
 });
 
-$("#userInfo").click(function () {
-    var token = $.cookie("token")
-    var data = JSON.stringify({
-        "token": token
-    });
 
-    ajaxData("/auth/checkAuthToken", data, "POST", function(){
-        if (data.status == "ok") {
-            $.cookie("screen_name", data.result.auth.screen_name);
-            $.cookie("email", data.result.auth.email);
-            $.cookie("phoneNo", data.result.phoneNo);
-            $.cookie("screen_photo", data.result.screen_photo);
-            window.open("/userInfo")
-        } else {
-            window.location = "/login"
-        }
-    }, function(e){console.error(e)})
-})
 
 //这个还可以在简化，@杨艳梅 回来你做
 function showleft() {

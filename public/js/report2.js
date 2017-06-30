@@ -14,6 +14,8 @@ $(function(){
     })
     ajaxData("/data/query/reportparameter", data, "POST", function(r){
         if(r.status == "ok") {
+            $(".categoryclasstitle").text(" • " + r.parameter.condition.category);
+            $(".categoryclass").text(r.parameter.condition.category);
             reportajax($.extend(r.parameter, {"token": $.cookie("token")}))
         }
     }, function(e){console.error(e)})
@@ -50,13 +52,22 @@ var reportgraphone = function(obj) {
             {type: 'value', name: '增长率', axisLabel: {formatter: '{value} %'}}
         ],
         series: [
-            {name:'销售额', type:'bar', data:seriesData_sales},
+            {name:'销售额', type:'bar', data:seriesData_sales, barWidth: "15%"},
             {name:'增长率', type:'line', yAxisIndex: 1, data:seriesData_trend}
             ]
     };
 
     var Histogram = Echart("reportgraphone", "vintage")
     Histogram.setOption(option);
+
+    var marketstarttime = xAxisData[xAxisData.length-2]
+    var marketendtime = xAxisData[xAxisData.length-1]
+    var markettrehd = seriesData_trend[seriesData_trend.length-1]
+    var markesales = seriesData_sales[seriesData_sales.length-1]
+    $("#hospmarketsummarytime").text(marketstarttime+"至"+marketendtime)
+    $("#hospmarketsummarytrend").text((markettrehd * 100).toFixed(2)+"%")
+    $("#hospmarketsummaryendtime").text(marketendtime)
+    $("#hospmarketsummarysales").text((markesales/100000000).toFixed(2))
 }
 
 var reportgrapheight = function (obj) {
@@ -81,7 +92,7 @@ var reportgrapheight = function (obj) {
                     $.each(l.keyvalue, function(o, p) {
                         $.each(p, function(b,m) {
                             if(v == b) {
-                                d.push(m)
+                                d.push((m * 100).toFixed(2))
                             }
                         })
                     })
@@ -95,8 +106,14 @@ var reportgrapheight = function (obj) {
         })
     })
     var option = {
-        title: {text: "医院市场Top10品牌i销售额占比", left: 'center', top:'4%'},
-        tooltip: {trigger: 'axis', axisPointer: {type: 'shadow'}},
+        title: {text: "医院市场Top10品牌销售额占比", left: 'center', top:'4%'},
+        tooltip: {trigger: 'axis', axisPointer: {type: 'shadow'},formatter: function(params) {
+            var c = params[0].axisValue
+            $.each(params, function(i, v){
+                c = c + '<br/>' + v.marker + v.seriesName + "：" + v.value+'%'
+            })
+           return c
+        }},
         legend: {
             data: legend
         },
@@ -113,14 +130,55 @@ var reportgrapheight = function (obj) {
     };
     var Histogram = Echart("reportgrapheight", "vintage")
     Histogram.setOption(option);
+    var inter = 0;
+    var outer = 0;
+    var lst = [];
+    var top = "";
+    var sales = [];
+    $.each(obj, function(i, v){
+        if((v.start + "-" + v.end) == yAxis[0]) {
+            $.each(v.interouter, function(j, k){
+                $.each(k, function(o, p){
+                    if(p == "合资") outer++
+                    else inter++
+                })
+            })
+            $.each(v.keyvalue, function(i, k){
+                $.each(k, function(o, p){
+                    lst.push({key: o, value: p})
+                })
+            })
+            sales = v.sales
+        }
+    })
+    top = lst.sort(function(a, b){return a.value < b.value ? 1 : -1})
+    var temp = yAxis.reverse()
+    var productstarttime = temp[temp.length-2]
+    var productendtime = temp[temp.length-1]
+    var top3name = ""
+    var top3sales = ""
+    $("#top10producttime").text(productstarttime + "至" + productendtime)
+    $("#top10productendtime").text(productendtime)
+    $("#top10productouter").text(outer)
+    $("#top10productinter").text(inter)
+    $("#topone").text(top[0].key)
+    $.each(top, function (i, v) {
+        if(i<=2){
+            top3name = top3name + v.key + "、"
+            top3sales = top3sales + (sales.sort())[i] + "、"
+        }
+    })
+    $("#producttime").text(productendtime)
+    $("#producttop3").text(top3name)
+    $("#producttop3salse").text(top3sales)
 }
 
 var reportgraphseven = function(obj) {
     var xAxisData = [], seriesData_sales = [], seriesData_trend = [];
     $.each(obj, function (i, v) {
         xAxisData.push(v.start + "-" + v.end);
-        seriesData_sales.push(v.sales);
-        seriesData_trend.push(v.trend);
+        seriesData_sales.push((v.sales * 100).toFixed(2));
+        seriesData_trend.push((v.trend * 100).toFixed(2));
     });
     option = {
         tooltip: {trigger: 'axis'},
@@ -131,13 +189,14 @@ var reportgraphseven = function(obj) {
             {type: 'value', name: '占比增长率', axisLabel: {formatter: '{value} %'}}
         ],
         series: [
-            {name:'销售额占比', type:'bar', data:seriesData_sales},
+            {name:'销售额占比', type:'bar', data:seriesData_sales, barWidth: "15%"},
             {name:'占比增长率', type:'line', yAxisIndex: 1, data:seriesData_trend}
         ]
     };
 
     var Histogram = Echart("reportgraphseven", "vintage")
     Histogram.setOption(option);
+    $("#top10producttrend").text(seriesData_sales.sort()[0]+"%")
 }
 
 var reportgraphfive = function(obj) {
@@ -156,6 +215,7 @@ var reportgraphfive = function(obj) {
 
     var bar = [];
     var line = [];
+    var trend = [];
     $.each(legend, function(i, v) {
         bar = []
         line = []
@@ -169,18 +229,20 @@ var reportgraphfive = function(obj) {
                     })
                     $.each(l.scale, function(b,m) {
                         if(v == m.key) {
-                            line.push(m.value)
+                            line.push((m.value * 100).toFixed(2))
                         }
                     })
                 }
             })
         })
+        trend.push(line[line.length-1])
         series.push({
             name: v,
             type: 'bar',
             stack: '总量',
             label: {normal: {show: true, position: 'inside'}},
-            data: bar
+            data: bar,
+            barWidth: "15%"
         },{
             name: v,
             type: 'line',
@@ -202,6 +264,17 @@ var reportgraphfive = function(obj) {
 
     var Histogram = Echart("reportgraphfive", "vintage")
     Histogram.setOption(option);
+    var categorystarttime = xAxis[xAxis.length-2]
+    var categoryendtime = xAxis[xAxis.length-1]
+    var lst = ""
+    var lsttrend = ""
+    $.each(legend, function(i, v){
+        lst = lst + v + "、"
+        lsttrend = lsttrend + trend[i] + "%" + "、"
+    })
+    $("#categorytime").text(categorystarttime + "至" + categoryendtime)
+    $("#categorylst").text(lst)
+    $("#categorylsttrend").text(lsttrend)
 }
 
 var reportgraphfour = function(obj) {
@@ -211,7 +284,7 @@ var reportgraphfour = function(obj) {
         xAxis.push(v.start + "-" + v.end)
         inter.push(v.inter)
         outer.push(v.outer)
-        percent.push(v.percent)
+        percent.push(parseFloat(v.percent).toFixed(2))
     });
     xAxis = xAxis.reverse()
     inter = inter.reverse()
@@ -232,13 +305,25 @@ var reportgraphfour = function(obj) {
             {type: 'value', name: '占比', axisLabel: {formatter: '{value} %'}}
         ],
         series: [
-            {name: '合资', type: 'bar', data: outer},
-            {name: '内资', type: 'bar', data: inter},
+            {name: '合资', type: 'bar', data: outer, barWidth: "15%"},
+            {name: '内资', type: 'bar', data: inter, barWidth: "15%"},
             {name: '占比', type: 'line', yAxisIndex: 1, data: percent}
         ]
     };
     var Histogram = Echart("reportgraphfour", "vintage")
     Histogram.setOption(option);
+
+    var enterprisestarttime = xAxis[xAxis.length-2]
+    var enterpriseendtime = xAxis[xAxis.length-1]
+    var enterprisepercent = percent[percent.length-1]
+    var enterprisesalses = outer[outer.length-1]
+
+    $("#enterprisetime").text(enterprisestarttime + "至" + enterpriseendtime)
+    $(".enterprisepercent").text(enterprisepercent+"%")
+    $("#enterpriseendtime").text(enterpriseendtime)
+    $("#enterprisesales").text((enterprisesalses / 100000000).toFixed(2))
+
+
 }
 
 var reportgraphsix = function(obj) {
@@ -275,7 +360,8 @@ var reportgraphsix = function(obj) {
         series.push({
             name : v,
             type : "bar",
-            data : d
+            data : d,
+            barWidth: "15%"
         })
     })
 
