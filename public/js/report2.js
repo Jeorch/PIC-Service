@@ -16,6 +16,7 @@ $(function(){
         if(r.status == "ok") {
             $(".categoryclasstitle").text(" • " + r.parameter.condition.category);
             $(".categoryclass").text(r.parameter.condition.category);
+            $(".biaoti").text(r.parameter.condition.category)
             reportajax($.extend(r.parameter, {"token": $.cookie("token")}))
         }
     }, function(e){console.error(e)})
@@ -40,7 +41,7 @@ var reportgraphone = function(obj) {
     $.each(obj, function (i, v) {
         xAxisData.push(v.start + "-" + v.end);
         seriesData_sales.push(v.sales);
-        seriesData_trend.push(v.trend);
+        seriesData_trend.push((v.trend * 100).toFixed(2));
     });
     option = {
         title: {text: "销售额表现", left: 'center', top:'4%'},
@@ -64,10 +65,10 @@ var reportgraphone = function(obj) {
     var marketendtime = xAxisData[xAxisData.length-1]
     var markettrehd = seriesData_trend[seriesData_trend.length-1]
     var markesales = seriesData_sales[seriesData_sales.length-1]
-    $("#hospmarketsummarytime").text(marketstarttime+"至"+marketendtime)
-    $("#hospmarketsummarytrend").text((markettrehd * 100).toFixed(2)+"%")
-    $("#hospmarketsummaryendtime").text(marketendtime)
-    $("#hospmarketsummarysales").text((markesales/100000000).toFixed(2))
+    $(".hospmarketsummarytime").text(marketstarttime+"至"+marketendtime)
+    $(".hospmarketsummarytrend").text(markettrehd+"%")
+    $(".hospmarketsummaryendtime").text(marketendtime)
+    $(".hospmarketsummarysales").text((markesales/100000000).toFixed(2))
 }
 
 var reportgrapheight = function (obj) {
@@ -132,45 +133,69 @@ var reportgrapheight = function (obj) {
     Histogram.setOption(option);
     var inter = 0;
     var outer = 0;
+    var internametemp = [];
+    var intername = "";
     var lst = [];
     var top = "";
     var sales = [];
+    var internamesum = 0;
     $.each(obj, function(i, v){
         if((v.start + "-" + v.end) == yAxis[0]) {
             $.each(v.interouter, function(j, k){
                 $.each(k, function(o, p){
                     if(p == "合资") outer++
-                    else inter++
+                    else {
+                        internametemp.push(o)
+                        inter++
+                    }
                 })
             })
             $.each(v.keyvalue, function(i, k){
                 $.each(k, function(o, p){
                     lst.push({key: o, value: p})
+                    $.each(internametemp, function(n, c){
+                        if(o == c){
+                            internamesum = internamesum + p
+                            intername = intername + o +"、"
+                        }
+                    })
                 })
+            })
+            top = lst.sort(function(a, b){return a.value < b.value ? 1 : -1})
+            $.each(v.manufacture, function(i, k){
+                if(top[0].key == k.product_name) {
+                    $(".top10manufacture").text(k.manufacture)
+                    $(".top10manufactureproduct").text(top[0].key)
+                    $(".top10manufactureproducttrend").text((top[0].value * 100).toFixed(2) + "%")
+                }
             })
             sales = v.sales
         }
     })
-    top = lst.sort(function(a, b){return a.value < b.value ? 1 : -1})
     var temp = yAxis.reverse()
     var productstarttime = temp[temp.length-2]
     var productendtime = temp[temp.length-1]
     var top3name = ""
     var top3sales = ""
-    $("#top10producttime").text(productstarttime + "至" + productendtime)
+    $(".top10producttime").text(productstarttime + "至" + productendtime)
     $("#top10productendtime").text(productendtime)
     $("#top10productouter").text(outer)
-    $("#top10productinter").text(inter)
-    $("#topone").text(top[0].key)
-    $.each(top, function (i, v) {
-        if(i<=2){
-            top3name = top3name + v.key + "、"
-            top3sales = top3sales + (sales.sort())[i] + "、"
+    $(".top10productinter").text(inter)
+    $(".topone").text(top[0].key)
+    $.each(sales.sort(function(a,b){return b.sales - a.sales}), function(i, v){
+        if(i<=2) {
+            top3name = top3name + v.product_name + "、"
+            top3sales = top3sales + v.sales + "、"
         }
     })
-    $("#producttime").text(productendtime)
-    $("#producttop3").text(top3name)
-    $("#producttop3salse").text(top3sales)
+
+    $(".producttime").text(productendtime)
+    $(".producttop3").text(top3name)
+    $(".producttop3salse").text(top3sales)
+    $(".top10productname").text(intername)
+    $(".top10productnametrendsum").text((internamesum * 100).toFixed(2)+"%")
+    $(".productendtime").text(productendtime)
+
 }
 
 var reportgraphseven = function(obj) {
@@ -196,7 +221,7 @@ var reportgraphseven = function(obj) {
 
     var Histogram = Echart("reportgraphseven", "vintage")
     Histogram.setOption(option);
-    $("#top10producttrend").text(seriesData_sales.sort()[0]+"%")
+    $(".top10producttrend").text(seriesData_sales.sort()[0]+"%")
 }
 
 var reportgraphfive = function(obj) {
@@ -272,9 +297,26 @@ var reportgraphfive = function(obj) {
         lst = lst + v + "、"
         lsttrend = lsttrend + trend[i] + "%" + "、"
     })
-    $("#categorytime").text(categorystarttime + "至" + categoryendtime)
+    var top3lst = []
+    $.each(obj, function(i, v){
+        if((v.start + "-" + v.end) == xAxis[xAxis.length-1]) {
+            top3lst = v.scale.sort(function(a,b){return b.value - a.value}).slice(0,3)
+        }
+    })
+    var oralendtime = legend[legend.length-1]
+    $(".oraltime").text(categorystarttime + "至" + categoryendtime)
     $("#categorylst").text(lst)
     $("#categorylsttrend").text(lsttrend)
+    $(".oralendtime").text(oralendtime)
+    var top3oral = ""
+    var top3trend = ""
+    $.each(top3lst, function (i, v) {
+        top3oral = top3oral + v.key + "、"
+        top3trend = top3trend + (v.value * 100).toFixed(2) + "%" + "、"
+    })
+    $(".top3oraltrend").text(top3trend)
+    $(".top3oral").text(top3oral)
+
 }
 
 var reportgraphfour = function(obj) {
@@ -317,11 +359,13 @@ var reportgraphfour = function(obj) {
     var enterpriseendtime = xAxis[xAxis.length-1]
     var enterprisepercent = percent[percent.length-1]
     var enterprisesalses = outer[outer.length-1]
+    var enterpriseintersales = inter[inter.length-1]
 
-    $("#enterprisetime").text(enterprisestarttime + "至" + enterpriseendtime)
+    $(".enterprisetime").text(enterprisestarttime + "至" + enterpriseendtime)
     $(".enterprisepercent").text(enterprisepercent+"%")
-    $("#enterpriseendtime").text(enterpriseendtime)
-    $("#enterprisesales").text((enterprisesalses / 100000000).toFixed(2))
+    $(".enterpriseendtime").text(enterpriseendtime)
+    $(".enterprisesales").text((enterprisesalses / 100000000).toFixed(2))
+    $(".enterpriseintersales").text((enterpriseintersales / 100000000).toFixed(2))
 
 
 }
