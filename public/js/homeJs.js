@@ -52,26 +52,28 @@ $(document).ready(function () {
 
     showAtcInfo()
     showleft()
+
+    $("#userInfo").click(function () {
+        var token = $.cookie("token")
+        var data = JSON.stringify({
+            "token": token
+        });
+
+        ajaxData("/auth/checkAuthToken", data, "POST", function(r){
+            if (r.status == "ok") {
+                $.cookie("screen_name", r.result.auth.screen_name);
+                $.cookie("email", r.result.auth.email);
+                $.cookie("phoneNo", r.result.phoneNo);
+                $.cookie("screen_photo", r.result.screen_photo);
+                window.open("/userInfo")
+            } else {
+                window.location = "/login"
+            }
+        }, function(e){console.error(e)})
+    })
 });
 
-$("#userInfo").click(function () {
-    var token = $.cookie("token")
-    var data = JSON.stringify({
-        "token": token
-    });
 
-    ajaxData("/auth/checkAuthToken", data, "POST", function(){
-        if (data.status == "ok") {
-            $.cookie("screen_name", data.result.auth.screen_name);
-            $.cookie("email", data.result.auth.email);
-            $.cookie("phoneNo", data.result.phoneNo);
-            $.cookie("screen_photo", data.result.screen_photo);
-            window.open("/userInfo")
-        } else {
-            window.location = "/login"
-        }
-    }, function(e){console.error(e)})
-})
 
 //这个还可以在简化，@杨艳梅 回来你做
 function showleft() {
@@ -82,12 +84,12 @@ function showleft() {
         contentType: "application/json,charset=utf-8",
         success: function (data) {
             if (data.status == "ok") {
-                showLeftInfo("province", "区域", data.result.info[0].province)
-                showLeftInfo("manufacture", "生产厂家", data.result.info[0].manufacture)
-                showLeftInfo("manufacturetype", "生产厂商类型",eval(["内资","合资"]))
-                showLeftInfo("dosage", "剂型", data.result.info[0].product_type)
-                showLeftInfo("specification", "规格", data.result.info[0].specifications)
-                showLeftInfo("package", "包装", data.result.info[0].package)
+                showLeftInfo("province", "区域", data.result.info[0].province,"glyphicon glyphicon-globe")
+                showLeftInfo("manufacture", "生产厂家", data.result.info[0].manufacture,"glyphicon glyphicon-wrench")
+                showLeftInfo("manufacturetype", "生产厂商类型",eval(["内资","合资"]),"glyphicon glyphicon-tags")
+                showLeftInfo("dosage", "剂型", data.result.info[0].product_type,"glyphicon glyphicon-book")
+                showLeftInfo("specification", "规格", data.result.info[0].specifications,"glyphicon-info-sign")
+                showLeftInfo("package", "包装", data.result.info[0].package,"glyphicon glyphicon-lock")
             }
         }
     })
@@ -101,11 +103,11 @@ var showAtcInfo = function() {
         contentType: "application/json,charset=utf-8",
         success: function (data) {
             if (data.status == "ok") {
-                showLeftInfo("ATC1", "治疗I", data.result.atc_one)
-                showLeftInfo("ATC2", "治疗II", data.result.atc_tow)
-                showLeftInfo("ATC3", "治疗III", data.result.atc_three)
-                showLeftInfo("genericnameinfo", "通用名", data.result.oral)
-                showLeftInfo("product", "商品名", data.result.product)
+                showLeftInfo("ATC1", "治疗I", data.result.atc_one,"glyphicon-briefcase")
+                showLeftInfo("ATC2", "治疗II", data.result.atc_tow,"glyphicon glyphicon-briefcase")
+                showLeftInfo("ATC3", "治疗III", data.result.atc_three,"glyphicon glyphicon-briefcase")
+                showLeftInfo("genericnameinfo", "通用名", data.result.oral,"glyphicon glyphicon-subscript")
+                showLeftInfo("product", "商品名", data.result.product,"glyphicon glyphicon-th")
             }
         }
     })
@@ -129,12 +131,21 @@ var eachResult = function (data, flag) {
     return array;
 }
 
-var creatSelect = function(id, info) {
+var creatSelect = function(id, info, graph) {
+    var formatState = function(state){
+        var g = "glyphicon" +' '+ graph
+        if (!state.id) { return state.text; }
+        var $state = $(
+            '<span><i class= '+g+' ></i>'   + state.text + '</span>'
+        );
+        return $state;
+    }
     return $("#" + id).select2({
         language: 'zh-CN',
         maximumInputLength: 100,//限制最大字符，以防坑货
         placeholder: info,
         allowClear: true,
+        templateResult: formatState,
         escapeMarkup: function (m) {
             return m;
         }
@@ -142,8 +153,8 @@ var creatSelect = function(id, info) {
 }
 
 //控制左
-function showLeftInfo(btn, info, res) {
-    var selectObj = creatSelect(btn, info);
+function showLeftInfo(btn, info, res, graph) {
+    var selectObj = creatSelect(btn, info, graph);
     selectObj.empty();//清空下拉框
     selectObj.append("<option value=''>info</option>");
     $.each(res, function (i, item) {
