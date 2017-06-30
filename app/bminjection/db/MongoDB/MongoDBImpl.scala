@@ -19,7 +19,7 @@ trait MongoDBImpl extends DBTrait {
         val primary = obj.get(primary_key) //.map (x => x).getOrElse(throw new Exception("get primary key error"))
         (from db() in db_name where (primary_key -> primary) select(x =>x)).toList match {
             case head :: Nil => _data_connection.getCollection(db_name).update(head, obj)
-            case _ => throw new Exception("primary key error")
+            case _ => println("未匹配"+(from db() in db_name where (primary_key -> primary) select(x =>x)).toList.length) /*throw new Exception("primary key error")*/
         }
     }
 

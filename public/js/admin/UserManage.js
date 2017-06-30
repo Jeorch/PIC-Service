@@ -54,9 +54,10 @@ $("#grid").kendoGrid({
 				fields : {
 					user_name : {
 						type : "string",
-						validation: { required: true,validationMessage : "用户名不能为空并保证唯一。"  } ,
+						validation: { required: true,validationMessage : "用户名不能为空并保证唯一。"  }
 					},pwd : {
                         type : "string",
+                        validation: { required: true,validationMessage : "密码不能为空！"  }
                     },status: {
 						type : "number",
 						validation: { required: true,validationMessage : "用户状态不能为空。"  }
@@ -139,7 +140,7 @@ $("#grid").kendoGrid({
         values : [{"value": 1, "text": "正常开通" },{"value": 0,"text": "暂不开通"}],
         width: 75
     }, {
-         field: "createDate",
+         field: "date",
          title: "创建时间",
          format: "{0: yyyy-MM-dd HH:mm:ss}", //格式化时间  
          width: 180
@@ -164,8 +165,8 @@ $("#grid").kendoGrid({
         if (!e.model.isNew()) {
         	e.container.find("input[name=user_name]")[0].disabled = true;
         }
-        $("label[for='createDate']").remove();
-    	$("div[data-container-for='createDate']").remove();
+        $("label[for='date']").remove();
+    	$("div[data-container-for='date']").remove();
     	$("label[for='updateDate']").remove();
     	$("div[data-container-for='updateDate']").remove();
      }/*,
