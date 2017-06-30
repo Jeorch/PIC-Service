@@ -49,7 +49,6 @@ object AuthModule extends ModuleTrait with AuthData {
 
             o += "user_id" -> Sercurity.md5Hash(user_name + pwd + Sercurity.getTimeSpanWithMillSeconds)
             o += "date" -> date.asInstanceOf[Number]
-            o += "createDate" -> date.asInstanceOf[Number]
             o += "updateDate" -> date.asInstanceOf[Number]
 
             db.insertObject(o, "users", "user_name")

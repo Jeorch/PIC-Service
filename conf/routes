@@ -47,6 +47,8 @@ GET     /admin/UserManage                       controllers.PagesController.user
 POST    /userInfo/queryUserAll                  controllers.UserManageController.queryUsers
 #删除用户
 POST    /userInfo/deleteById                    controllers.UserManageController.deleteUser
+#更新用户
+POST    /userInfo/saveOrUpdate                  controllers.UserManageController.saveUser
 #个人中心
 GET     /userInfo                               controllers.PagesController.userInfo
 

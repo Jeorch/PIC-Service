@@ -31,11 +31,7 @@ trait UserData extends AuthScope{
 
         build += "scope" -> scope_builder.result
 
-        //        build += "date" -> (js \ "date").asOpt[Long].map (x => x).getOrElse("")
-        //        build += "createDate" -> (js \ "createDate").asOpt[String].map (x => x).getOrElse("")
-        //        build += "updateDate" -> (js \ "updateDate").asOpt[String].map (x => x).getOrElse("")
         build += "status" -> (js \ "status").asOpt[Int].map (x => x).getOrElse("")
-        //        build += "id" -> (js \ "id").asOpt[Int].map (x => x).getOrElse("")
 
         build.result
     }
@@ -61,11 +57,7 @@ trait UserData extends AuthScope{
 
         build += "scope" -> scope_builder.result
 
-        //        build += "date" -> (js \ "date").asOpt[Long].map (x => x).getOrElse("")
-        //        build += "createDate" -> (js \ "createDate").asOpt[String].map (x => x).getOrElse("")
-        //        build += "updateDate" -> (js \ "updateDate").asOpt[String].map (x => x).getOrElse("")
         build += "status" -> (js \ "status").asOpt[Int].map (x => x).getOrElse("")
-        //        build += "id" -> (js \ "id").asOpt[Int].map (x => x).getOrElse("")
 
         build.result
     }
@@ -79,6 +71,7 @@ trait UserData extends AuthScope{
         Map(
             "user_id" -> toJson(obj.getAs[String]("user_id").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "user_name" -> toJson(obj.getAs[String]("user_name").map (x => x).getOrElse(throw new Exception("db prase error"))),
+            "pwd" -> toJson(obj.getAs[String]("pwd").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "phoneNo" -> toJson(obj.getAs[String]("phoneNo").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "email" -> toJson(obj.getAs[String]("email").map (x => x).getOrElse(throw new Exception("db prase error"))),
 
@@ -88,11 +81,9 @@ trait UserData extends AuthScope{
                 "is_admin" -> queryIsAdminScope(obj))),
             "screen_name" -> toJson(obj.getAs[String]("screen_name").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "screen_photo" -> toJson(obj.getAs[String]("screen_photo").map (x => x).getOrElse(throw new Exception("db prase error"))),
-            "date" -> toJson(obj.getAs[Number]("date").map (x => x.longValue).getOrElse(throw new Exception("db prase error"))),
-            "createDate" -> toJson(obj.getAs[Number]("createDate").map (x => sdf.format(new Date(x.longValue()))).getOrElse(throw new Exception("db prase error"))),
+            "date" -> toJson(obj.getAs[Number]("date").map (x => sdf.format(new Date(x.longValue()))).getOrElse(throw new Exception("db prase error"))),
             "updateDate" -> toJson(obj.getAs[Number]("updateDate").map (x => sdf.format(new Date(x.longValue()))).getOrElse(throw new Exception("db prase error"))),
             "status" -> toJson(obj.getAs[Int]("status").map (x => x).getOrElse(throw new Exception("db prase error")))
-            //            "id" -> toJson(obj.getAs[Int]("id").map (x => x).getOrElse(throw new Exception("db prase error")))
         )
     }
 }
