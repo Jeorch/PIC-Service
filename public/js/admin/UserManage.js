@@ -16,7 +16,9 @@ $("#grid").kendoGrid({
 	                type : "post"
             },
             destroy: {
-	                url: '../userInfo/deleteById',
+	                url: "../userInfo/deleteById",
+                	dataType: "json",
+                	contentType : "application/json",
 	                type : "post"
             },
             create: {
@@ -32,16 +34,23 @@ $("#grid").kendoGrid({
 						return JSON.stringify(options);
 					}else if(operation == "create"){
 						return JSON.stringify(options);
-					}else if(operation == "destroy"){
-						return "id="+options.id;
-					}
+                    }else if(operation == "destroy"){
+                        console.log("destroy->"+JSON.stringify(options)+"<-");
+						var user=new Object();
+                        user.user_name=options.user_name;
+                        user.pwd="";
+                        console.log("user->"+JSON.stringify(user)+"<-");
+						return JSON.stringify(user);
+
+                        // return "id:"+options.id;
+                    }
 			}
 		},
 		pageSize : 10,
 		schema : {
 			total : "totalRecord",
 			model : {
-				id : "id",
+				id : "user_id",
 				fields : {
 					user_name : {
 						type : "string",
@@ -67,7 +76,7 @@ $("#grid").kendoGrid({
 					$("#grid").data('kendoGrid').dataSource.read();
 				}
 			}else if(d.type == "destroy"){
-				if(d.response > 0){
+				if(d.response != ""){
 					alert("删除成功！");
 				}else{
 					alert("删除失败！");
@@ -107,7 +116,7 @@ $("#grid").kendoGrid({
 		template : "暂无数据！"
 	},
 	columns: [{
-        field: "id",
+        field: "user_id",
         title: "批量操作",
         template: "<div style=\"text-align:center\"><input type='checkbox' id='batch' value='#: id #' /></div>",
         width: 75
@@ -123,8 +132,7 @@ $("#grid").kendoGrid({
      }, {
          field: "pwd",
          title: "密码",
-     	 width: 1,
-         visible: false
+     	 width: 1
      }, {
         field: "status",
         title: "用户状态",

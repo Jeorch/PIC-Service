@@ -40,10 +40,11 @@ object AuthModule extends ModuleTrait with AuthData {
             val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
 
             val date = new Date().getTime
+
             val o : DBObject = data
 
             val user_name = (data \ "user_name").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
-//            val status = (data \ "status").asOpt[Int].map (x => x).getOrElse(throw new Exception("input error"))
+            //            val status = (data \ "status").asOpt[Int].map (x => x).getOrElse(throw new Exception("input error"))
             val pwd = (data \ "pwd").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
 
             o += "user_id" -> Sercurity.md5Hash(user_name + pwd + Sercurity.getTimeSpanWithMillSeconds)

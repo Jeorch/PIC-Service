@@ -1,15 +1,14 @@
 package bmlogic.userManage
 
-import java.text.SimpleDateFormat
-import java.util.Date
+
+import bmutil.errorcode.ErrorCode
+
 
 import bminjection.db.DBTrait
-import bminjection.token.AuthTokenTrait
 import bmlogic.auth.AuthData.AuthData
 import bmlogic.userManage.UserManageMessage._
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
-import bmutil.errorcode._
 import com.mongodb.casbah.Imports._
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
@@ -22,6 +21,7 @@ import scala.collection.immutable.Map
 object UserManageModule extends ModuleTrait with AuthData {
     def dispatchMsg(msg: MessageDefines)(pr: Option[Map[String, JsValue]])(implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
         case msg_userManage_query(data) => query_user_func(data)
+        case msg_deleteUserManage(data) => delete_user_func(data)
 
         case _ => ???
     }
@@ -31,12 +31,7 @@ object UserManageModule extends ModuleTrait with AuthData {
 
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
 
-            /*val createDate=db.queryMultipleObject(DBObject(),"users").map(x=>x.get("createDate").get)
-            println("---start---")
-            val sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
-            println(createDate.getClass)
-            println(createDate.map(x => sdf.format(new Date(x.as[Long]))))
-            println("---end---")*/
+//            val createDate=db.queryMultipleObject(DBObject(),"users").map(x=>x.get("createDate").get)
 
             val userList=db.queryMultipleObject(DBObject(),"users").map(x=>x)
             if (userList.isEmpty) throw new Exception("unknown error")
@@ -52,6 +47,22 @@ object UserManageModule extends ModuleTrait with AuthData {
                     "totalRecord" -> toJson(record)
                 )), None)
             }
+
+        } catch {
+            case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+
+    }
+    def delete_user_func(data: JsValue)(implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+
+            val o : DBObject = data
+            db.deleteObject(o,"users","user_name")
+
+            (Some(Map(
+                "delete_result" -> toJson("ok")
+            )), None)
 
         } catch {
             case ex: Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))

@@ -19,7 +19,7 @@ class UserManageController@Inject()(as_inject : ActorSystem, dbt : DBTrait, att 
     def queryUsers = Action(request => requestArgsQuery().requestArgsV2(request) { jv =>
         import bmpattern.LogMessage.common_log
         import bmpattern.ResultMessage.lst_result
-//        println("---Im in UserManageController---")
+//        println("---Im in queryUsers---")
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("queryUsers"))), jv)
             :: msg_userManage_query(jv) :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
@@ -27,9 +27,9 @@ class UserManageController@Inject()(as_inject : ActorSystem, dbt : DBTrait, att 
     def deleteUser = Action(request => requestArgsQuery().requestArgsV2(request) { jv =>
         import bmpattern.LogMessage.common_log
         import bmpattern.ResultMessage.lst_result
+        println("---Im in deleteUser---")
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("deleteUser"))), jv)
-            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-            :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+            :: msg_deleteUserManage(jv) :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
 
     def findOneUser = Action(request => requestArgsQuery().requestArgsV2(request) { jv =>
