@@ -10,4 +10,5 @@ abstract class msg_UserManageCommand extends CommonMessage
 
 object UserManageMessage {
     case class msg_userManage_query(data : JsValue) extends msg_UserManageCommand // 用户管理
+    case class msg_deleteUserManage(data : JsValue) extends msg_UserManageCommand // 用户管理
 }
