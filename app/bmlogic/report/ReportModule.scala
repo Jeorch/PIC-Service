@@ -285,7 +285,8 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 				val condition = (conditionParse(data, pr.get) :: oralNameConditionParse(data) :: dateConditionParse(x) :: Nil).filterNot(_ == None).map(_.get)
 				db.aggregate($and(condition), "retrieval", group) { z =>
 					val sum = aggregateSalesResult(z, "oral_sum")
-					Map("sales" -> toJson(topsalessum / sum),
+					val value = if(topsalessum == 0) toJson(0) else toJson(topsalessum / sum)
+					Map("sales" -> value,
 						"start" -> toJson((x \ "condition" \ "date" \ "start").as[String]),
 						"end" -> toJson((x \ "condition" \ "date" \ "end").as[String]))
 				}
@@ -531,7 +532,6 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 					))
 				} catch {
 					case ex: Exception =>
-						println(ex)
 						Some(Map(
 							"info" -> toJson("暂无数据"),
 							"start" -> toJson((x \ "condition" \ "date" \ "start").as[String]),
@@ -544,7 +544,7 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 		try {
 			
 			val lst = resultdata(dateCondition(timeList(1, data)))
-			(Some(Map("ReportTableOne" -> toJson(lst))), None)
+			(Some(Map("ReportTableOne" -> toJson(lst)) ++ pr.get), None)
 			
 		} catch {
 			case ex: Exception =>
@@ -552,11 +552,6 @@ object ReportModule extends ModuleTrait with ReportData with ConditionSearchFunc
 				(None, Some(ErrorCode.errorToJson(ex.getMessage)))
 		}
 	}
-	
-	
-	
-		
-	
 	
 	
 	def reportparameter(obj: DBObject): Map[String, JsValue] = {
