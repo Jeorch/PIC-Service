@@ -72,24 +72,6 @@ class ReportController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att :
 			:: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
 	})
 	
-//	def graphfour = Action(request => requestArgsQuery().requestArgsV2(request) { jv =>
-//		import bmpattern.LogMessage.common_log
-//		import bmpattern.ResultMessage.lst_result
-//
-//		MessageRoutes(msg_log(toJson(Map("method" -> toJson("reportparameter"))), jv)
-//			:: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-//			:: msg_CheckProductLevelScope(jv) :: msg_ReportGraph_Four(jv)
-//			:: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
-//	})
-//
-//	def chartOne = Action(request => requestArgsQuery().requestArgsV2(request) { jv =>
-//		import bmpattern.LogMessage.common_log
-//		import bmpattern.ResultMessage.lst_result
-//
-//		MessageRoutes(msg_log(toJson(Map("method" -> toJson("reportparameter"))), jv)
-//			:: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
-//			:: msg_CheckProductLevelScope(jv) ::msg_ReportChart_one(jv)
-//			:: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
-//	})
+
 	
 }
