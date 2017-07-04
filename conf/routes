@@ -38,6 +38,7 @@ POST    /data/query/reportparameter             controllers.ReportController.que
 POST    /data/calc/report/summary               controllers.ReportController.reportcalcsummary
 
 #用户登录
+GET     /                                       controllers.PagesController.login
 GET     /login                                  controllers.PagesController.login
 #管理員界面
 GET     /admin                                  controllers.PagesController.admin
