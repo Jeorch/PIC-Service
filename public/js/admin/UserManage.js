@@ -35,11 +35,11 @@ $("#grid").kendoGrid({
 					}else if(operation == "create"){
 						return JSON.stringify(options);
                     }else if(operation == "destroy"){
-                        console.log("destroy->"+JSON.stringify(options)+"<-");
+                        // console.log("destroy->"+JSON.stringify(options)+"<-");
 						var user=new Object();
                         user.user_name=options.user_name;
                         user.pwd="";
-                        console.log("user->"+JSON.stringify(user)+"<-");
+                        // console.log("user->"+JSON.stringify(user)+"<-");
 						return JSON.stringify(user);
 
                         // return "id:"+options.id;
@@ -233,22 +233,23 @@ function deleteByIds(){
 }
 
 function userSetRoles(obj){
-	var id = $(obj).parent().parent().find("input[id='batch']").val();
-	userName = $(obj).parent().parent()[0].cells[2].innerText;
+	var id = new Object();
+	id.user_id = $(obj).parent().parent().find("input[id='batch']").val();
+	userName = $(obj).parent().parent()[0].cells[1].innerText;
 	$.ajax({
 	   type : "post",
 	   url : "../module/queryAuthTree",
 	   dataType:"json",
 	   contentType : "application/json",
-	   data : {"userId" : id},
+	   data : JSON.stringify(id),
 	   success : function(msg){
 		   $("#treeView").kendoTreeView({
 		        checkboxes: {
 		            checkChildren: true
 		        },
-		        dataSource: eval("("+msg+")")
+		        dataSource: eval("("+msg.result+")")
 		    });
-		   
+
 		   $("#treeView").kendoWindow({
 		        width: "600px",
 		        height : "600px",
@@ -260,17 +261,17 @@ function userSetRoles(obj){
 		            "Maximize",
 		            "Close"
 		        ],
-		        close: function (e) {  
+		        close: function (e) {
 		        	$("#treeView").remove();
 		        	$("#grid").after("<div id='treeView'></div>");
 		        }
 		    }).data("kendoWindow").center().open();
-		   
-		   var html = "<div style='position: absolute;bottom: 35px;right: 39%;text-align: center;'><input type='button' style='margin:20px;'value='确定' onclick='saveUserAuth("+id+");'><input type='button' value='取消' onclick='cancelUserAuth();'></div>"
+
+		   var html = "<div style='position: absolute;bottom: 35px;right: 39%;text-align: center;'><input type='button' style='margin:20px;'value='确定' onclick='saveUserAuth("+id.user_id+");'><input type='button' value='取消' onclick='cancelUserAuth();'></div>"
 		   $("#treeView").after(html);
 	   },
 	   error : function(e){
-		   alert("加载权限列表失败，请重试！");
+		   alert("加载权限列表失败，请重试！"+userName);
 	   }
 	});
 }

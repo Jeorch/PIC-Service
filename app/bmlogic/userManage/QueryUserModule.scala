@@ -17,6 +17,7 @@ import scala.collection.immutable.Map
   * Created by jeorch on 17-6-27.
   */
 object QueryUserModule extends ModuleTrait with UserData {
+
     def dispatchMsg(msg: MessageDefines)(pr: Option[Map[String, JsValue]])(implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
         case msg_userManage_query(data) => query_user_func(data)
 

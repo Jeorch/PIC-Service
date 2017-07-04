@@ -93,12 +93,24 @@ object AuthModule extends ModuleTrait with AuthData {
     def queryUser(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-
             val user_id = (data \ "conditions" \ "user_id").asOpt[String].getOrElse(throw new Exception("input error"))
             val result = db.queryObject(DBObject("user_id" -> user_id), "users")
             if (result.isEmpty) throw new Exception("unkonw error")
             else (Some(result.get), None)
             
+
+        } catch {
+            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+        }
+    }
+    def queryUserById(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
+        try {
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val user_id = (data \ "user_id").asOpt[String].getOrElse(throw new Exception("input error"))
+            val result = db.queryObject(DBObject("user_id" -> user_id), "users")
+            if (result.isEmpty) throw new Exception("unkonw error")
+            else (Some(result.get), None)
+
 
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))

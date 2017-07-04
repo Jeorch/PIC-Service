@@ -38,7 +38,7 @@ trait ConfigData {
             "product_type"->toJson(obj.getAs[List[String]]("product_type").get),
             "specifications"->toJson(obj.getAs[List[String]]("specifications").get),
             "package"->toJson(obj.getAs[List[String]]("package").get)
-            
+
         )
     }
 }
