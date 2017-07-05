@@ -199,11 +199,25 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
     def productSize(data: JsValue)
                    (pr : Option[Map[String, JsValue]])
                    (implicit cm : CommonModules): (Option[Map[String, JsValue]], Option[JsValue]) = {
+    
+        def aggregateResult(x : MongoDBObject) : Long = {
+            val ok = x.getAs[Number]("ok").get.intValue
+            if (ok == 0) throw new Exception("db aggregation error")
+            else {
+                val lst : BasicDBList = x.getAs[BasicDBList]("result").get
+                lst.toList.asInstanceOf[List[BasicDBObject]].size.toLong
+            }
+        }
+        
         try {
-            import bmlogic.common.LeftAtcLinkAge._
-            val size = linkage(data)
+            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+            val group = MongoDBObject("_id" -> MongoDBObject("product_name" -> "$product_name", "manufacture" -> "$manufacture", "product_type" -> "$product_type"))
             
-            (Some(Map("size" -> toJson(size))), None)
+            val condition = (conditionParse(data, pr.get) :: dateConditionParse(data) :: oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
+            val size = db.aggregate($and(condition), "retrieval", group) { x =>
+                Map("size" -> toJson(aggregateResult(x)))
+            }
+            (size, None)
         } catch {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
