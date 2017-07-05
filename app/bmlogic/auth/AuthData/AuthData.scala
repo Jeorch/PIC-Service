@@ -13,9 +13,33 @@ import play.api.libs.json.Json.toJson
   */
 trait AuthData extends AuthScope {
 
+    val condition : JsValue => DBObject = { js =>
+        val build = MongoDBObject.newBuilder
+        (js \ "user_name").asOpt[String].map (x => x).getOrElse(Unit)
+        (js \ "pwd").asOpt[String].map (x => x).getOrElse(Unit)
+        (js \ "user_id").asOpt[String].map (x => x).getOrElse(Unit)
+        (js \ "screen_name").asOpt[String].map (x => x).getOrElse(Unit)
+        (js \ "screen_photo").asOpt[String].map (x => x).getOrElse(Unit)
+        (js \ "phoneNo").asOpt[String].map (x => x).getOrElse(Unit)
+        (js \ "email").asOpt[String].map (x => x).getOrElse(Unit)
+
+        val scope_builder = MongoDBObject.newBuilder
+        scope_builder += "edge" -> pushEdgeScope(js)
+        scope_builder += "category" -> pushProduceLevelScope(js)
+        scope_builder += "manufacture_name" -> pushManufactureNameScope(js)
+        scope_builder += "is_admin" -> (js \ "scope" \ "is_admin").asOpt[Int].map (x => x).getOrElse(0)
+
+        build += "scope" -> scope_builder.result
+
+        build += "status" -> (js \ "status").asOpt[Int].map (x => x).getOrElse("")
+
+        build.result
+    }
+
     implicit val m2d : JsValue => DBObject = { js =>
         val build = MongoDBObject.newBuilder
         build += "user_name" -> (js \ "user_name").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
+        build += "user_id" -> (js \ "user_id").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
         build += "pwd" -> (js \ "pwd").asOpt[String].map (x => x).getOrElse(throw new Exception("input error"))
         build += "screen_name" -> (js \ "screen_name").asOpt[String].map (x => x).getOrElse("")
         build += "screen_photo" -> (js \ "screen_photo").asOpt[String].map (x => x).getOrElse("")
@@ -43,6 +67,7 @@ trait AuthData extends AuthScope {
         Map(
             "user_id" -> toJson(obj.getAs[String]("user_id").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "user_name" -> toJson(obj.getAs[String]("user_name").map (x => x).getOrElse(throw new Exception("db prase error"))),
+            "pwd" -> toJson(obj.getAs[String]("pwd").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "phoneNo" -> toJson(obj.getAs[String]("phoneNo").map (x => x).getOrElse(throw new Exception("db prase error"))),
             "email" -> toJson(obj.getAs[String]("email").map (x => x).getOrElse(throw new Exception("db prase error"))),
 

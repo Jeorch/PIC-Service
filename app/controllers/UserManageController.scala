@@ -38,4 +38,10 @@ class UserManageController@Inject()(as_inject : ActorSystem, dbt : DBTrait, att 
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("queryUsers"))), jv)
             :: msg_queryAuthTree(jv) :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
+
+    def saveUserAuth = Action(request => requestArgsQuery().requestArgsV2(request) { jv =>
+        import bmpattern.LogMessage.common_log
+        MessageRoutes(msg_log(toJson(Map("method" -> toJson("queryUsers"))), jv)
+            :: msg_saveUserAuth(jv) :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
+    })
 }

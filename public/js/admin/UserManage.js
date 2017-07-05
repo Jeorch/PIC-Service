@@ -1,4 +1,5 @@
 var userName;
+var userId;
 
 $("#grid").kendoGrid({
 	dataSource : {
@@ -37,9 +38,8 @@ $("#grid").kendoGrid({
                     }else if(operation == "destroy"){
                         // console.log("destroy->"+JSON.stringify(options)+"<-");
 						var user=new Object();
-                        user.user_name=options.user_name;
+                        user.user_id=options.user_id;
                         user.pwd="";
-                        // console.log("user->"+JSON.stringify(user)+"<-");
 						return JSON.stringify(user);
 
                         // return "id:"+options.id;
@@ -267,7 +267,8 @@ function userSetRoles(obj){
 		        }
 		    }).data("kendoWindow").center().open();
 
-		   var html = "<div style='position: absolute;bottom: 35px;right: 39%;text-align: center;'><input type='button' style='margin:20px;'value='确定' onclick='saveUserAuth("+id.user_id+");'><input type='button' value='取消' onclick='cancelUserAuth();'></div>"
+		   userId=$(obj).parent().parent().find("input[id='batch']").val();
+		   var html = "<div style='position: absolute;bottom: 35px;right: 39%;text-align: center;'><input type='button' style='margin:20px;'value='确定' onclick='saveUserAuth("+"userId"+");'><input type='button' value='取消' onclick='cancelUserAuth();'></div>"
 		   $("#treeView").after(html);
 	   },
 	   error : function(e){
@@ -286,12 +287,18 @@ function saveUserAuth(userId){
 	} else{
 		checkedNodes = [""];
 	}
+	// console.log("checkedNodes="+checkedNodes);
+	var save_user_auth= new Object();
+    save_user_auth.user_id=userId;
+    save_user_auth.scope=checkedNodes;
 	$.ajax({
 	   type : "post",
-	   url : "../module/saveAllotAuth",
+	   url : "../module/saveUserAuth",
 	   dataType:"json",
-	   data : {"userId": userId, "checkedAuthNodes" : checkedNodes},
+	   contentType : "application/json",
+	   data : JSON.stringify(save_user_auth),
 	   success : function(data){
+           $("#grid").data('kendoGrid').dataSource.read();
 		   alert("用户【"+userName+"】的权限已分配成功！");
 		   cancelUserAuth();
 	   },
@@ -304,10 +311,10 @@ function saveUserAuth(userId){
 function checkedNodeIds(nodes, checkedNodes) {
     for (var i = 0; i < nodes.length; i++) {
     	if (nodes[i].checked && nodes[i].hasChildren == false) {
-    		if(nodes[i].flag == undefined){
-    			 checkedNodes.push(nodes[i].id);
+    		if(nodes[i].id < 30){
+    			 checkedNodes.push("c-"+nodes[i].text);
     		}else{
-    			 checkedNodes.push(nodes[i].flag + "-qy-"+nodes[i].id);
+    			 checkedNodes.push("e-"+nodes[i].text);
     		}
         }
         if (nodes[i].hasChildren) {
