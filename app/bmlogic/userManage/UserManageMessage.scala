@@ -13,4 +13,5 @@ object UserManageMessage {
     case class msg_userManage_query(data : JsValue) extends msg_QueryUserCommand // 用户管理
     case class msg_deleteUserManage(data : JsValue) extends msg_UserManageCommand // 删除用户
     case class msg_saveUserManage(data : JsValue) extends msg_UserManageCommand   // 更新用户
+    case class msg_saveUserAuth(data : JsValue) extends msg_UserManageCommand   // 更新用户
 }

@@ -50,8 +50,10 @@ POST    /userInfo/queryUserAll                  controllers.UserManageController
 POST    /userInfo/deleteById                    controllers.UserManageController.deleteUser
 #更新用户
 POST    /userInfo/saveOrUpdate                  controllers.UserManageController.saveUser
-#查询用户授权
+#初始化用户授权树状结构
 POST    /module/queryAuthTree                   controllers.UserManageController.queryAuthTree
+#更新用户授权
+POST    /module/saveUserAuth                    controllers.UserManageController.saveUserAuth
 #个人中心
 GET     /userInfo                               controllers.PagesController.userInfo
 

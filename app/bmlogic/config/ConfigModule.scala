@@ -89,7 +89,7 @@ object ConfigModule extends ModuleTrait with ConfigData{
 
     def list2string(list: List[JsValue]): String ={
         val iterable = list.iterator
-        var i = 0
+        var i = list.length
         var string = "["
         while (iterable.hasNext){
             i=i+1
