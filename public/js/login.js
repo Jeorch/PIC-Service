@@ -11,11 +11,15 @@ $(function(){
         ajaxData("/auth/password", data, "POST", function(data){
             if(data.status == "ok") {
                 $.cookie("token",data.result.auth_token);
-                $.cookie("user_name",data.result.user.user_name)
+                $.cookie("user_name",data.result.user.user_name);
+
+                var ip = $.cookie("cname")+":"+$.cookie("cip");
+                importLoginLog(data.result.user.user_name,ip);
+
                 if(data.result.user.user_name=="admin"){
-                    window.location="/admin"
+                    window.location="/admin";
                 }else {
-                    window.location = "/data/report"
+                    window.location = "/data/report";
                 }
             }
         }, function(e){$("#errText").show();$("#noErr").hide()})
@@ -23,8 +27,9 @@ $(function(){
 })
 
 function logoutSys() {
+    saveLoginLog();
     cleanAllCookie();
-    location = "/login"
+    location = "/login";
 }
 
 var cleanAllCookie = function() {
@@ -34,4 +39,27 @@ var cleanAllCookie = function() {
             $.cookie(v, "", {"path": "/", "expires": -1 });
         })
     }
+}
+
+function importLoginLog(user_name,ip) {
+    var data = JSON.stringify({
+        "user_name" : user_name,
+        "ip" : ip
+    })
+    ajaxData("/loginLog/import", data, "POST", function(data){
+        if(data.status == "ok") {
+            $.cookie("log_id",data.result.log_id);
+        }
+    }, function(e){$("#errText").show();$("#noErr").hide()})
+}
+
+function saveLoginLog() {
+    var data = JSON.stringify({
+        "log_id" : $.cookie("log_id")
+    })
+    ajaxData("/loginLog/save", data, "POST", function(data){
+        if(data.status == "ok") {
+           console.log("saveLoginLog succeed");
+        }
+    }, function(e){$("#errText").show();$("#noErr").hide()})
 }

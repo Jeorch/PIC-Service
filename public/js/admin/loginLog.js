@@ -5,7 +5,7 @@ $(function(){
 });
 
 function log(){
-	$('#grid').DataTable({
+	/*$('#grid').DataTable({
       "language": {"url": "//cdn.datatables.net/plug-ins/1.10.12/i18n/Chinese.json"},
       "paging": true,
       "lengthChange": true,
@@ -14,8 +14,8 @@ function log(){
       "ordering": false,
       "info": false,
       "autoWidth": true
-	});
-	/*$("#grid").kendoGrid({
+	});*/
+	$("#grid").kendoGrid({
 		dataSource : {
 			transport : {
 				read : {
@@ -35,19 +35,15 @@ function log(){
 				total : "totalRecord",
 				model : {
 					fields : {
-						loginname : {
+						user_name : {
 							type : "string"
-						},loginstart: {
+						},/*date: {
 							type : "date"
-						},loginend: {
+						},login_end: {
 							type : "date"
-						},timesum:{
-							type : "string"
-						},logintype:{
+						},time_sum:{
 							type : "number"
-						},ip:{
-							type : "string"
-						},descinfo:{
+						},*/ip:{
 							type : "string"
 						}
 					}
@@ -86,34 +82,27 @@ function log(){
 			template : "暂无数据！"
 		},
 		columns: [{
-	         field: "rowNumber",
-	         title: "序号",
-	         template : "<span class='row-number'></span>",
-	         width: 80,
-	         editable : false
-	     },{
-	         field: "loginname",
+	         field: "user_name",
 	         title: "用户名",
 	         width: 120
 	     },{
-	         field: "loginstart",
+	         field: "date",
 	         title: "登入时间",
 	         format: "{0: yyyy-MM-dd HH:mm:ss}", //格式化时间  
-	         width: 180
+	         width: 120
 	     },{
-	         field: "loginend",
+	         field: "login_end",
 	         title: "登出时间",
 	         format: "{0: yyyy-MM-dd HH:mm:ss}", //格式化时间
-	         width: 180
+	         width: 120
 	     },{
-	         field: "timesum",
+	         field: "time_sum",
 	         title: "停留时长",
-	         width: 180
+	         width: 120
 	     },{
-	         field: "logintype",
-	         title: "登录类型",
-	         values : [{"value": 1, "text": "登入" },{"value": 0,"text": "登出"}],
-	     	 width: 75
+	         field: "ip",
+	         title: "登录IP",
+	     	 width: 120
 	     }],
 		dataBound : function() {
 			var rows = this.items();
@@ -125,5 +114,5 @@ function log(){
 				$(rowLabel).html(index);
 			});
 		}
-	});*/
+	});
 }

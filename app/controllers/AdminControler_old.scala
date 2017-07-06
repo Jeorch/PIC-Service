@@ -10,7 +10,7 @@ import play.api.mvc.{Action, Controller}
 /**
   * Created by alfredyang on 06/06/2017.
   */
-class AdminController @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait) extends Controller {
+class AdminController_old @Inject () (as_inject : ActorSystem, dbt : DBTrait, att : AuthTokenTrait) extends Controller {
     implicit val as = as_inject
 
     def adminWithPassword = Action(Ok(""))

@@ -18,6 +18,7 @@ import bmlogic.report.{ReportModule, msg_ReportCommand}
 import bmlogic.retrieval.{RetrievalModule, msg_RetrievalCommand}
 import bmlogic.userManage.{UserManageModule, msg_UserManageCommand}
 import bmlogic.userManage.{QueryUserModule, msg_QueryUserCommand}
+import bmlogic.loginLog.{LoginLogModule, msg_LoginLogCommand}
 
 
 object PipeFilterActor {
@@ -60,6 +61,7 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 		case cmd : msg_ReportCommand => dispatchImpl(cmd, ReportModule)
 		case cmd : msg_UserManageCommand => dispatchImpl(cmd, UserManageModule)
 		case cmd : msg_QueryUserCommand => dispatchImpl(cmd, QueryUserModule)
+		case cmd : msg_LoginLogCommand => dispatchImpl(cmd, LoginLogModule)
 		case cmd : ParallelMessage => {
 		    cancelActor
 			next = context.actorOf(ScatterGatherActor.prop(originSender, msr), "scat")
