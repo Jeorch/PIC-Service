@@ -26,7 +26,7 @@ trait MongoDBImpl extends DBTrait {
     override def queryObject(condition : DBObject, db_name : String)
                    (implicit t : DBObject => Map[String, JsValue]) : Option[Map[String, JsValue]] = {
 
-        (from db() in db_name where condition select(x => t(x))).toList match {
+        (from db() in db_name where condition).selectTop(1)("date")(x => t(x)).toList match {
             case Nil => None
             case head :: Nil => Some(head)
             case _ => throw new Exception("data duplicate")
@@ -45,4 +45,23 @@ trait MongoDBImpl extends DBTrait {
             case _ => throw new Exception("primary key error")
         }
     }
+
+    override def querySum(condition : DBObject, db_name : String)
+                         (sum : (Map[String, JsValue], Map[String, JsValue]) => Map[String, JsValue])
+                         (acc: (DBObject) => Map[String, JsValue]) : Option[Map[String, JsValue]] = {
+
+        val c = from db() in db_name where condition selectCursor
+
+        var result : Map[String, JsValue] = Map.empty
+        while (c.hasNext) {
+            result = sum(result, acc(c.next()))
+        }
+
+        if (result.isEmpty) None
+        else Some(result)
+    }
+
+    override def aggregate(condition : DBObject, db_name : String, group : DBObject)
+                 (implicit t : DBObject => Map[String, JsValue]) : Option[Map[String, JsValue]] =
+        Some(t((from db() in db_name where condition).aggregate(group)))
 }

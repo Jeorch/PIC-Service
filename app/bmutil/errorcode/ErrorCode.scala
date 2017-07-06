@@ -28,14 +28,19 @@ object ErrorCode {
         new ErrorNode("product without package", -211, "销售数据没有剂型数据"),
         new ErrorNode("product without sales id", -212, "销售数据没有缺少ID"),
 		new ErrorNode("product without category", -213, "销售数据没有分类数据"),
+		new ErrorNode("product without product name", -21, "销售数据没有商品名数据"),
 
 		new ErrorNode("search condition parse error", -301, "搜索条件解析错误"),
+		new ErrorNode("calc market size func error", -302, "计算市场销售额出错"),
+		new ErrorNode("calc percentage without oral name or product name", -303, "计算市场份额必须提供通用名或者产品名"),
+		new ErrorNode("calc market trend func error", -304, "计算市场增长了出错"),
 
 		new ErrorNode("no db connection", -901, "没找到数据库链接"),
 		new ErrorNode("db prase error", -902, "数据库结构发现错误"),
 		new ErrorNode("no encrypt impl", -903, "权限加密方式不清晰或者Token不存在"),
 		new ErrorNode("token parse error", -904, "token数据解析出现错误"),
 		new ErrorNode("token expired", -905, "token过期"),
+		new ErrorNode("db aggregation error", -906, "数据Map Reduce操作发生错误"),
 
   		new ErrorNode("unknown error", -999, "unknown error")
   	)

@@ -1,11 +1,11 @@
 package bmlogic.retrieval
 
-import java.util.Date
 
 import bminjection.db.DBTrait
-import bminjection.token.AuthTokenTrait
+import bminjection.db.LoadCategory._
+import bmlogic.common.Page._
 import bmlogic.common.sercurity.Sercurity
-import bmlogic.retrieval.ConditionSearchFunc.ConditionSearchFunc
+import bmlogic.conditions.ConditionSearchFunc
 import bmlogic.retrieval.RetrievalData.RetrievalData
 import bmlogic.retrieval.RetrievalMessage._
 import bmmessages.{CommonModules, MessageDefines}
@@ -21,6 +21,8 @@ import com.mongodb.casbah.Imports._
   * Created by alfredyang on 01/06/2017.
   */
 object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSearchFunc {
+    lazy val lst = category
+    
     def dispatchMsg(msg : MessageDefines)(pr : Option[Map[String, JsValue]])(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = msg match {
         case msg_ConditionSearchCommand(data) => conditionSearch(data)(pr)
 
@@ -28,28 +30,91 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
         case msg_UpdateProduct(data) => updateProduct(data)
         case msg_DeleteProduct(data) => deleteProduct(data)
 
-        case msg_CalcPercentage(data) => calcPercentage(data)
-        case msg_CalcTrend(data) => calcTrend(data)
-
         case _ => ???
+    }
+    
+    def searchatc(value: String)
+                 (result: Option[List[Map[String, JsValue]]]): Option[List[Map[String, JsValue]]] = {
+        category match {
+            case None => None
+            case Some(list) =>
+                val v = list.find(x => x.get("des").get.as[String] == value)
+                val vv = list.find(x => x.get("def").get.as[String] == v.get.get("parent").get.as[String]).get
+                if(vv.get("level").get.as[Int] == 0) Some(vv :: result.get)
+                else searchatc(vv.get("des").get.as[String])(Some(vv :: result.get))
+            case _ => ???
+        }
     }
 
     def conditionSearch(data : JsValue)
                        (pr : Option[Map[String, JsValue]])
                        (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
-
-
+        import bmutil.alDateOpt._
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-
-            val condition = conditionParse(data, pr.get)
-            val result = Map("search_result" -> toJson(db.queryMultipleObject(condition, "retrieval")))
-
+            
+            val condition = (conditionParse(data, pr.get) :: dateConditionParse(data) ::
+                             oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
+            
+            val count = if(!condition.isEmpty) {
+                val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "count"), "count" -> MongoDBObject("$sum" -> 1))
+                db.aggregate($and(condition), "retrieval", group){ x =>
+                    Map("count" -> toJson(aggregateSalesResult(x, "count")))
+                }
+            }else {
+                Some(Map("count" -> toJson(0)))
+            }
+            
+            var index = 1
+            val skip = (data \ "skip").asOpt[Int].getOrElse(1)
+            val r = db.queryMultipleObject($and(condition), "retrieval", skip = skip, take = TAKE).map { x =>
+                lazy val atc = searchatc(x.get("category").get.asOpt[String].getOrElse(throw new Exception("input error")))(Some(Nil)).map(x => x).getOrElse(throw new Exception)
+                val html =
+					s"""<tr>
+                      |     <td>$index</td>
+                      |     <td>${Timestamp2yyyyMM(x.get("date").get.as[Long])}</td>
+                      |     <td>${x.get("province").get.as[String]}</td>
+                      |     <td>${x.get("product_name").get.as[String]}</td>
+                      |     <td>${x.get("sales").get.as[Long]}</td>
+                      |     <td>${x.get("units").get.as[Long]}</td>
+                      |     <td>${x.get("oral_name").get.as[String]}</td>
+                      |     <td>${x.get("manufacture").get.as[String]}</td>
+                      |     <td>${x.get("specifications").get.as[String]}</td>
+                      |     <td>${atc.head.get("des").get.as[String]}</td>
+                      |     <td>${atc.tail.head.get("des").get.as[String]}</td>
+                      |     <td>${x.get("category").get.as[String]}</td>
+                      |     <td>${x.get("product_unit").get.as[String]}</td>
+                      |     <td>${x.get("manufacture_type").get.as[String]}</td>
+                      |     <td>${x.get("product_type").get.as[String]}</td>
+                      |     <td>${x.get("package").get.as[String]}</td>
+                      |  </tr>""".stripMargin
+                index += 1
+                Map("html" -> html)
+            }
+            
+            val result = Map("search_result" -> toJson(r), "page" -> toJson(Page(skip, count.get.get("count").get.as[Long])))
             (Some(result), None)
         } catch {
-            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+            case ex : Exception =>
+                (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
+  
+//    //查询某商品数量
+//    def productQuantity(data:JsValue)
+//                       (pr : Option[Map[String, JsValue]])
+//                       (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue])={
+//        try{
+//            val db=cm.modules.get.get("db").map(x=>x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
+//            val condition=(productNameConditionParse(data)::Nil).filterNot(_==None).map(_.get)
+//            val productNum = db.queryMultipleObject($or(condition), "retrieval").size
+//            val result=Map("productQuantity"->toJson(productNum))
+//            (Some(result), None)
+//        }catch {
+//            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+//        }
+//
+//    }
 
     def pushProduct(data : JsValue)
                    (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
@@ -108,51 +173,15 @@ object RetrievalModule extends ModuleTrait with RetrievalData with ConditionSear
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
-
-    //by clock
-    def calcPercentage(data : JsValue)
-                     (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
-        try {
-//            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-//            val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
-
-            val queryName = (data \ "oral_name").asOpt[String].map (x => x).getOrElse((data \ "category").asOpt[String].map (x => x).getOrElse(throw new Exception("input error")))
-            val province = (data \ "province").asOpt[String].map (x => x).getOrElse("all")
-            val date = (data \ "date").asOpt[String].map (x => x).getOrElse(new Date().getTime)
-
-            (Some(Map(
-                "queryname" -> toJson(queryName),
-                "province" -> toJson(province),
-                "date" -> toJson(date.toString),
-                "percentage" -> toJson("13.72 %")
-            )), None)
-        } catch {
-            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
-        }
-    }
-
-    //by clock
-    def calcTrend(data : JsValue)
-                      (implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
-        try {
-//            val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
-//            val att = cm.modules.get.get("att").map (x => x.asInstanceOf[AuthTokenTrait]).getOrElse(throw new Exception("no encrypt impl"))
-
-            val queryName = (data \ "oral_name").asOpt[String].map (x => x).getOrElse((data \ "category").asOpt[String].map (x => x).getOrElse(throw new Exception("input error")))
-            val province = (data \ "province").asOpt[String].map (x => x).getOrElse("all")
-            val date = (data \ "date").asOpt[String].map (x => x).getOrElse(new Date().getTime)
-
-//            val thisYearSales = ???
-//            val listYearSales = ???
-
-            (Some(Map(
-                "queryname" -> toJson(queryName),
-                "province" -> toJson(province),
-                "date" -> toJson(date.toString),
-                "trend" -> toJson("1.26 %")
-            )), None)
-        } catch {
-            case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
+    
+    def aggregateSalesResult(x : MongoDBObject, id : String) : Long = {
+        val ok = x.getAs[Number]("ok").get.intValue
+        if (ok == 0) throw new Exception("db aggregation error")
+        else {
+            val lst = x.getAs[MongoDBList]("result").get
+            val tmp = lst.toList.asInstanceOf[List[BasicDBObject]]
+            tmp.find ( z => z.getAs[BasicDBObject]("_id").get.getAs[String]("ms").map(a => a).getOrElse("") == id )
+                .map ( y =>y.getAs[Number]("count").map(_.longValue()).getOrElse(throw new Exception("db aggregation error"))).getOrElse(0)
         }
     }
 }

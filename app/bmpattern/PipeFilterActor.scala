@@ -5,12 +5,21 @@ import akka.actor.Actor
 import akka.actor.ActorLogging
 import akka.actor.ActorRef
 import akka.actor.Props
+import bmlogic.aggregateCalc.{AggregateModule, msg_AggregateCommand}
+import bmlogic.adjustdata.{AdjustDataModule, msg_AdjustDataCommand}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json.toJson
 import bmmessages._
 import bmlogic.auth.{AuthModule, msg_AuthCommand}
+import bmlogic.category.{CategoryModule, msg_CategoryCommand}
+import bmlogic.config.{ConfigModule, msg_ConfigCommand}
+import bmlogic.report.{ReportModule, msg_ReportCommand}
 import bmlogic.retrieval.{RetrievalModule, msg_RetrievalCommand}
+import bmlogic.userManage.{UserManageModule, msg_UserManageCommand}
+import bmlogic.userManage.{QueryUserModule, msg_QueryUserCommand}
+import bmlogic.loginLog.{LoginLogModule, msg_LoginLogCommand}
+
 
 object PipeFilterActor {
 	def prop(originSender : ActorRef, msr : MessageRoutes) : Props = {
@@ -26,7 +35,7 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 		module.dispatchMsg(cmd)(rst) match {
 			case (_, Some(err)) => {
 				originSender ! error(err)
-				cancelActor					
+				cancelActor
 			}
 			case (Some(r), _) => {
 //				println(r)
@@ -43,8 +52,16 @@ class PipeFilterActor(originSender : ActorRef, msr : MessageRoutes) extends Acto
 	def receive = {
 		case cmd : msg_AuthCommand => dispatchImpl(cmd, AuthModule)
 		case cmd : msg_RetrievalCommand => dispatchImpl(cmd, RetrievalModule)
+		case cmd : msg_AggregateCommand => dispatchImpl(cmd, AggregateModule)
+		case cmd : msg_AdjustDataCommand => dispatchImpl(cmd, AdjustDataModule)
 		case cmd : msg_ResultCommand => dispatchImpl(cmd, ResultModule)
         case cmd : msg_LogCommand => dispatchImpl(cmd, LogModule)
+		case cmd : msg_ConfigCommand=>dispatchImpl(cmd,ConfigModule)
+		case cmd : msg_CategoryCommand=>dispatchImpl(cmd,CategoryModule)
+		case cmd : msg_ReportCommand => dispatchImpl(cmd, ReportModule)
+		case cmd : msg_UserManageCommand => dispatchImpl(cmd, UserManageModule)
+		case cmd : msg_QueryUserCommand => dispatchImpl(cmd, QueryUserModule)
+		case cmd : msg_LoginLogCommand => dispatchImpl(cmd, LoginLogModule)
 		case cmd : ParallelMessage => {
 		    cancelActor
 			next = context.actorOf(ScatterGatherActor.prop(originSender, msr), "scat")

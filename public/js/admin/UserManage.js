@@ -1,4 +1,5 @@
 var userName;
+var userId;
 
 $("#grid").kendoGrid({
 	dataSource : {
@@ -16,11 +17,13 @@ $("#grid").kendoGrid({
 	                type : "post"
             },
             destroy: {
-	                url: '../userInfo/deleteById',
+	                url: "../userInfo/deleteById",
+                	dataType: "json",
+                	contentType : "application/json",
 	                type : "post"
             },
             create: {
-	                url: "../userInfo/saveOrUpdate",
+	                url: "../auth/pushUser ",
 	                dataType: "json",
 	                contentType : "application/json",
 	                type : "post"
@@ -32,22 +35,31 @@ $("#grid").kendoGrid({
 						return JSON.stringify(options);
 					}else if(operation == "create"){
 						return JSON.stringify(options);
-					}else if(operation == "destroy"){
-						return "id="+options.id;
-					}
+                    }else if(operation == "destroy"){
+                        // console.log("destroy->"+JSON.stringify(options)+"<-");
+						var user=new Object();
+                        user.user_id=options.user_id;
+                        user.pwd="";
+						return JSON.stringify(user);
+
+                        // return "id:"+options.id;
+                    }
 			}
 		},
 		pageSize : 10,
 		schema : {
 			total : "totalRecord",
 			model : {
-				id : "id",
+				id : "user_id",
 				fields : {
-					loginName : {
+					user_name : {
 						type : "string",
-						validation: { required: true,validationMessage : "用户名不能为空并保证唯一。"  } ,
-					},status: {
-						type : "string",
+						validation: { required: true,validationMessage : "用户名不能为空并保证唯一。"  }
+					},pwd : {
+                        type : "string",
+                        validation: { required: true,validationMessage : "密码不能为空！"  }
+                    },status: {
+						type : "number",
 						validation: { required: true,validationMessage : "用户状态不能为空。"  }
 					}
 				}
@@ -65,7 +77,7 @@ $("#grid").kendoGrid({
 					$("#grid").data('kendoGrid').dataSource.read();
 				}
 			}else if(d.type == "destroy"){
-				if(d.response > 0){
+				if(d.response != ""){
 					alert("删除成功！");
 				}else{
 					alert("删除失败！");
@@ -105,7 +117,7 @@ $("#grid").kendoGrid({
 		template : "暂无数据！"
 	},
 	columns: [{
-        field: "id",
+        field: "user_id",
         title: "批量操作",
         template: "<div style=\"text-align:center\"><input type='checkbox' id='batch' value='#: id #' /></div>",
         width: 75
@@ -115,16 +127,20 @@ $("#grid").kendoGrid({
          template : "<span class='row-number'></span>",
          editable : false
      }*/, {
-         field: "loginName",
+         field: "user_name",
          title: "用户名",
          width: 120
      }, {
-         field: "status",
-         title: "用户状态",
-         values : [{"value": 1, "text": "正常开通" },{"value": 0,"text": "暂不开通"}],
-     	 width: 75
+         field: "pwd",
+         title: "密码",
+     	 width: 1
      }, {
-         field: "createDate",
+        field: "status",
+        title: "用户状态",
+        values : [{"value": 1, "text": "正常开通" },{"value": 0,"text": "暂不开通"}],
+        width: 75
+    }, {
+         field: "date",
          title: "创建时间",
          format: "{0: yyyy-MM-dd HH:mm:ss}", //格式化时间  
          width: 180
@@ -147,10 +163,10 @@ $("#grid").kendoGrid({
     toolbar: [{ name: "create", text: "新增用户" }, {  template: kendo.template($("#template").html())}],
     edit: function(e) {
         if (!e.model.isNew()) {
-        	e.container.find("input[name=loginName]")[0].disabled = true;
+        	e.container.find("input[name=user_name]")[0].disabled = true;
         }
-        $("label[for='createDate']").remove();
-    	$("div[data-container-for='createDate']").remove();
+        $("label[for='date']").remove();
+    	$("div[data-container-for='date']").remove();
     	$("label[for='updateDate']").remove();
     	$("div[data-container-for='updateDate']").remove();
      }/*,
@@ -217,22 +233,23 @@ function deleteByIds(){
 }
 
 function userSetRoles(obj){
-	var id = $(obj).parent().parent().find("input[id='batch']").val();
-	userName = $(obj).parent().parent()[0].cells[2].innerText;
+	var id = new Object();
+	id.user_id = $(obj).parent().parent().find("input[id='batch']").val();
+	userName = $(obj).parent().parent()[0].cells[1].innerText;
 	$.ajax({
 	   type : "post",
 	   url : "../module/queryAuthTree",
 	   dataType:"json",
 	   contentType : "application/json",
-	   data : {"userId" : id},
+	   data : JSON.stringify(id),
 	   success : function(msg){
 		   $("#treeView").kendoTreeView({
 		        checkboxes: {
 		            checkChildren: true
 		        },
-		        dataSource: eval("("+msg+")")
+		        dataSource: eval("("+msg.result+")")
 		    });
-		   
+
 		   $("#treeView").kendoWindow({
 		        width: "600px",
 		        height : "600px",
@@ -244,17 +261,18 @@ function userSetRoles(obj){
 		            "Maximize",
 		            "Close"
 		        ],
-		        close: function (e) {  
+		        close: function (e) {
 		        	$("#treeView").remove();
 		        	$("#grid").after("<div id='treeView'></div>");
 		        }
 		    }).data("kendoWindow").center().open();
-		   
-		   var html = "<div style='position: absolute;bottom: 35px;right: 39%;text-align: center;'><input type='button' style='margin:20px;'value='确定' onclick='saveUserAuth("+id+");'><input type='button' value='取消' onclick='cancelUserAuth();'></div>"
+
+		   userId=$(obj).parent().parent().find("input[id='batch']").val();
+		   var html = "<div style='position: absolute;bottom: 35px;right: 39%;text-align: center;'><input type='button' style='margin:20px;'value='确定' onclick='saveUserAuth("+"userId"+");'><input type='button' value='取消' onclick='cancelUserAuth();'></div>"
 		   $("#treeView").after(html);
 	   },
 	   error : function(e){
-		   alert("加载权限列表失败，请重试！");
+		   alert("加载权限列表失败，请重试！"+userName);
 	   }
 	});
 }
@@ -269,12 +287,18 @@ function saveUserAuth(userId){
 	} else{
 		checkedNodes = [""];
 	}
+	// console.log("checkedNodes="+checkedNodes);
+	var save_user_auth= new Object();
+    save_user_auth.user_id=userId;
+    save_user_auth.scope=checkedNodes;
 	$.ajax({
 	   type : "post",
-	   url : "../module/saveAllotAuth",
+	   url : "../module/saveUserAuth",
 	   dataType:"json",
-	   data : {"userId": userId, "checkedAuthNodes" : checkedNodes},
+	   contentType : "application/json",
+	   data : JSON.stringify(save_user_auth),
 	   success : function(data){
+           $("#grid").data('kendoGrid').dataSource.read();
 		   alert("用户【"+userName+"】的权限已分配成功！");
 		   cancelUserAuth();
 	   },
@@ -287,10 +311,10 @@ function saveUserAuth(userId){
 function checkedNodeIds(nodes, checkedNodes) {
     for (var i = 0; i < nodes.length; i++) {
     	if (nodes[i].checked && nodes[i].hasChildren == false) {
-    		if(nodes[i].flag == undefined){
-    			 checkedNodes.push(nodes[i].id);
+    		if(nodes[i].id < 30){
+    			 checkedNodes.push("c-"+nodes[i].text);
     		}else{
-    			 checkedNodes.push(nodes[i].flag + "-qy-"+nodes[i].id);
+    			 checkedNodes.push("e-"+nodes[i].text);
     		}
         }
         if (nodes[i].hasChildren) {

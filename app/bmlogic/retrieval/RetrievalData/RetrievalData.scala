@@ -39,6 +39,7 @@ trait RetrievalData {
             "manufacture" -> toJson(obj.getAs[String]("manufacture").map (x => x).getOrElse(throw new Exception("product with manufacture"))),
             "specifications" -> toJson(obj.getAs[String]("specifications").map (x => x).getOrElse(throw new Exception("product with specifications"))),
             "product_unit" -> toJson(obj.getAs[String]("product_unit").map (x => x).getOrElse(throw new Exception("product with product unit"))),
+            "product_name" -> toJson(obj.getAs[String]("product_name").map (x => x).getOrElse(throw new Exception("product with product unit"))),
             "manufacture_type" -> toJson(obj.getAs[String]("manufacture_type").map (x => x).getOrElse(throw new Exception("product with manufacture type"))),
             "product_type" -> toJson(obj.getAs[String]("product_type").map (x => x).getOrElse(throw new Exception("product with product type"))),
             "package" -> toJson(obj.getAs[String]("package").map (x => x).getOrElse(throw new Exception("product with package"))),

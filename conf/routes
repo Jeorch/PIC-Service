@@ -20,22 +20,64 @@ POST    /data/search                            controllers.RetrievalController.
 POST    /data/calc/market                       controllers.RetrievalController.calcMarket
 POST    /data/calc/trend                        controllers.RetrievalController.calcTrend
 POST    /data/calc/percentage                   controllers.RetrievalController.calcPercentage
+POST    /data/calc/quantity                     controllers.RetrievalController.calcQuantity
 POST    /data/calc/units                        controllers.RetrievalController.calcUnits
+
+# 调试数据所用，以后去掉，不要调用
+POST    /data/adjust                            controllers.AdjustController.adjustNameData
 
 # retrieval 生成报告 End Point (详情参考概要设计，@Alfred)
 
-# 显示报告界面
+# 显示主页
 GET     /data/report                            controllers.PagesController.goHome
 
+# 报告页面
+GET     /report:reportid                        controllers.PagesController.report(reportid)
+POST    /data/reportparameter                   controllers.ReportController.reportparameter
+POST    /data/query/reportparameter             controllers.ReportController.queryreportparameter
+POST    /data/calc/report/summary               controllers.ReportController.reportcalcsummary
 
 #用户登录
+GET     /                                       controllers.PagesController.login
 GET     /login                                  controllers.PagesController.login
-#POST    /loginAction                            controllers.LoginController.loginAction
+
+#管理員界面
+GET     /admin                                  controllers.PagesController.admin
+#用户管理界面
+GET     /admin/UserManage                       controllers.PagesController.userManage
+#登录日志管理界面
+GET     /loginLog/show                          controllers.PagesController.loginLog
+#登录日志查询
+POST    /loginLog/query                         controllers.AdminController.loginLogQuery
+#导入登录日志
+POST    /loginLog/import                        controllers.AdminController.loginLogImport
+#保存登录日志
+POST    /loginLog/save                          controllers.AdminController.loginLogSave
+#用户查询
+POST    /userInfo/queryUserAll                  controllers.UserManageController.queryUsers
+#删除用户
+POST    /userInfo/deleteById                    controllers.UserManageController.deleteUser
+#更新用户
+POST    /userInfo/saveOrUpdate                  controllers.UserManageController.saveUser
+#初始化用户授权树状结构
+POST    /module/queryAuthTree                   controllers.UserManageController.queryAuthTree
+#更新用户授权
+POST    /module/saveUserAuth                    controllers.UserManageController.saveUserAuth
+
+#个人中心
+GET     /userInfo                               controllers.PagesController.userInfo
+
+#左侧下拉选项数据
+POST    /showConfig                             controllers.ConfigController.showConfig
+POST    /category                               controllers.CategoryController.category
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               			controllers.Assets.at(path="/public", file)
 
 
-# by clock
+# 帮助与关于
 GET     /contactus                      		controllers.PagesController.contactus
 GET     /aboutus                                controllers.PagesController.aboutus
+
+# 尽请期待
+GET     /comingsoon                             controllers.PagesController.comingsoon

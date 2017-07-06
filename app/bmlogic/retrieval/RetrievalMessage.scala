@@ -14,7 +14,4 @@ object RetrievalMessage {
     case class msg_PushProduct(data : JsValue) extends msg_RetrievalCommand
     case class msg_UpdateProduct(data : JsValue) extends msg_RetrievalCommand
     case class msg_DeleteProduct(data : JsValue) extends msg_RetrievalCommand
-
-    case class msg_CalcPercentage(data : JsValue) extends msg_RetrievalCommand
-    case class msg_CalcTrend(data : JsValue) extends msg_RetrievalCommand
 }
