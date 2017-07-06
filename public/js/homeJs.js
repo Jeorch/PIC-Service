@@ -54,22 +54,7 @@ $(document).ready(function () {
     showleft()
 
     $("#userInfo").click(function () {
-        var token = $.cookie("token")
-        var data = JSON.stringify({
-            "token": token
-        });
-
-        ajaxData("/auth/checkAuthToken", data, "POST", function(r){
-            if (r.status == "ok") {
-                $.cookie("screen_name", r.result.auth.screen_name);
-                $.cookie("email", r.result.auth.email);
-                $.cookie("phoneNo", r.result.phoneNo);
-                $.cookie("screen_photo", r.result.screen_photo);
-                window.open("/userInfo")
-            } else {
-                window.location = "/login"
-            }
-        }, function(e){console.error(e)})
+        window.open("/userInfo")
     })
 });
 

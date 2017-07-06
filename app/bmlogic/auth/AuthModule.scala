@@ -103,6 +103,7 @@ object AuthModule extends ModuleTrait with AuthData {
             case ex : Exception => (None, Some(ErrorCode.errorToJson(ex.getMessage)))
         }
     }
+    
     def queryUserById(data : JsValue)(implicit cm : CommonModules) : (Option[Map[String, JsValue]], Option[JsValue]) = {
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
