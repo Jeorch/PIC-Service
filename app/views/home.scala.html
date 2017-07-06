@@ -73,7 +73,7 @@
                         </div>-->
                         <div class="btn-group" style="padding-top: 23px">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <img src="..." alt="..." class="img-circle">
+                                @*<img src="..." alt="..." class="img-circle">*@
                                 用户名 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu">
@@ -96,8 +96,8 @@
                                 年</a></li>
                             <li role="presentation" class="fontCon"><a id="tabMonth" href="#month" aria-controls="month" role="tab" data-toggle="tab">
                                 月</a></li>
-                            <li role="presentation" class="fontCon"><a id="tabQuarter" href="#quarter" aria-controls="quarter" role="tab" da a-toggle="tab">
-                                季度</a></li>
+                            <!--<li role="presentation" class="fontCon"><a id="tabQuarter" href="#quarter" aria-controls="quarter" role="tab" da a-toggle="tab">
+                                季度</a></li> -->
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane active" id="year">
@@ -120,7 +120,7 @@
                                 </div>
 
                             </div>
-                            <div class="tab-pane" id="quarter">
+                            <!-- <div class="tab-pane" id="quarter">
                                 <div class="form-group" style="margin-bottom: 8px;">
                                     <div class="input-group date timepk_year" data-date="" data-link-field="dtp_input2">
                                         <input class="form-control time" id="quarterInput" size="16" type="text" value="" readonly placeholder="截止时间">
@@ -134,11 +134,10 @@
                                     <option value="7-9">第三季度</option>
                                     <option value="10-12">第四季度</option>
                                 </select>
-                            </div>
+                            </div>-->
                         </div>
                     </div>
                     <div class="box-wrap">
-
                         <select id="ATC1" class="selectWidth" name="atc1Name"></select>
                     </div>
 
@@ -174,10 +173,12 @@
                     </div>
 
                     <div class="screen-box" id="screen_box"><!-- class="screen-box" -->
-                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6"><a id="reset" class="search-btn" onclick="reset()">
-                            重置</a></div>
-                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6"><a id="xssj" class="search-btn" onclick="showDig()">
-                            显示数据</a></div>
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                            <a id="reset" class="search-btn" onclick="reset()">重置</a>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+                            <a id="xssj" class="search-btn" onclick="showDig()">显示数据</a>
+                        </div>
                     </div>
                     <div class="h100"></div>
                     <div class="h10"></div>
