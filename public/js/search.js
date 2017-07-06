@@ -130,7 +130,7 @@ var calcMarket = function(data) {
     ajaxData("/data/calc/market", data, "POST", function(r){
         if (r.status == "ok") {
             var market = r.result.calc.sales;
-            $("#guim").text(market)
+            $("#guim").text(toThousands(market))
 
             if(searchCount == 5){
                 $("#xssj").attr({"class":"search-btn","onclick":"showDig()"})
