@@ -4,6 +4,10 @@
 
 $(function(){
     $("#sub").click(function(){
+        if($("#name").val() == "" || $("#password").val() == "") {
+            alert("用户名和密码不能为空！")
+            return;
+        }
         var data = JSON.stringify({
             "user_name" : $("#name").val(),
             "pwd" : $("#password").val()
@@ -15,7 +19,7 @@ $(function(){
                 var ip = $.cookie("cname")+":"+$.cookie("cip");
                 importLoginLog(data.result.user.user_name,ip);
             }
-        }, function(e){$("#errText").show();$("#noErr").hide()})
+        }, function(e){console.info(e)})
     })
 })
 
