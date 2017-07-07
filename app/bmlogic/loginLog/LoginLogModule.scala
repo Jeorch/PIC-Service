@@ -6,7 +6,7 @@ import java.util.Date
 import bminjection.db.DBTrait
 import bmlogic.common.sercurity.Sercurity
 import bmlogic.loginLog.LogData.LogData
-import bmlogic.loginLog.UserManageMessage.{msg_loginLog_import, msg_loginLog_query, msg_loginLog_save}
+import bmlogic.loginLog.LoginLogMessage.{msg_loginLog_import, msg_loginLog_query, msg_loginLog_save}
 import bmmessages.{CommonModules, MessageDefines}
 import bmpattern.ModuleTrait
 import bmutil.errorcode.ErrorCode

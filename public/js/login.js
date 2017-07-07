@@ -16,17 +16,8 @@ $(function(){
             if(data.status == "ok") {
                 $.cookie("token",data.result.auth_token);
                 $.cookie("user_name",data.result.user.user_name);
-
                 var ip = $.cookie("cname")+":"+$.cookie("cip");
                 importLoginLog(data.result.user.user_name,ip);
-
-                if(data.result.user.user_name=="admin"){
-                    window.location="/admin";
-                }else {
-                    window.location = "/data/report";
-                }
-            }else {
-                alert("登录失败，请检查账户与用户名！")
             }
         }, function(e){console.info(e)})
     })
@@ -34,8 +25,6 @@ $(function(){
 
 function logoutSys() {
     saveLoginLog();
-    cleanAllCookie();
-    location = "/login";
 }
 
 var cleanAllCookie = function() {
@@ -55,6 +44,11 @@ function importLoginLog(user_name,ip) {
     ajaxData("/loginLog/import", data, "POST", function(data){
         if(data.status == "ok") {
             $.cookie("log_id",data.result.log_id);
+            if(user_name="admin"){
+                window.location="/admin";
+            }else {
+                window.location = "/data/report";
+            }
         }
     }, function(e){$("#errText").show();$("#noErr").hide()})
 }
@@ -65,7 +59,8 @@ function saveLoginLog() {
     })
     ajaxData("/loginLog/save", data, "POST", function(data){
         if(data.status == "ok") {
-           console.log("saveLoginLog succeed");
+           cleanAllCookie();
+           location = "/login";
         }
     }, function(e){$("#errText").show();$("#noErr").hide()})
 }
