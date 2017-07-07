@@ -168,17 +168,12 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
             
-            val condition = (conditionParse(data, pr.get) :: dateConditionParse(data) ::
-
-                oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).
-                filterNot(_ == None).map(_.get)
+            val condition = (conditionParse(data, pr.get) :: dateConditionParse(data) :: oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
 
 //                                oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).
 //                                    filterNot(_ == None).map(_.get)
 
-
             val group = MongoDBObject("_id" -> MongoDBObject("ms" -> "market size"), "sales" -> MongoDBObject("$sum" -> "$sales"))
-            
             val result = db.aggregate($and(condition), "retrieval", group){ x =>
                 Map("sales" -> toJson(aggregateSalesResult(x, "market size")))
             }
@@ -212,7 +207,6 @@ object AggregateModule extends ModuleTrait with ConditionSearchFunc {
         try {
             val db = cm.modules.get.get("db").map (x => x.asInstanceOf[DBTrait]).getOrElse(throw new Exception("no db connection"))
             val group = MongoDBObject("_id" -> MongoDBObject("product_name" -> "$product_name", "manufacture" -> "$manufacture", "product_type" -> "$product_type"))
-            
             val condition = (conditionParse(data, pr.get) :: dateConditionParse(data) :: oralNameConditionParse(data) :: productNameConditionParse(data) :: Nil).filterNot(_ == None).map(_.get)
             val size = db.aggregate($and(condition), "retrieval", group) { x =>
                 Map("size" -> toJson(aggregateResult(x)))
