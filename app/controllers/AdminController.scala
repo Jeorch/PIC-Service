@@ -5,10 +5,8 @@ import javax.inject.Inject
 import akka.actor.ActorSystem
 import bminjection.db.DBTrait
 import bminjection.token.AuthTokenTrait
-import bmlogic.auth.AuthMessage.msg_AuthWithPassword
 import bmlogic.common.requestArgsQuery
-import bmlogic.loginLog.UserManageMessage.{msg_loginLog_import, msg_loginLog_query, msg_loginLog_save}
-import bmlogic.userManage.UserManageMessage.msg_userManage_query
+import bmlogic.loginLog.LoginLogMessage.{msg_loginLog_query,msg_loginLog_import,msg_loginLog_save}
 import bmmessages.{CommonModules, MessageRoutes}
 import bmpattern.LogMessage.msg_log
 import bmpattern.ResultMessage.msg_CommonResultMessage

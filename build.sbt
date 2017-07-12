@@ -14,8 +14,11 @@ libraryDependencies ++= Seq(
     "org.mongodb.scala" %% "mongo-scala-driver" % "1.2.1",
     "org.mongodb.spark" %% "mongo-spark-connector" % "2.0.0",
     "org.apache.spark" %% "spark-core" % "2.0.0",
-    "org.apache.spark" %% "spark-sql" % "2.0.0"
+    "org.apache.spark" %% "spark-sql" % "2.0.0",
+    "org.specs2" %% "specs2-core" % "3.9.1" % "test"
 )
+
+scalacOptions in Test ++= Seq("-Yrangepos")
 
 lazy val root = (project in file(".")).
     settings(commonSettings: _*).

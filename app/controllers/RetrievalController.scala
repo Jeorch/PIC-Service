@@ -61,7 +61,7 @@ class RetrievalController @Inject () (as_inject : ActorSystem, dbt : DBTrait, at
         import bmpattern.LogMessage.common_log
         import bmpattern.ResultMessage.common_result
         MessageRoutes(msg_log(toJson(Map("method" -> toJson("calc quantity"))), jv)
-            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv)
+            :: msg_AuthTokenParser(jv) :: msg_CheckTokenExpire(jv) :: msg_CheckProductLevelScope(jv)
             :: msg_CheckEdgeScope(jv) :: msg_CheckManufactureNameScope(jv)
             :: msg_ProductQuantity(jv) :: msg_CommonResultMessage() :: Nil, None)(CommonModules(Some(Map("db" -> dbt, "att" -> att))))
     })
